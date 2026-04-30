@@ -14,6 +14,3 @@ ENVIRONMENT = "production"
 # CLOUDINARY_API_SECRET
 # ADMIN_SECRET_KEY         ← used to protect admin routes
 
-[[routes]]
-pattern = "api.paper.media/*"
-zone_name = "paper.media"
