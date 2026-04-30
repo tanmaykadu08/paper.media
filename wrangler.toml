@@ -1,6 +1,6 @@
-name = "paper-media-api"
-main = "src/index.ts"
-compatibility_date = "2024-06-20"
+name = "papermediaapi"
+main = "worker.js"
+compatibility_date = "2024-01-01"
 compatibility_flags = ["nodejs_compat"]
 
 [vars]
