@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Paper.Media – Creative Studio</title>
+<meta name="description" content="Paper.Media — High-quality reels, social media management & content creation built to convert views into followers and followers into customers.">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- Custom Cursor -->
+<div class="cursor" id="cursor"></div>
+
+<!-- Scroll Progress -->
+<div class="scroll-progress" id="scrollProgress"></div>
+
+<!-- NAV -->
+<nav id="navbar">
+  <div class="logo">Paper<span>.</span>Media</div>
+  <ul class="nav-links">
+    <li><a href="#home">Home</a></li>
+    <li><a href="#services">Services</a></li>
+    <li><a href="#portfolio">Portfolio</a></li>
+    <li><a href="#about">About</a></li>
+    <li><a href="#contact">Contact</a></li>
+  </ul>
+  <a href="#contact" class="nav-cta magnetic">Get Started</a>
+  <button class="hamburger" id="hamburger" aria-label="Menu">
+    <span></span><span></span><span></span>
+  </button>
+</nav>
+
+<!-- MOBILE NAV -->
+<div class="mobile-nav" id="mobileNav">
+  <a href="#home" onclick="closeNav()">Home</a>
+  <a href="#services" onclick="closeNav()">Services</a>
+  <a href="#portfolio" onclick="closeNav()">Portfolio</a>
+  <a href="#about" onclick="closeNav()">About</a>
+  <a href="#contact" onclick="closeNav()">Contact</a>
+  <a href="#contact" class="mob-cta" onclick="closeNav()">Get Started →</a>
+</div>
+
+<!-- HERO -->
+<section id="home">
+  <div class="hero-bg-shape shape-1"></div>
+  <div class="hero-bg-shape shape-2"></div>
+  <div class="hero-dots"></div>
+  <div class="hero-inner">
+    <div class="hero-badge">
+      <div class="hero-badge-dot"></div>
+      Creative Studio — Available for Projects
+    </div>
+    <h1 class="hero-title">We Help<br>Brands Grow<br>With <em>Great</em> Content</h1>
+    <p class="hero-sub">High-quality reels, social media management &amp; content creation — built to convert views into followers and followers into customers.</p>
+    <div class="hero-btns">
+      <a href="#contact" class="btn-dark magnetic">Get Started</a>
+      <a href="#portfolio" class="btn-outline magnetic">View Our Work →</a>
+    </div>
+
+    <!-- Mobile Stats -->
+    <div class="hero-stats-strip">
+      <div class="hstat"><div class="hstat-icon">🎬</div><div class="hstat-num">200+</div><div class="hstat-label">Reels</div></div>
+      <div class="hstat"><div class="hstat-icon">📈</div><div class="hstat-num">10x</div><div class="hstat-label">Growth</div></div>
+      <div class="hstat"><div class="hstat-icon">🏷️</div><div class="hstat-num">50+</div><div class="hstat-label">Brands</div></div>
+      <div class="hstat"><div class="hstat-icon">⚡</div><div class="hstat-num">48h</div><div class="hstat-label">Delivery</div></div>
+    </div>
+  </div>
+
+  <!-- Desktop Stats -->
+  <div class="hero-visual" id="heroVisual">
+    <div class="hero-card"><div class="hero-card-icon">🎬</div><div class="hero-card-num">200+</div><div class="hero-card-label">Reels Made</div></div>
+    <div class="hero-card"><div class="hero-card-icon">📈</div><div class="hero-card-num">10x</div><div class="hero-card-label">Avg Growth</div></div>
+    <div class="hero-card"><div class="hero-card-icon">🏷️</div><div class="hero-card-num">50+</div><div class="hero-card-label">Brands Served</div></div>
+    <div class="hero-card"><div class="hero-card-icon">⚡</div><div class="hero-card-num">48h</div><div class="hero-card-label">Turnaround</div></div>
+  </div>
+</section>
+
+<!-- SERVICES -->
+<section id="services" class="section">
+  <span class="section-label reveal">What We Do</span>
+  <h2 class="section-title reveal">Our Services</h2>
+  <div class="services-grid">
+    <div class="service-card spotlight-card reveal">
+      <span class="service-emoji">🎬</span>
+      <div class="service-name">Reels Editing</div>
+      <p class="service-desc">Cinematic cuts, trending transitions, colour grading &amp; captions — reels built to stop the scroll.</p>
+      <div class="service-pills">
+        <span class="pill">Short-form</span>
+        <span class="pill">Transitions</span>
+        <span class="pill">Colour Grade</span>
+      </div>
+    </div>
+    <div class="service-card spotlight-card reveal">
+      <span class="service-emoji">📱</span>
+      <div class="service-name">Social Media Management</div>
+      <p class="service-desc">Strategy, scheduling, hashtags, analytics — we run your page so you can run your business.</p>
+      <div class="service-pills">
+        <span class="pill">Instagram</span>
+        <span class="pill">Analytics</span>
+        <span class="pill">Growth</span>
+      </div>
+    </div>
+    <div class="service-card spotlight-card reveal">
+      <span class="service-emoji">✨</span>
+      <div class="service-name">Content Creation</div>
+      <p class="service-desc">Scripts, hooks, visuals, thumbnails — end-to-end content engineered for reach and results.</p>
+      <div class="service-pills">
+        <span class="pill">Scripting</span>
+        <span class="pill">Thumbnails</span>
+        <span class="pill">Branding</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PORTFOLIO -->
+<section id="portfolio" class="section">
+  <div class="portfolio-top reveal">
+    <div>
+      <span class="section-label">Our Work</span>
+      <h2 class="section-title">Portfolio</h2>
+    </div>
+    <a href="#contact" class="btn-dark magnetic" style="font-size:13px;padding:14px 30px;">Work With Us →</a>
+  </div>
+  <div class="portfolio-grid">
+    <div class="port-card spotlight-card reveal">
+      <div class="port-thumb" style="background:#f5e6e8;">
+        <div class="port-thumb-bg">👗</div>
+        <div class="port-thumb-overlay"><div class="port-play-btn">▶</div></div>
+      </div>
+      <div class="port-info">
+        <span class="port-tag">Reels</span>
+        <div class="port-name">Fashion Brand Campaign</div>
+      </div>
+    </div>
+    <div class="port-card spotlight-card reveal">
+      <div class="port-thumb" style="background:#e8f0f5;">
+        <div class="port-thumb-bg">🍽️</div>
+        <div class="port-thumb-overlay"><div class="port-play-btn">▶</div></div>
+      </div>
+      <div class="port-info">
+        <span class="port-tag">Content</span>
+        <div class="port-name">Restaurant Series</div>
+      </div>
+    </div>
+    <div class="port-card spotlight-card reveal">
+      <div class="port-thumb" style="background:#e8f5ea;">
+        <div class="port-thumb-bg">🛍️</div>
+        <div class="port-thumb-overlay"><div class="port-play-btn">▶</div></div>
+      </div>
+      <div class="port-info">
+        <span class="port-tag">Social Media</span>
+        <div class="port-name">E-commerce Relaunch</div>
+      </div>
+    </div>
+    <div class="port-card spotlight-card reveal">
+      <div class="port-thumb" style="background:#f5f0e8;">
+        <div class="port-thumb-bg">💄</div>
+        <div class="port-thumb-overlay"><div class="port-play-btn">▶</div></div>
+      </div>
+      <div class="port-info">
+        <span class="port-tag">Reels</span>
+        <div class="port-name">Beauty Brand Reels</div>
+      </div>
+    </div>
+    <div class="port-card spotlight-card reveal">
+      <div class="port-thumb" style="background:#ede8f5;">
+        <div class="port-thumb-bg">🏋️</div>
+        <div class="port-thumb-overlay"><div class="port-play-btn">▶</div></div>
+      </div>
+      <div class="port-info">
+        <span class="port-tag">Content</span>
+        <div class="port-name">Fitness Brand Series</div>
+      </div>
+    </div>
+    <div class="port-card spotlight-card reveal">
+      <div class="port-thumb" style="background:#e8f5f5;">
+        <div class="port-thumb-bg">🏠</div>
+        <div class="port-thumb-overlay"><div class="port-play-btn">▶</div></div>
+      </div>
+      <div class="port-info">
+        <span class="port-tag">Social Media</span>
+        <div class="port-name">Real Estate Growth</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- WHY US -->
+<section id="why" class="section">
+  <span class="section-label reveal">Why Paper.Media</span>
+  <h2 class="section-title reveal">Why Choose Us</h2>
+  <div class="why-grid">
+    <div class="reveal">
+      <div class="why-row">
+        <div class="why-icon">⚡</div>
+        <div><h3>Fast Delivery</h3><p>Reels &amp; content delivered within 24–48 hours. Your audience never waits.</p></div>
+      </div>
+      <div class="why-row">
+        <div class="why-icon">🔥</div>
+        <div><h3>Trend-Based Content</h3><p>We stay on top of what's trending — content that always feels fresh.</p></div>
+      </div>
+      <div class="why-row">
+        <div class="why-icon">💰</div>
+        <div><h3>Affordable Pricing</h3><p>Premium quality without premium price tags. Plans for every brand.</p></div>
+      </div>
+      <div class="why-row">
+        <div class="why-icon">📊</div>
+        <div><h3>Results-Driven</h3><p>We track views, reach and engagement — every decision backed by data.</p></div>
+      </div>
+    </div>
+    <div class="stats-box reveal">
+      <div class="stats-grid">
+        <div class="stat"><div class="stat-num">50+</div><div class="stat-label">Brands Served</div></div>
+        <div class="stat"><div class="stat-num">200+</div><div class="stat-label">Reels Created</div></div>
+        <div class="stat"><div class="stat-num">10x</div><div class="stat-label">Avg. Growth</div></div>
+        <div class="stat"><div class="stat-num">48h</div><div class="stat-label">Turnaround</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ABOUT -->
+<section id="about" class="section">
+  <span class="section-label reveal">Our Story</span>
+  <h2 class="section-title reveal">About Us</h2>
+  <div class="about-grid">
+    <div class="about-text reveal">
+      <p>We're <strong>Paper.Media</strong> — a team of passionate creators, editors, and strategists obsessed with one thing: making your brand impossible to scroll past.</p>
+      <p>We don't just make videos. We craft <strong>moments that resonate</strong>. From scripting to publishing, we handle everything.</p>
+      <p>Every brand has a story. We help you tell it in a way that <strong>grows your audience and drives real results.</strong></p>
+      <a href="#contact" class="btn-dark magnetic" style="display:inline-block;margin-top:24px;">Let's Talk →</a>
+    </div>
+    <div class="about-visual reveal">
+      <div class="about-chip"><div class="about-chip-icon">🎬</div><div><div class="about-chip-text">Video-First Approach</div><div class="about-chip-sub">Every brand needs great video</div></div></div>
+      <div class="about-chip"><div class="about-chip-icon">📈</div><div><div class="about-chip-text">Growth-Focused</div><div class="about-chip-sub">Data-driven content strategy</div></div></div>
+      <div class="about-chip"><div class="about-chip-icon">🤝</div><div><div class="about-chip-text">Brand Partners</div><div class="about-chip-sub">We grow with you long-term</div></div></div>
+      <div class="about-chip"><div class="about-chip-icon">⚡</div><div><div class="about-chip-text">Fast &amp; Reliable</div><div class="about-chip-sub">On-time, every time</div></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA BAND -->
+<div class="cta-band">
+  <div>
+    <h2>Let's Grow Your Brand 🚀</h2>
+    <p>Ready to take your content to the next level?</p>
+  </div>
+  <a href="#contact" class="cta-band-btn magnetic">Start Today</a>
+</div>
+
+<!-- CONTACT -->
+<section id="contact" class="section">
+  <span class="section-label reveal">Get In Touch</span>
+  <h2 class="section-title reveal">Contact Us</h2>
+  <div class="contact-grid">
+    <div class="reveal">
+      <p style="font-size:15px;color:#666;line-height:1.8;margin-bottom:32px;">Fill in the form and your inquiry lands directly in our inbox. We'll get back to you within a few hours.</p>
+      <div class="contact-links">
+        <a href="https://wa.me/91XXXXXXXXXX" class="contact-link-card" target="_blank">
+          <div class="contact-link-icon">💬</div>
+          <div><div class="contact-link-title">WhatsApp Us</div><div class="contact-link-sub">We reply within minutes</div></div>
+          <div class="contact-link-arrow">↗</div>
+        </a>
+        <a href="https://instagram.com/paper.media" class="contact-link-card" target="_blank">
+          <div class="contact-link-icon">📸</div>
+          <div><div class="contact-link-title">@paper.media</div><div class="contact-link-sub">Follow us on Instagram</div></div>
+          <div class="contact-link-arrow">↗</div>
+        </a>
+        <!-- Shared Links Card -->
+        <a href="links.html" class="contact-link-card">
+          <div class="contact-link-icon">🔗</div>
+          <div><div class="contact-link-title">All Our Links</div><div class="contact-link-sub">Links &amp; resources we share</div></div>
+          <div class="contact-link-arrow">↗</div>
+        </a>
+      </div>
+    </div>
+    
+    <form class="form reveal" id="contactForm" action="https://formspree.io/f/xgorgyyv" method="POST">
+      <div class="form-row">
+        <div class="input-wrap">
+          <label class="input-label">Name</label>
+          <input class="input" type="text" name="name" placeholder="Your name" required>
+        </div>
+        <div class="input-wrap">
+          <label class="input-label">Email</label>
+          <input class="input" type="email" name="email" placeholder="you@email.com" required>
+        </div>
+      </div>
+      <div class="input-wrap">
+        <label class="input-label">Message</label>
+        <textarea class="textarea" name="message" placeholder="Tell us about your project..." required></textarea>
+      </div>
+      <button type="submit" class="form-btn magnetic">Send Message →</button>
+    </form>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-logo">Paper<span>.</span>Media</div>
+  <div class="footer-nav">
+    <a href="#home">Home</a>
+    <a href="#services">Services</a>
+    <a href="#portfolio">Portfolio</a>
+    <a href="links.html">Links</a>
+  </div>
+  <div class="footer-copy">© 2025 Paper.Media. All rights reserved.</div>
+</footer>
+
+<script>
+  // === CUSTOM CURSOR ===
+  const cursor = document.getElementById('cursor');
+  const isTouch = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
+
+  if (!isTouch) {
+    document.addEventListener('mousemove', (e) => {
+      cursor.style.left = e.clientX + 'px';
+      cursor.style.top = e.clientY + 'px';
+    });
+
+    const magneticElements = document.querySelectorAll('a, button, .magnetic');
+    magneticElements.forEach(el => {
+      el.addEventListener('mouseenter', () => cursor.classList.add('hovered'));
+      el.addEventListener('mouseleave', () => cursor.classList.remove('hovered'));
+      el.addEventListener('mousemove', (e) => {
+        const rect = el.getBoundingClientRect();
+        const x = e.clientX - rect.left - rect.width / 2;
+        const y = e.clientY - rect.top - rect.height / 2;
+        el.style.transform = `translate(${x * 0.15}px, ${y * 0.15}px)`;
+      });
+      el.addEventListener('mouseleave', () => { el.style.transform = 'translate(0, 0)'; });
+    });
+  }
+
+  // === HAMBURGER ===
+  const hamburger = document.getElementById('hamburger');
+  const mobileNav = document.getElementById('mobileNav');
+  hamburger.addEventListener('click', () => {
+    hamburger.classList.toggle('open');
+    mobileNav.classList.toggle('open');
+    document.body.style.overflow = mobileNav.classList.contains('open') ? 'hidden' : 'auto';
+  });
+  function closeNav() {
+    hamburger.classList.remove('open');
+    mobileNav.classList.remove('open');
+    document.body.style.overflow = 'auto';
+  }
+  document.addEventListener('click', (e) => {
+    if (!hamburger.contains(e.target) && !mobileNav.contains(e.target)) closeNav();
+  });
+
+  // === SCROLL REVEAL ===
+  const reveals = document.querySelectorAll('.reveal');
+  const obs = new IntersectionObserver((entries) => {
+    entries.forEach((entry) => {
+      if (entry.isIntersecting) { entry.target.classList.add('visible'); obs.unobserve(entry.target); }
+    });
+  }, { threshold: 0.1 });
+  reveals.forEach(r => obs.observe(r));
+
+  // === SCROLL ===
+  window.onscroll = function() {
+    let winScroll = document.body.scrollTop || document.documentElement.scrollTop;
+    let height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+    document.getElementById("scrollProgress").style.width = (winScroll / height) * 100 + "%";
+
+    const nav = document.getElementById('navbar');
+    if (winScroll > 50) {
+      nav.style.boxShadow = "0 4px 20px rgba(0,0,0,0.05)";
+      nav.style.padding = "0 50px";
+    } else {
+      nav.style.boxShadow = "none";
+      nav.style.padding = "0 60px";
+    }
+    if (!isTouch) {
+      const visual = document.getElementById('heroVisual');
+      if (visual) visual.style.transform = `translateY(${winScroll * 0.15}px)`;
+    }
+  };
+
+  // === ACTIVE NAV ===
+  const sections = document.querySelectorAll('section[id]');
+  const navLinks = document.querySelectorAll('.nav-links a');
+  window.addEventListener('scroll', () => {
+    let cur = '';
+    sections.forEach(s => { if (window.scrollY >= (s.offsetTop - 150)) cur = s.id; });
+    navLinks.forEach(a => { a.classList.toggle('active', a.getAttribute('href') === '#' + cur); });
+  });
+
+  // === SPOTLIGHT ===
+  const spotlightCards = document.querySelectorAll('.spotlight-card');
+  if (!isTouch) {
+    spotlightCards.forEach(card => {
+      card.onmousemove = e => {
+        const rect = card.getBoundingClientRect();
+        card.style.setProperty('--mouse-x', `${e.clientX - rect.left}px`);
+        card.style.setProperty('--mouse-y', `${e.clientY - rect.top}px`);
+      };
+    });
+  }
+
+  // === FORM SUBMIT ===
+  async function handleSubmit(event) {
+    event.preventDefault();
+    const form = document.getElementById("contactForm");
+    const btn = form.querySelector('.form-btn');
+    const data = new FormData(event.target);
+    const originalText = btn.textContent;
+    btn.textContent = 'Sending...'; btn.style.opacity = '0.7'; btn.disabled = true;
+
+    fetch(event.target.action, { method: form.method, body: data, headers: { 'Accept': 'application/json' } })
+      .then(response => {
+        if (response.ok) {
+          btn.textContent = 'Sent ✓'; btn.style.background = '#27ae60'; btn.style.opacity = '1'; form.reset();
+          setTimeout(() => { btn.textContent = originalText; btn.style.background = ''; btn.disabled = false; }, 3000);
+        } else {
+          btn.textContent = 'Error!'; btn.style.background = '#e63946'; btn.style.opacity = '1';
+          setTimeout(() => { btn.textContent = originalText; btn.style.background = ''; btn.disabled = false; }, 3000);
+        }
+      }).catch(() => {
+        btn.textContent = 'Error!'; btn.style.background = '#e63946'; btn.style.opacity = '1';
+        setTimeout(() => { btn.textContent = originalText; btn.style.background = ''; btn.disabled = false; }, 3000);
+      });
+  }
+  document.getElementById("contactForm").addEventListener("submit", handleSubmit);
+</script>
+</body>
+</html>
