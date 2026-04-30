@@ -1,0 +1,19 @@
+name = "paper-media-api"
+main = "src/index.ts"
+compatibility_date = "2024-06-20"
+compatibility_flags = ["nodejs_compat"]
+
+[vars]
+CLOUDINARY_CLOUD_NAME = "YOUR_CLOUD_NAME"
+ENVIRONMENT = "production"
+
+# Secrets (set via: wrangler secret put SECRET_NAME)
+# TURSO_DATABASE_URL
+# TURSO_AUTH_TOKEN
+# CLOUDINARY_API_KEY
+# CLOUDINARY_API_SECRET
+# ADMIN_SECRET_KEY         ← used to protect admin routes
+
+[[routes]]
+pattern = "api.paper.media/*"
+zone_name = "paper.media"
