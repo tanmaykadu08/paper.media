@@ -94,75 +94,14 @@
 
   <!-- Profile -->
   <div class="profile">
-    <div class="profile-avatar">P</div>
-    <div class="profile-name">Paper<span>.</span>Media</div>
+    <img src="logo.png" alt="Paper.Media Logo" style="height: 48px; width: auto; margin: 0 auto 16px; display: block;">
     <div class="profile-bio">Creative Studio — Content that Converts</div>
     <div class="profile-badge">Public links shared by owner</div>
   </div>
 
   <!-- Links -->
-  <div class="links-wrap">
-
-    <div class="links-label">🌐 Website</div>
-
-    <a href="online_viewer_net.html" class="link-item">
-      <span class="link-icon">🏠</span>
-      <div class="link-text">
-        <div class="link-title">Main Website</div>
-        <div class="link-sub">paper.media — services, portfolio &amp; contact</div>
-      </div>
-      <span class="link-arrow">↗</span>
-    </a>
-
-    <a href="online_viewer_net.html#portfolio" class="link-item">
-      <span class="link-icon">🎬</span>
-      <div class="link-text">
-        <div class="link-title">Browse Portfolio Gallery</div>
-        <div class="link-sub">Photos &amp; videos — uploaded by owner</div>
-      </div>
-      <span class="link-arrow">↗</span>
-    </a>
-
-    <div class="links-label">📅 Work With Us</div>
-
-    <a href="online_viewer_net.html#contact" class="link-item">
-      <span class="link-icon">💬</span>
-      <div class="link-text">
-        <div class="link-title">Contact Us</div>
-        <div class="link-sub">Your message lands directly in our inbox</div>
-      </div>
-      <span class="link-arrow">↗</span>
-    </a>
-
-    <a href="#" class="link-item">
-      <span class="link-icon">📅</span>
-      <div class="link-text">
-        <div class="link-title">Book a Consultation</div>
-        <div class="link-sub">Schedule a free 15-min discovery call</div>
-      </div>
-      <span class="link-arrow">↗</span>
-    </a>
-
-    <div class="links-label">📱 Social</div>
-
-    <a href="https://instagram.com/paper.media" class="link-item" target="_blank" rel="noopener">
-      <span class="link-icon">📸</span>
-      <div class="link-text">
-        <div class="link-title">@paper.media</div>
-        <div class="link-sub">Follow us on Instagram</div>
-      </div>
-      <span class="link-arrow">↗</span>
-    </a>
-
-    <a href="https://wa.me/91XXXXXXXXXX" class="link-item" target="_blank" rel="noopener">
-      <span class="link-icon">💬</span>
-      <div class="link-text">
-        <div class="link-title">WhatsApp Us</div>
-        <div class="link-sub">We reply within minutes</div>
-      </div>
-      <span class="link-arrow">↗</span>
-    </a>
-
+  <div class="links-wrap" id="links-container">
+    <!-- Links will be dynamically injected here -->
   </div>
 
   <div class="footer-mark">
@@ -170,5 +109,48 @@
     <a href="online_viewer_net.html">← Back to website</a>
   </div>
 
+  <script>
+    const linksData = [
+      { type: 'label', text: '🌐 Website' },
+      { type: 'link', href: 'online_viewer_net.html', icon: '🏠', title: 'Main Website', sub: 'paper.media — services, portfolio &amp; contact' },
+      { type: 'link', href: 'https://drive.google.com/drive/folders/1ZP0-psU-5778glYLB8FrCNTch85uiObb?usp=sharing', icon: '🎬', title: 'Browse Portfolio Gallery', sub: 'Photos &amp; videos — uploaded by owner', external: true },
+      { type: 'label', text: '📅 Work With Us' },
+      { type: 'link', href: 'https://ig.me/m/paper.mediaa?text=Hi%20Paper.Medias%20%2C%20I%20want%20to%20work%20with%20you', icon: '💬', title: 'Contact Us', sub: 'Send us an Instagram DM', external: true },
+      { type: 'link', href: '#', icon: '📅', title: 'Book a Consultation', sub: 'Schedule a free 15-min discovery call' },
+      { type: 'label', text: '📱 Social' },
+      { type: 'link', href: 'https://www.instagram.com/paper.mediaa?igsh=cHA2MWM5eWwzZjNh&utm_source=qr', icon: '📸', title: '@paper.mediaa', sub: 'Follow us on Instagram', external: true },
+      { type: 'link', href: 'https://wa.me/91XXXXXXXXXX', icon: '💬', title: 'WhatsApp Us', sub: 'We reply within minutes', external: true }
+    ];
+
+    const container = document.getElementById('links-container');
+
+    linksData.forEach(item => {
+      if (item.type === 'label') {
+        const label = document.createElement('div');
+        label.className = 'links-label';
+        label.textContent = item.text;
+        container.appendChild(label);
+      } else if (item.type === 'link') {
+        const a = document.createElement('a');
+        a.href = item.href;
+        a.className = 'link-item';
+        if (item.external) {
+          a.target = '_blank';
+          a.rel = 'noopener';
+        }
+
+        a.innerHTML = `
+          <span class="link-icon">${item.icon}</span>
+          <div class="link-text">
+            <div class="link-title">${item.title}</div>
+            <div class="link-sub">${item.sub}</div>
+          </div>
+          <span class="link-arrow">↗</span>
+        `;
+        
+        container.appendChild(a);
+      }
+    });
+  </script>
 </body>
 </html>

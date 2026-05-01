@@ -3,10 +3,15 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Paper.Media – Creative Studio</title>
+<title>Paper.Media – Content & Reels</title>
 <meta name="description" content="Paper.Media — High-quality reels, social media management & content creation built to convert views into followers and followers into customers.">
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
+<style>
+  .port-card { transition: transform 0.3s ease, box-shadow 0.3s ease; }
+  .port-card:hover { transform: translateY(-4px) scale(1.03); box-shadow: 0 16px 32px rgba(0,0,0,0.3); z-index: 2; }
+  .logo, .footer-logo { display: flex; align-items: center; }
+</style>
 </head>
 <body>
 
@@ -18,7 +23,9 @@
 
 <!-- NAV -->
 <nav id="navbar">
-  <div class="logo">Paper<span>.</span>Media</div>
+  <div class="logo">
+    <img src="logo.png" alt="Paper.Media Logo" style="height: 44px; width: auto; vertical-align: middle;">
+  </div>
   <ul class="nav-links">
     <li><a href="#home">Home</a></li>
     <li><a href="#services">Services</a></li>
@@ -52,8 +59,8 @@
       <div class="hero-badge-dot"></div>
       Creative Studio — Available for Projects
     </div>
-    <h1 class="hero-title">We Help<br>Brands Grow<br>With <em>Great</em> Content</h1>
-    <p class="hero-sub">High-quality reels, social media management &amp; content creation — built to convert views into followers and followers into customers.</p>
+    <h1 class="hero-title">We Turn Content<br>Into Growth 🚀</h1>
+    <p class="hero-sub">Reels, edits & content that grab attention, increase reach, and convert viewers into customers.</p>
     <div class="hero-btns">
       <a href="#contact" class="btn-dark magnetic">Get Started</a>
       <a href="#portfolio" class="btn-outline magnetic">View Our Work →</a>
@@ -61,19 +68,19 @@
 
     <!-- Mobile Stats -->
     <div class="hero-stats-strip">
-      <div class="hstat"><div class="hstat-icon">🎬</div><div class="hstat-num">200+</div><div class="hstat-label">Reels</div></div>
-      <div class="hstat"><div class="hstat-icon">📈</div><div class="hstat-num">10x</div><div class="hstat-label">Growth</div></div>
-      <div class="hstat"><div class="hstat-icon">🏷️</div><div class="hstat-num">50+</div><div class="hstat-label">Brands</div></div>
-      <div class="hstat"><div class="hstat-icon">⚡</div><div class="hstat-num">48h</div><div class="hstat-label">Delivery</div></div>
+      <div class="hstat"><div class="hstat-icon">🎬</div><div class="hstat-num">10+</div><div class="hstat-label">Projects Completed</div></div>
+      <div class="hstat"><div class="hstat-icon">📈</div><div class="hstat-num">Growing</div><div class="hstat-label">Brands with Content</div></div>
+      <div class="hstat"><div class="hstat-icon">🤝</div><div class="hstat-num">Trusted by</div><div class="hstat-label">Local Businesses</div></div>
+      <div class="hstat"><div class="hstat-icon">⚡</div><div class="hstat-num">Fast Delivery</div><div class="hstat-label">(24–48 hrs)</div></div>
     </div>
   </div>
 
   <!-- Desktop Stats -->
   <div class="hero-visual" id="heroVisual">
-    <div class="hero-card"><div class="hero-card-icon">🎬</div><div class="hero-card-num">200+</div><div class="hero-card-label">Reels Made</div></div>
-    <div class="hero-card"><div class="hero-card-icon">📈</div><div class="hero-card-num">10x</div><div class="hero-card-label">Avg Growth</div></div>
-    <div class="hero-card"><div class="hero-card-icon">🏷️</div><div class="hero-card-num">50+</div><div class="hero-card-label">Brands Served</div></div>
-    <div class="hero-card"><div class="hero-card-icon">⚡</div><div class="hero-card-num">48h</div><div class="hero-card-label">Turnaround</div></div>
+    <div class="hero-card"><div class="hero-card-icon">🎬</div><div class="hero-card-num">10+</div><div class="hero-card-label">Projects Completed</div></div>
+    <div class="hero-card"><div class="hero-card-icon">📈</div><div class="hero-card-num">Growing</div><div class="hero-card-label">Brands with Content</div></div>
+    <div class="hero-card"><div class="hero-card-icon">🤝</div><div class="hero-card-num">Trusted by</div><div class="hero-card-label">Local Businesses</div></div>
+    <div class="hero-card"><div class="hero-card-icon">⚡</div><div class="hero-card-num">Fast Delivery</div><div class="hero-card-label">(24–48 hrs)</div></div>
   </div>
 </section>
 
@@ -85,7 +92,7 @@
     <div class="service-card spotlight-card reveal">
       <span class="service-emoji">🎬</span>
       <div class="service-name">Reels Editing</div>
-      <p class="service-desc">Cinematic cuts, trending transitions, colour grading &amp; captions — reels built to stop the scroll.</p>
+      <p class="service-desc">Scroll-stopping reels designed to boost engagement and retention.</p>
       <div class="service-pills">
         <span class="pill">Short-form</span>
         <span class="pill">Transitions</span>
@@ -95,7 +102,7 @@
     <div class="service-card spotlight-card reveal">
       <span class="service-emoji">📱</span>
       <div class="service-name">Social Media Management</div>
-      <p class="service-desc">Strategy, scheduling, hashtags, analytics — we run your page so you can run your business.</p>
+      <p class="service-desc">We manage your content, posting, and growth so you focus on your business.</p>
       <div class="service-pills">
         <span class="pill">Instagram</span>
         <span class="pill">Analytics</span>
@@ -105,7 +112,7 @@
     <div class="service-card spotlight-card reveal">
       <span class="service-emoji">✨</span>
       <div class="service-name">Content Creation</div>
-      <p class="service-desc">Scripts, hooks, visuals, thumbnails — end-to-end content engineered for reach and results.</p>
+      <p class="service-desc">From idea to execution — content that performs and converts.</p>
       <div class="service-pills">
         <span class="pill">Scripting</span>
         <span class="pill">Thumbnails</span>
@@ -124,66 +131,28 @@
     </div>
     <a href="#contact" class="btn-dark magnetic" style="font-size:13px;padding:14px 30px;">Work With Us →</a>
   </div>
-  <div class="portfolio-grid">
-    <div class="port-card spotlight-card reveal">
-      <div class="port-thumb" style="background:#f5e6e8;">
-        <div class="port-thumb-bg">👗</div>
-        <div class="port-thumb-overlay"><div class="port-play-btn">▶</div></div>
-      </div>
-      <div class="port-info">
-        <span class="port-tag">Reels</span>
-        <div class="port-name">Fashion Brand Campaign</div>
-      </div>
+  <div class="portfolio-grid" id="portfolioContainer"></div>
+</section>
+
+<!-- SOCIAL PROOF -->
+<section id="achievements" class="section">
+  <span class="section-label reveal">What We’ve Achieved</span>
+  <h2 class="section-title reveal">Real Results</h2>
+  <div class="services-grid">
+    <div class="service-card spotlight-card reveal" style="text-align:center; padding:40px 20px;">
+      <span class="service-emoji" style="margin:0 auto 16px;">📈</span>
+      <h3 style="font-size:28px; font-weight:700; color:#fff; margin-bottom:8px;">1M+</h3>
+      <p style="color:var(--muted); font-size:14px;">Views Generated</p>
     </div>
-    <div class="port-card spotlight-card reveal">
-      <div class="port-thumb" style="background:#e8f0f5;">
-        <div class="port-thumb-bg">🍽️</div>
-        <div class="port-thumb-overlay"><div class="port-play-btn">▶</div></div>
-      </div>
-      <div class="port-info">
-        <span class="port-tag">Content</span>
-        <div class="port-name">Restaurant Series</div>
-      </div>
+    <div class="service-card spotlight-card reveal" style="text-align:center; padding:40px 20px;">
+      <span class="service-emoji" style="margin:0 auto 16px;">🎬</span>
+      <h3 style="font-size:28px; font-weight:700; color:#fff; margin-bottom:8px;">50+</h3>
+      <p style="color:var(--muted); font-size:14px;">Reels Edited</p>
     </div>
-    <div class="port-card spotlight-card reveal">
-      <div class="port-thumb" style="background:#e8f5ea;">
-        <div class="port-thumb-bg">🛍️</div>
-        <div class="port-thumb-overlay"><div class="port-play-btn">▶</div></div>
-      </div>
-      <div class="port-info">
-        <span class="port-tag">Social Media</span>
-        <div class="port-name">E-commerce Relaunch</div>
-      </div>
-    </div>
-    <div class="port-card spotlight-card reveal">
-      <div class="port-thumb" style="background:#f5f0e8;">
-        <div class="port-thumb-bg">💄</div>
-        <div class="port-thumb-overlay"><div class="port-play-btn">▶</div></div>
-      </div>
-      <div class="port-info">
-        <span class="port-tag">Reels</span>
-        <div class="port-name">Beauty Brand Reels</div>
-      </div>
-    </div>
-    <div class="port-card spotlight-card reveal">
-      <div class="port-thumb" style="background:#ede8f5;">
-        <div class="port-thumb-bg">🏋️</div>
-        <div class="port-thumb-overlay"><div class="port-play-btn">▶</div></div>
-      </div>
-      <div class="port-info">
-        <span class="port-tag">Content</span>
-        <div class="port-name">Fitness Brand Series</div>
-      </div>
-    </div>
-    <div class="port-card spotlight-card reveal">
-      <div class="port-thumb" style="background:#e8f5f5;">
-        <div class="port-thumb-bg">🏠</div>
-        <div class="port-thumb-overlay"><div class="port-play-btn">▶</div></div>
-      </div>
-      <div class="port-info">
-        <span class="port-tag">Social Media</span>
-        <div class="port-name">Real Estate Growth</div>
-      </div>
+    <div class="service-card spotlight-card reveal" style="text-align:center; padding:40px 20px;">
+      <span class="service-emoji" style="margin:0 auto 16px;">🤝</span>
+      <h3 style="font-size:28px; font-weight:700; color:#fff; margin-bottom:8px;">100%</h3>
+      <p style="color:var(--muted); font-size:14px;">Clients Growing Monthly</p>
     </div>
   </div>
 </section>
@@ -213,10 +182,10 @@
     </div>
     <div class="stats-box reveal">
       <div class="stats-grid">
-        <div class="stat"><div class="stat-num">50+</div><div class="stat-label">Brands Served</div></div>
-        <div class="stat"><div class="stat-num">200+</div><div class="stat-label">Reels Created</div></div>
-        <div class="stat"><div class="stat-num">10x</div><div class="stat-label">Avg. Growth</div></div>
-        <div class="stat"><div class="stat-num">48h</div><div class="stat-label">Turnaround</div></div>
+        <div class="stat"><div class="stat-num">10+</div><div class="stat-label">Projects Completed</div></div>
+        <div class="stat"><div class="stat-num">Growing</div><div class="stat-label">Brands</div></div>
+        <div class="stat"><div class="stat-num">Trusted</div><div class="stat-label">by Locals</div></div>
+        <div class="stat"><div class="stat-num">24-48h</div><div class="stat-label">Turnaround</div></div>
       </div>
     </div>
   </div>
@@ -245,7 +214,7 @@
 <!-- CTA BAND -->
 <div class="cta-band">
   <div>
-    <h2>Let's Grow Your Brand 🚀</h2>
+    <h2>Ready to Go Viral? 🚀</h2>
     <p>Ready to take your content to the next level?</p>
   </div>
   <a href="#contact" class="cta-band-btn magnetic">Start Today</a>
@@ -257,16 +226,16 @@
   <h2 class="section-title reveal">Contact Us</h2>
   <div class="contact-grid">
     <div class="reveal">
-      <p style="font-size:15px;color:#666;line-height:1.8;margin-bottom:32px;">Fill in the form and your inquiry lands directly in our inbox. We'll get back to you within a few hours.</p>
+      <p style="font-size:15px;color:#666;line-height:1.8;margin-bottom:32px;">Usually replies within 10–30 minutes ⚡<br><strong>Limited slots available this month</strong></p>
       <div class="contact-links">
         <a href="https://wa.me/91XXXXXXXXXX" class="contact-link-card" target="_blank">
           <div class="contact-link-icon">💬</div>
           <div><div class="contact-link-title">WhatsApp Us</div><div class="contact-link-sub">We reply within minutes</div></div>
           <div class="contact-link-arrow">↗</div>
         </a>
-        <a href="https://instagram.com/paper.media" class="contact-link-card" target="_blank">
+        <a href="https://www.instagram.com/paper.mediaa?igsh=cHA2MWM5eWwzZjNh&utm_source=qr" class="contact-link-card" target="_blank">
           <div class="contact-link-icon">📸</div>
-          <div><div class="contact-link-title">@paper.media</div><div class="contact-link-sub">Follow us on Instagram</div></div>
+          <div><div class="contact-link-title">@paper.mediaa</div><div class="contact-link-sub">Follow us on Instagram</div></div>
           <div class="contact-link-arrow">↗</div>
         </a>
         <!-- Shared Links Card -->
@@ -278,7 +247,7 @@
       </div>
     </div>
     
-    <form class="form reveal" id="contactForm" action="https://formspree.io/f/xgorgyyv" method="POST">
+    <form class="form reveal" id="contactForm" action="http://localhost:3000/contact" method="POST">
       <div class="form-row">
         <div class="input-wrap">
           <label class="input-label">Name</label>
@@ -300,7 +269,9 @@
 
 <!-- FOOTER -->
 <footer>
-  <div class="footer-logo">Paper<span>.</span>Media</div>
+  <div class="footer-logo">
+    <img src="logo.png" alt="Paper.Media Logo" style="height: 40px; width: auto; vertical-align: middle;">
+  </div>
   <div class="footer-nav">
     <a href="#home">Home</a>
     <a href="#services">Services</a>
@@ -316,15 +287,38 @@
   const isTouch = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
 
   if (!isTouch) {
+    let mouseX = window.innerWidth / 2;
+    let mouseY = window.innerHeight / 2;
+    let cursorX = mouseX;
+    let cursorY = mouseY;
+
     document.addEventListener('mousemove', (e) => {
-      cursor.style.left = e.clientX + 'px';
-      cursor.style.top = e.clientY + 'px';
+      mouseX = e.clientX;
+      mouseY = e.clientY;
     });
 
-    const magneticElements = document.querySelectorAll('a, button, .magnetic');
+    function renderCursor() {
+      cursorX += (mouseX - cursorX) * 0.35;
+      cursorY += (mouseY - cursorY) * 0.35;
+      cursor.style.transform = `translate3d(${cursorX}px, ${cursorY}px, 0) translate(-50%, -50%)`;
+      requestAnimationFrame(renderCursor);
+    }
+    requestAnimationFrame(renderCursor);
+
+    // Use event delegation for hover states
+    document.addEventListener('mouseover', (e) => {
+      if (e.target.closest('a, button, .magnetic, .port-card')) {
+        cursor.classList.add('hovered');
+      }
+    });
+    document.addEventListener('mouseout', (e) => {
+      if (e.target.closest('a, button, .magnetic, .port-card')) {
+        cursor.classList.remove('hovered');
+      }
+    });
+
+    const magneticElements = document.querySelectorAll('.magnetic');
     magneticElements.forEach(el => {
-      el.addEventListener('mouseenter', () => cursor.classList.add('hovered'));
-      el.addEventListener('mouseleave', () => cursor.classList.remove('hovered'));
       el.addEventListener('mousemove', (e) => {
         const rect = el.getBoundingClientRect();
         const x = e.clientX - rect.left - rect.width / 2;
@@ -407,11 +401,19 @@
     event.preventDefault();
     const form = document.getElementById("contactForm");
     const btn = form.querySelector('.form-btn');
-    const data = new FormData(event.target);
+    const data = {
+      name: form.elements.name.value,
+      email: form.elements.email.value,
+      message: form.elements.message.value
+    };
     const originalText = btn.textContent;
     btn.textContent = 'Sending...'; btn.style.opacity = '0.7'; btn.disabled = true;
 
-    fetch(event.target.action, { method: form.method, body: data, headers: { 'Accept': 'application/json' } })
+    fetch(event.target.action, { 
+      method: form.method, 
+      body: JSON.stringify(data), 
+      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' } 
+    })
       .then(response => {
         if (response.ok) {
           btn.textContent = 'Sent ✓'; btn.style.background = '#27ae60'; btn.style.opacity = '1'; form.reset();
@@ -426,6 +428,82 @@
       });
   }
   document.getElementById("contactForm").addEventListener("submit", handleSubmit);
+  // === DYNAMIC PORTFOLIO ===
+  async function loadPortfolio() {
+    const container = document.getElementById('portfolioContainer');
+    if (!container) return;
+    
+    try {
+      const response = await fetch('http://localhost:3000/media');
+      const mediaItems = await response.json();
+      
+      container.innerHTML = '';
+      
+      mediaItems.forEach(item => {
+        const card = document.createElement('div');
+        card.className = 'port-card spotlight-card reveal';
+        
+        let mediaContent = '';
+        if (item.type === 'video') {
+          mediaContent = `<video src="${item.url}" autoplay muted loop playsinline style="width:100%; height:100%; object-fit:cover; position:absolute; top:0; left:0; border-radius:inherit;"></video>`;
+        } else if (item.type === 'image') {
+          mediaContent = `<img src="${item.url}" alt="${item.title || ''}" style="width:100%; height:100%; object-fit:cover; position:absolute; top:0; left:0; border-radius:inherit;">`;
+        }
+        
+        card.innerHTML = `
+          <div class="port-thumb" style="background:#f5e6e8; position:relative; overflow:hidden;">
+            ${mediaContent}
+          </div>
+          <div class="port-info">
+            <span class="port-tag">${item.tag || item.type}</span>
+            <div class="port-name">${item.title || 'Portfolio Item'}</div>
+          </div>
+        `;
+        
+        container.appendChild(card);
+        if (typeof obs !== 'undefined') {
+          obs.observe(card);
+        }
+      });
+    } catch (error) {
+      console.error('Error loading portfolio:', error);
+      // Fallback dummy data if backend is not connected
+      const fallbackItems = [
+        { type: 'video', url: 'https://cdn.pixabay.com/video/2021/08/04/83866-584752252_tiny.mp4', tag: 'Reels', title: 'Fashion Brand Campaign' },
+        { type: 'image', url: 'https://images.unsplash.com/photo-1555244162-803834f70033?w=500&q=80', tag: 'Content', title: 'Restaurant Series' },
+        { type: 'image', url: 'https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=500&q=80', tag: 'Social Media', title: 'E-commerce Relaunch' },
+        { type: 'video', url: 'https://cdn.pixabay.com/video/2019/04/18/22880-331599386_tiny.mp4', tag: 'Reels', title: 'Beauty Brand Reels' },
+        { type: 'image', url: 'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=500&q=80', tag: 'Content', title: 'Fitness Brand Series' },
+        { type: 'image', url: 'https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=500&q=80', tag: 'Social Media', title: 'Real Estate Growth' }
+      ];
+      
+      fallbackItems.forEach(item => {
+        const card = document.createElement('div');
+        card.className = 'port-card spotlight-card reveal visible';
+        
+        let mediaContent = '';
+        if (item.type === 'video') {
+          mediaContent = `<video src="${item.url}" autoplay muted loop playsinline style="width:100%; height:100%; object-fit:cover; position:absolute; top:0; left:0; border-radius:inherit;"></video>`;
+        } else if (item.type === 'image') {
+          mediaContent = `<img src="${item.url}" alt="${item.title || ''}" style="width:100%; height:100%; object-fit:cover; position:absolute; top:0; left:0; border-radius:inherit;">`;
+        }
+        
+        card.innerHTML = `
+          <div class="port-thumb" style="background:#1a1727; position:relative; overflow:hidden;">
+            ${mediaContent}
+          </div>
+          <div class="port-info">
+            <span class="port-tag">${item.tag || item.type}</span>
+            <div class="port-name">${item.title || 'Portfolio Item'}</div>
+          </div>
+        `;
+        
+        container.appendChild(card);
+      });
+    }
+  }
+  
+  loadPortfolio();
 </script>
 </body>
 </html>
