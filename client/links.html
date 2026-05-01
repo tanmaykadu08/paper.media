@@ -105,7 +105,7 @@
 
     <div class="links-label">🌐 Website</div>
 
-    <a href="online_viewer_net.html" class="link-item">
+    <a href="/" class="link-item">
       <span class="link-icon">🏠</span>
       <div class="link-text">
         <div class="link-title">Main Website</div>
@@ -114,7 +114,7 @@
       <span class="link-arrow">↗</span>
     </a>
 
-    <a href="online_viewer_net.html#portfolio" class="link-item">
+    <a href="/#portfolio" class="link-item">
       <span class="link-icon">🎬</span>
       <div class="link-text">
         <div class="link-title">Browse Portfolio Gallery</div>
@@ -125,7 +125,7 @@
 
     <div class="links-label">📅 Work With Us</div>
 
-    <a href="online_viewer_net.html#contact" class="link-item">
+    <a href="/#contact" class="link-item">
       <span class="link-icon">💬</span>
       <div class="link-text">
         <div class="link-title">Contact Us</div>
@@ -145,7 +145,7 @@
 
     <div class="links-label">📱 Social</div>
 
-    <a href="https://instagram.com/paper.media" class="link-item" target="_blank" rel="noopener">
+    <a href="https://instagram.com/paper.media" class="link-item" target="_blank" rel="noopener" id="link-ig">
       <span class="link-icon">📸</span>
       <div class="link-text">
         <div class="link-title">@paper.media</div>
@@ -154,7 +154,7 @@
       <span class="link-arrow">↗</span>
     </a>
 
-    <a href="https://wa.me/91XXXXXXXXXX" class="link-item" target="_blank" rel="noopener">
+    <a href="https://wa.me/91XXXXXXXXXX" class="link-item" target="_blank" rel="noopener" id="link-whatsapp">
       <span class="link-icon">💬</span>
       <div class="link-text">
         <div class="link-title">WhatsApp Us</div>
@@ -167,8 +167,27 @@
 
   <div class="footer-mark">
     Paper<span>.</span>Media
-    <a href="online_viewer_net.html">← Back to website</a>
+    <a href="/">← Back to website</a>
   </div>
 
+  <script>
+    async function loadDynamicLinks() {
+      try {
+        const res = await fetch('https://papermediaapi.paper-mediaa.workers.dev/content');
+        const data = await res.json();
+        if (data.content) {
+          const waLink = document.getElementById("link-whatsapp");
+          if (waLink && data.content.contact_whatsapp) waLink.href = data.content.contact_whatsapp;
+          
+          const igLink = document.getElementById("link-ig");
+          if (igLink && data.content.contact_ig) igLink.href = data.content.contact_ig;
+        }
+      } catch (err) {
+        console.error("Failed to load dynamic links", err);
+      }
+    }
+    
+    document.addEventListener("DOMContentLoaded", loadDynamicLinks);
+  </script>
 </body>
 </html>
