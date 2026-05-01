@@ -5,6 +5,20 @@ async fetch(request, env) {
 const url = new URL(request.url);
 
 
+// ✅ CORS headers
+const corsHeaders = {
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
+  "Access-Control-Allow-Headers": "Content-Type"
+};
+
+// ✅ Handle preflight request
+if (request.method === "OPTIONS") {
+  return new Response(null, {
+    headers: corsHeaders
+  });
+}
+
 const db = createClient({
   url: env.TURSO_DATABASE_URL,
   authToken: env.TURSO_AUTH_TOKEN
@@ -20,18 +34,26 @@ if (request.method === "POST" && url.pathname === "/contact") {
     });
 
     return new Response(JSON.stringify({ success: true }), {
-      headers: { "Content-Type": "application/json" }
+      headers: {
+        "Content-Type": "application/json",
+        ...corsHeaders
+      }
     });
 
   } catch (err) {
     return new Response(JSON.stringify({
       success: false,
       error: err.message
-    }), { status: 500 });
+    }), {
+      status: 500,
+      headers: corsHeaders
+    });
   }
 }
 
-return new Response("API running 🚀");
+return new Response("API running 🚀", {
+  headers: corsHeaders
+});
 
 
 }
