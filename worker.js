@@ -1,82 +1,149 @@
 // ============================================================
 //  worker.js — Paper.Media Cloudflare Worker
-//  Stack : Cloudflare Workers + Turso (LibSQL) + Cloudinary
+//  ✅ ZERO npm dependencies — uses native fetch() only
+//  
+//  Turso    → HTTP REST API  (no @libsql/client needed)
+//  Cloudinary → Signed upload params via Web Crypto SHA-1
+//
 //  Routes:
-//    GET  /                       → health check
-//    GET  /portfolio              → list all portfolio items
-//    POST /contact                → save inquiry to Turso
-//    POST /media/sign             → Cloudinary signed upload params (admin)
-//    POST /media/confirm          → link uploaded media to portfolio row
-//    POST /admin/portfolio        → create portfolio item (admin)
-//    PUT  /admin/portfolio/:id    → update portfolio item (admin)
-//    DELETE /admin/portfolio/:id  → delete portfolio item (admin)
-//    GET  /admin/inquiries        → list inquiries (admin)
-//    PUT  /admin/inquiries/:id    → update inquiry status (admin)
+//    GET    /                       → health check
+//    GET    /portfolio              → list portfolio items
+//    POST   /contact                → save inquiry
+//    POST   /media/sign             → Cloudinary signed upload (admin)
+//    POST   /media/confirm          → link media to portfolio row (admin)
+//    POST   /admin/portfolio        → create portfolio item (admin)
+//    PUT    /admin/portfolio/:id    → update portfolio item (admin)
+//    DELETE /admin/portfolio/:id    → delete portfolio item (admin)
+//    GET    /admin/inquiries        → list inquiries (admin)
+//    PUT    /admin/inquiries/:id    → update inquiry status (admin)
 // ============================================================
 
-import { createClient } from "@libsql/client/web";
+// ── CORS ─────────────────────────────────────────────────────
+const ALLOWED_ORIGINS = [
+  "https://paper.media",
+  "https://www.paper.media",
+  "http://localhost:3000",
+  "http://127.0.0.1:5500",
+  "http://localhost:8080",
+];
 
-// ── CORS headers ─────────────────────────────────────────────
-function corsHeaders(origin) {
-  const allowed = [
-    "https://paper.media",
-    "https://www.paper.media",
-    "http://localhost:3000",
-    "http://127.0.0.1:5500",
-  ];
-  const allowOrigin = allowed.includes(origin) ? origin : allowed[0];
+function getCorsHeaders(origin) {
+  const allow = ALLOWED_ORIGINS.includes(origin) ? origin : ALLOWED_ORIGINS[0];
   return {
-    "Access-Control-Allow-Origin": allowOrigin,
+    "Access-Control-Allow-Origin": allow,
     "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
     "Access-Control-Allow-Headers": "Content-Type, X-Admin-Key",
     "Access-Control-Max-Age": "86400",
   };
 }
 
-// ── JSON response helpers ────────────────────────────────────
-function json(data, status = 200, origin = "*") {
+// ── Response helpers ─────────────────────────────────────────
+function jsonResponse(data, status, origin) {
   return new Response(JSON.stringify(data), {
-    status,
-    headers: { "Content-Type": "application/json", ...corsHeaders(origin) },
+    status: status || 200,
+    headers: {
+      "Content-Type": "application/json",
+      ...getCorsHeaders(origin || ""),
+    },
   });
 }
 
-function err(message, status = 400, origin = "*") {
-  return json({ error: message }, status, origin);
+function errResponse(message, status, origin) {
+  return jsonResponse({ error: message }, status || 400, origin);
 }
 
-// ── Turso client ──────────────────────────────────────────────
-function getDb(env) {
-  return createClient({
-    url: env.TURSO_DATABASE_URL,
-    authToken: env.TURSO_AUTH_TOKEN,
-  });
-}
-
-// ── Admin auth guard ─────────────────────────────────────────
-function isAdmin(request, env) {
+// ── Admin auth ────────────────────────────────────────────────
+function checkAdmin(request, env) {
   return request.headers.get("X-Admin-Key") === env.ADMIN_SECRET_KEY;
 }
 
-// ── Cloudinary: generate SHA-1 signature (Web Crypto) ────────
+// ── Turso HTTP REST client ────────────────────────────────────
+//  Turso exposes a REST API at: <db-url>/v2/pipeline
+//  No npm package needed — just fetch().
+async function turso(env, sql, args) {
+  const dbUrl = env.TURSO_DATABASE_URL.replace(/^libsql:\/\//, "https://");
+
+  const body = {
+    requests: [
+      {
+        type: "execute",
+        stmt: {
+          sql: sql,
+          args: (args || []).map((v) => {
+            if (v === null || v === undefined) return { type: "null" };
+            if (typeof v === "number") return { type: "integer", value: String(v) };
+            return { type: "text", value: String(v) };
+          }),
+        },
+      },
+      { type: "close" },
+    ],
+  };
+
+  const res = await fetch(`${dbUrl}/v2/pipeline`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${env.TURSO_AUTH_TOKEN}`,
+    },
+    body: JSON.stringify(body),
+  });
+
+  if (!res.ok) {
+    const text = await res.text();
+    throw new Error(`Turso HTTP ${res.status}: ${text}`);
+  }
+
+  const json = await res.json();
+
+  // Check for query-level error
+  const result = json.results && json.results[0];
+  if (!result) throw new Error("Empty Turso response");
+  if (result.type === "error") throw new Error(result.error.message);
+
+  const response = result.response;
+  if (!response) throw new Error("No response in Turso result");
+
+  // Convert columnar result to row objects
+  const cols = (response.result && response.result.cols) || [];
+  const rawRows = (response.result && response.result.rows) || [];
+
+  const rows = rawRows.map((row) => {
+    const obj = {};
+    cols.forEach((col, i) => {
+      const cell = row[i];
+      obj[col.name] = cell && cell.type !== "null" ? cell.value : null;
+    });
+    return obj;
+  });
+
+  return {
+    rows,
+    lastInsertRowid: response.result && response.result.last_insert_rowid
+      ? Number(response.result.last_insert_rowid)
+      : null,
+  };
+}
+
+// ── Cloudinary SHA-1 signature (Web Crypto — no npm needed) ──
 async function signCloudinaryUpload(folder, resourceType, env) {
   const timestamp = Math.floor(Date.now() / 1000);
-  const toSign = `folder=${folder}&resource_type=${resourceType}&timestamp=${timestamp}${env.CLOUDINARY_API_SECRET}`;
 
+  // String to sign: sorted key=value pairs + api_secret appended (NOT HMAC)
+  const paramStr = [
+    `folder=${folder}`,
+    `resource_type=${resourceType}`,
+    `timestamp=${timestamp}`,
+  ]
+    .sort()
+    .join("&");
+
+  const toSign = paramStr + env.CLOUDINARY_API_SECRET;
+
+  // SHA-1 digest via Web Crypto
   const encoder = new TextEncoder();
-  const key = await crypto.subtle.importKey(
-    "raw",
-    encoder.encode(env.CLOUDINARY_API_SECRET),
-    { name: "HMAC", hash: "SHA-1" },
-    false,
-    ["sign"]
-  );
-  const sigBuffer = await crypto.subtle.sign(
-    "HMAC",
-    key,
-    encoder.encode(toSign.replace(env.CLOUDINARY_API_SECRET, ""))
-  );
-  const signature = Array.from(new Uint8Array(sigBuffer))
+  const hashBuffer = await crypto.subtle.digest("SHA-1", encoder.encode(toSign));
+  const signature = Array.from(new Uint8Array(hashBuffer))
     .map((b) => b.toString(16).padStart(2, "0"))
     .join("");
 
@@ -85,273 +152,219 @@ async function signCloudinaryUpload(folder, resourceType, env) {
     timestamp,
     api_key: env.CLOUDINARY_API_KEY,
     cloud_name: env.CLOUDINARY_CLOUD_NAME,
+    folder,
+    resource_type: resourceType,
     upload_url: `https://api.cloudinary.com/v1_1/${env.CLOUDINARY_CLOUD_NAME}/${resourceType}/upload`,
   };
 }
 
 // ============================================================
-//  MAIN FETCH HANDLER
+//  MAIN HANDLER
 // ============================================================
 export default {
   async fetch(request, env) {
     const url = new URL(request.url);
-    const origin = request.headers.get("Origin") || "";
     const method = request.method;
+    const origin = request.headers.get("Origin") || "";
+    const path = url.pathname;
 
-    // ── Preflight ─────────────────────────────────────────────
+    // ── Preflight ───────────────────────────────────────────
     if (method === "OPTIONS") {
-      return new Response(null, { status: 204, headers: corsHeaders(origin) });
+      return new Response(null, {
+        status: 204,
+        headers: getCorsHeaders(origin),
+      });
     }
 
-    // ── Health check ──────────────────────────────────────────
-    if (method === "GET" && url.pathname === "/") {
-      return json({
-        status: "ok",
-        project: "paper.media",
-        version: "2.0.0",
-        timestamp: new Date().toISOString(),
-      }, 200, origin);
-    }
+    try {
+      // ── GET / ─────────────────────────────────────────────
+      if (method === "GET" && path === "/") {
+        return jsonResponse({
+          status: "ok",
+          project: "paper.media",
+          version: "2.0.0",
+          timestamp: new Date().toISOString(),
+        }, 200, origin);
+      }
 
-    // ── GET /portfolio ─────────────────────────────────────────
-    if (method === "GET" && url.pathname === "/portfolio") {
-      try {
-        const db = getDb(env);
-        const result = await db.execute(
-          "SELECT * FROM portfolio ORDER BY created_at DESC"
+      // ── GET /portfolio ─────────────────────────────────────
+      if (method === "GET" && path === "/portfolio") {
+        const result = await turso(
+          env,
+          "SELECT * FROM portfolio ORDER BY created_at DESC",
+          []
         );
-        return json({ items: result.rows, count: result.rows.length }, 200, origin);
-      } catch (e) {
-        console.error("[portfolio]", e.message);
-        return err("Failed to fetch portfolio", 500, origin);
-      }
-    }
-
-    // ── POST /contact ──────────────────────────────────────────
-    if (method === "POST" && url.pathname === "/contact") {
-      let body;
-      try {
-        body = await request.json();
-      } catch {
-        return err("Invalid JSON body", 400, origin);
+        return jsonResponse({ items: result.rows, count: result.rows.length }, 200, origin);
       }
 
-      const { name, email, message } = body || {};
-      if (!name || !email || !message) {
-        return err("name, email, and message are required", 422, origin);
-      }
-      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-        return err("Invalid email address", 422, origin);
-      }
-      if (String(message).length < 10) {
-        return err("Message must be at least 10 characters", 422, origin);
-      }
+      // ── POST /contact ──────────────────────────────────────
+      if (method === "POST" && path === "/contact") {
+        let body;
+        try { body = await request.json(); }
+        catch { return errResponse("Invalid JSON body", 400, origin); }
 
-      try {
-        const db = getDb(env);
-        const result = await db.execute({
-          sql: `INSERT INTO inquiries (name, email, message, status, created_at)
-                VALUES (?, ?, ?, 'new', datetime('now'))`,
-          args: [String(name).trim(), String(email).trim().toLowerCase(), String(message).trim()],
-        });
-        return json(
-          { success: true, id: Number(result.lastInsertRowid), message: "Inquiry received!" },
+        const name    = body && body.name    ? String(body.name).trim()    : "";
+        const email   = body && body.email   ? String(body.email).trim()   : "";
+        const message = body && body.message ? String(body.message).trim() : "";
+
+        if (!name || !email || !message)
+          return errResponse("name, email, and message are required", 422, origin);
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))
+          return errResponse("Invalid email address", 422, origin);
+        if (message.length < 10)
+          return errResponse("Message must be at least 10 characters", 422, origin);
+
+        const result = await turso(
+          env,
+          "INSERT INTO inquiries (name, email, message, status, created_at) VALUES (?, ?, ?, 'new', datetime('now'))",
+          [name, email.toLowerCase(), message]
+        );
+        return jsonResponse(
+          { success: true, id: result.lastInsertRowid, message: "Inquiry received!" },
           201,
           origin
         );
-      } catch (e) {
-        console.error("[contact]", e.message);
-        return err("Failed to save inquiry", 500, origin);
-      }
-    }
-
-    // ── POST /media/sign  (admin only) ─────────────────────────
-    if (method === "POST" && url.pathname === "/media/sign") {
-      if (!isAdmin(request, env)) return err("Unauthorized", 401, origin);
-
-      let body;
-      try {
-        body = await request.json();
-      } catch {
-        return err("Invalid JSON", 400, origin);
       }
 
-      const resourceType = body.resource_type || "image";
-      const folder = body.folder || "paper-media/portfolio";
+      // ── POST /media/sign (admin) ───────────────────────────
+      if (method === "POST" && path === "/media/sign") {
+        if (!checkAdmin(request, env)) return errResponse("Unauthorized", 401, origin);
 
-      if (!["image", "video", "auto"].includes(resourceType)) {
-        return err("resource_type must be image, video, or auto", 422, origin);
-      }
+        let body;
+        try { body = await request.json(); }
+        catch { return errResponse("Invalid JSON", 400, origin); }
 
-      try {
+        const resourceType = (body && body.resource_type) || "image";
+        const folder       = (body && body.folder)        || "paper-media/portfolio";
+
+        if (!["image", "video", "auto"].includes(resourceType))
+          return errResponse("resource_type must be image, video, or auto", 422, origin);
+
         const params = await signCloudinaryUpload(folder, resourceType, env);
-        return json(params, 200, origin);
-      } catch (e) {
-        console.error("[media/sign]", e.message);
-        return err("Failed to generate signature", 500, origin);
-      }
-    }
-
-    // ── POST /media/confirm  (admin only) ──────────────────────
-    if (method === "POST" && url.pathname === "/media/confirm") {
-      if (!isAdmin(request, env)) return err("Unauthorized", 401, origin);
-
-      let body;
-      try {
-        body = await request.json();
-      } catch {
-        return err("Invalid JSON", 400, origin);
+        return jsonResponse(params, 200, origin);
       }
 
-      const { portfolio_id, public_id, secure_url, resource_type } = body || {};
-      if (!portfolio_id || !public_id || !secure_url) {
-        return err("portfolio_id, public_id, and secure_url are required", 422, origin);
+      // ── POST /media/confirm (admin) ────────────────────────
+      if (method === "POST" && path === "/media/confirm") {
+        if (!checkAdmin(request, env)) return errResponse("Unauthorized", 401, origin);
+
+        let body;
+        try { body = await request.json(); }
+        catch { return errResponse("Invalid JSON", 400, origin); }
+
+        const { portfolio_id, public_id, secure_url, resource_type } = body || {};
+        if (!portfolio_id || !public_id || !secure_url)
+          return errResponse("portfolio_id, public_id, and secure_url are required", 422, origin);
+
+        const col = resource_type === "video" ? "video_url" : "image_url";
+        await turso(
+          env,
+          `UPDATE portfolio SET ${col} = ?, cloudinary_public_id = ?, updated_at = datetime('now') WHERE id = ?`,
+          [secure_url, public_id, Number(portfolio_id)]
+        );
+        return jsonResponse({ success: true }, 200, origin);
       }
 
-      try {
-        const db = getDb(env);
-        const column = resource_type === "video" ? "video_url" : "image_url";
-        await db.execute({
-          sql: `UPDATE portfolio
-                SET ${column} = ?, cloudinary_public_id = ?, updated_at = datetime('now')
-                WHERE id = ?`,
-          args: [secure_url, public_id, Number(portfolio_id)],
-        });
-        return json({ success: true, message: "Media linked to portfolio item" }, 200, origin);
-      } catch (e) {
-        console.error("[media/confirm]", e.message);
-        return err("Failed to update portfolio item", 500, origin);
-      }
-    }
+      // ── POST /admin/portfolio (create) ─────────────────────
+      if (method === "POST" && path === "/admin/portfolio") {
+        if (!checkAdmin(request, env)) return errResponse("Unauthorized", 401, origin);
 
-    // ── POST /admin/portfolio  (create) ────────────────────────
-    if (method === "POST" && url.pathname === "/admin/portfolio") {
-      if (!isAdmin(request, env)) return err("Unauthorized", 401, origin);
+        let body;
+        try { body = await request.json(); }
+        catch { return errResponse("Invalid JSON", 400, origin); }
 
-      let body;
-      try {
-        body = await request.json();
-      } catch {
-        return err("Invalid JSON", 400, origin);
+        const title     = body && body.title     ? String(body.title)     : "";
+        const tag       = body && body.tag       ? String(body.tag)       : "";
+        const bg_color  = body && body.bg_color  ? String(body.bg_color)  : "#f5f5f5";
+        const emoji     = body && body.emoji     ? String(body.emoji)     : "🎬";
+        const image_url = body && body.image_url ? String(body.image_url) : null;
+        const video_url = body && body.video_url ? String(body.video_url) : null;
+
+        if (!title || !tag) return errResponse("title and tag are required", 422, origin);
+
+        const result = await turso(
+          env,
+          "INSERT INTO portfolio (title, tag, bg_color, emoji, image_url, video_url, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, datetime('now'), datetime('now'))",
+          [title, tag, bg_color, emoji, image_url, video_url]
+        );
+        return jsonResponse({ success: true, id: result.lastInsertRowid }, 201, origin);
       }
 
-      const { title, tag, bg_color = "#f5f5f5", emoji = "🎬", image_url = null, video_url = null } = body || {};
-      if (!title || !tag) return err("title and tag are required", 422, origin);
+      // ── PUT /admin/portfolio/:id (update) ──────────────────
+      const putPortMatch = path.match(/^\/admin\/portfolio\/(\d+)$/);
+      if (method === "PUT" && putPortMatch) {
+        if (!checkAdmin(request, env)) return errResponse("Unauthorized", 401, origin);
 
-      try {
-        const db = getDb(env);
-        const result = await db.execute({
-          sql: `INSERT INTO portfolio (title, tag, bg_color, emoji, image_url, video_url, created_at, updated_at)
-                VALUES (?, ?, ?, ?, ?, ?, datetime('now'), datetime('now'))`,
-          args: [title, tag, bg_color, emoji, image_url, video_url],
-        });
-        return json({ success: true, id: Number(result.lastInsertRowid) }, 201, origin);
-      } catch (e) {
-        console.error("[admin/portfolio POST]", e.message);
-        return err("Failed to create portfolio item", 500, origin);
-      }
-    }
+        const id = Number(putPortMatch[1]);
+        let body;
+        try { body = await request.json(); }
+        catch { return errResponse("Invalid JSON", 400, origin); }
 
-    // ── PUT /admin/portfolio/:id  (update) ─────────────────────
-    const putPortfolioMatch = url.pathname.match(/^\/admin\/portfolio\/(\d+)$/);
-    if (method === "PUT" && putPortfolioMatch) {
-      if (!isAdmin(request, env)) return err("Unauthorized", 401, origin);
-
-      const id = Number(putPortfolioMatch[1]);
-      let body;
-      try {
-        body = await request.json();
-      } catch {
-        return err("Invalid JSON", 400, origin);
-      }
-
-      const allowed = ["title", "tag", "bg_color", "emoji", "image_url", "video_url"];
-      const fields = [];
-      const args = [];
-      for (const key of allowed) {
-        if (body[key] !== undefined) {
-          fields.push(`${key} = ?`);
-          args.push(body[key]);
+        const allowed = ["title", "tag", "bg_color", "emoji", "image_url", "video_url"];
+        const setParts = [];
+        const args = [];
+        for (const key of allowed) {
+          if (body && body[key] !== undefined) {
+            setParts.push(`${key} = ?`);
+            args.push(body[key]);
+          }
         }
-      }
-      if (fields.length === 0) return err("No valid fields to update", 422, origin);
-      fields.push("updated_at = datetime('now')");
-      args.push(id);
+        if (setParts.length === 0) return errResponse("No valid fields to update", 422, origin);
+        setParts.push("updated_at = datetime('now')");
+        args.push(id);
 
-      try {
-        const db = getDb(env);
-        await db.execute({ sql: `UPDATE portfolio SET ${fields.join(", ")} WHERE id = ?`, args });
-        return json({ success: true }, 200, origin);
-      } catch (e) {
-        console.error("[admin/portfolio PUT]", e.message);
-        return err("Failed to update portfolio item", 500, origin);
+        await turso(env, `UPDATE portfolio SET ${setParts.join(", ")} WHERE id = ?`, args);
+        return jsonResponse({ success: true }, 200, origin);
       }
+
+      // ── DELETE /admin/portfolio/:id ────────────────────────
+      const delPortMatch = path.match(/^\/admin\/portfolio\/(\d+)$/);
+      if (method === "DELETE" && delPortMatch) {
+        if (!checkAdmin(request, env)) return errResponse("Unauthorized", 401, origin);
+        const id = Number(delPortMatch[1]);
+        await turso(env, "DELETE FROM portfolio WHERE id = ?", [id]);
+        return jsonResponse({ success: true }, 200, origin);
+      }
+
+      // ── GET /admin/inquiries ───────────────────────────────
+      if (method === "GET" && path === "/admin/inquiries") {
+        if (!checkAdmin(request, env)) return errResponse("Unauthorized", 401, origin);
+
+        const status = url.searchParams.get("status");
+        const result = await turso(
+          env,
+          status
+            ? "SELECT * FROM inquiries WHERE status = ? ORDER BY created_at DESC"
+            : "SELECT * FROM inquiries ORDER BY created_at DESC",
+          status ? [status] : []
+        );
+        return jsonResponse({ inquiries: result.rows, count: result.rows.length }, 200, origin);
+      }
+
+      // ── PUT /admin/inquiries/:id ───────────────────────────
+      const putInqMatch = path.match(/^\/admin\/inquiries\/(\d+)$/);
+      if (method === "PUT" && putInqMatch) {
+        if (!checkAdmin(request, env)) return errResponse("Unauthorized", 401, origin);
+
+        const id = Number(putInqMatch[1]);
+        let body;
+        try { body = await request.json(); }
+        catch { return errResponse("Invalid JSON", 400, origin); }
+
+        const status = body && body.status ? String(body.status) : "";
+        if (!["new", "read", "replied"].includes(status))
+          return errResponse("status must be: new, read, or replied", 422, origin);
+
+        await turso(env, "UPDATE inquiries SET status = ? WHERE id = ?", [status, id]);
+        return jsonResponse({ success: true }, 200, origin);
+      }
+
+      // ── 404 ───────────────────────────────────────────────
+      return errResponse("Route not found", 404, origin);
+
+    } catch (e) {
+      console.error("[worker error]", e.message);
+      return errResponse("Internal server error: " + e.message, 500, origin);
     }
-
-    // ── DELETE /admin/portfolio/:id ────────────────────────────
-    const deletePortfolioMatch = url.pathname.match(/^\/admin\/portfolio\/(\d+)$/);
-    if (method === "DELETE" && deletePortfolioMatch) {
-      if (!isAdmin(request, env)) return err("Unauthorized", 401, origin);
-
-      const id = Number(deletePortfolioMatch[1]);
-      try {
-        const db = getDb(env);
-        await db.execute({ sql: "DELETE FROM portfolio WHERE id = ?", args: [id] });
-        return json({ success: true }, 200, origin);
-      } catch (e) {
-        console.error("[admin/portfolio DELETE]", e.message);
-        return err("Failed to delete portfolio item", 500, origin);
-      }
-    }
-
-    // ── GET /admin/inquiries ───────────────────────────────────
-    if (method === "GET" && url.pathname === "/admin/inquiries") {
-      if (!isAdmin(request, env)) return err("Unauthorized", 401, origin);
-
-      const status = url.searchParams.get("status");
-      try {
-        const db = getDb(env);
-        const sql = status
-          ? "SELECT * FROM inquiries WHERE status = ? ORDER BY created_at DESC"
-          : "SELECT * FROM inquiries ORDER BY created_at DESC";
-        const args = status ? [status] : [];
-        const result = await db.execute({ sql, args });
-        return json({ inquiries: result.rows, count: result.rows.length }, 200, origin);
-      } catch (e) {
-        console.error("[admin/inquiries GET]", e.message);
-        return err("Failed to fetch inquiries", 500, origin);
-      }
-    }
-
-    // ── PUT /admin/inquiries/:id ───────────────────────────────
-    const putInquiryMatch = url.pathname.match(/^\/admin\/inquiries\/(\d+)$/);
-    if (method === "PUT" && putInquiryMatch) {
-      if (!isAdmin(request, env)) return err("Unauthorized", 401, origin);
-
-      const id = Number(putInquiryMatch[1]);
-      let body;
-      try {
-        body = await request.json();
-      } catch {
-        return err("Invalid JSON", 400, origin);
-      }
-
-      const { status } = body || {};
-      if (!["new", "read", "replied"].includes(status)) {
-        return err("status must be new, read, or replied", 422, origin);
-      }
-
-      try {
-        const db = getDb(env);
-        await db.execute({ sql: "UPDATE inquiries SET status = ? WHERE id = ?", args: [status, id] });
-        return json({ success: true }, 200, origin);
-      } catch (e) {
-        console.error("[admin/inquiries PUT]", e.message);
-        return err("Failed to update inquiry", 500, origin);
-      }
-    }
-
-    // ── 404 ───────────────────────────────────────────────────
-    return err("Route not found", 404, origin);
   },
 };

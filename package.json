@@ -3,16 +3,8 @@
   "version": "1.0.0",
   "type": "module",
   "scripts": {
-    "dev": "wrangler dev",
-    "deploy": "wrangler deploy",
-    "secret:turso-url":   "wrangler secret put TURSO_DATABASE_URL",
-    "secret:turso-token": "wrangler secret put TURSO_AUTH_TOKEN",
-    "secret:cld-key":     "wrangler secret put CLOUDINARY_API_KEY",
-    "secret:cld-secret":  "wrangler secret put CLOUDINARY_API_SECRET",
-    "secret:admin-key":   "wrangler secret put ADMIN_SECRET_KEY"
-  },
-  "dependencies": {
-    "@libsql/client": "^0.5.0"
+    "dev":    "wrangler dev",
+    "deploy": "wrangler deploy"
   },
   "devDependencies": {
     "wrangler": "^3.65.0"
