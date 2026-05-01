@@ -1,5 +1,5 @@
 export default {
-  async fetch(request) {
+  async fetch(request, env) {
     const url = new URL(request.url);
 
     const cors = {
@@ -13,12 +13,21 @@ export default {
     }
 
     if (request.method === "POST" && url.pathname === "/contact") {
-      const data = await request.json();
+      const { name, email, message } = await request.json();
 
-      return new Response(JSON.stringify({
-        success: true,
-        data
-      }), {
+      await fetch(env.TURSO_DATABASE_URL, {
+        method: "POST",
+        headers: {
+          "Authorization": `Bearer ${env.TURSO_AUTH_TOKEN}`,
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          sql: "INSERT INTO contacts (name, email, message) VALUES (?, ?, ?)",
+          args: [name, email, message]
+        })
+      });
+
+      return new Response(JSON.stringify({ success: true }), {
         headers: {
           "Content-Type": "application/json",
           ...cors
@@ -26,6 +35,6 @@ export default {
       });
     }
 
-    return new Response("API READY 🚀", { headers: cors });
+    return new Response("API OK 🚀", { headers: cors });
   }
 };
