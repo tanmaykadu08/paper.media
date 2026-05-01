@@ -1,34 +1,37 @@
+import { createClient } from "@libsql/client";
+
 export default {
-async fetch(request) {
+async fetch(request, env) {
 const url = new URL(request.url);
 
 
-// Handle contact form
+const db = createClient({
+  url: env.TURSO_DATABASE_URL,
+  authToken: env.TURSO_AUTH_TOKEN
+});
+
 if (request.method === "POST" && url.pathname === "/contact") {
   try {
-    const data = await request.json();
+    const { name, email, message } = await request.json();
 
-    return new Response(JSON.stringify({
-      success: true,
-      message: "Received",
-      data
-    }), {
+    await db.execute({
+      sql: "INSERT INTO contacts (name, email, message) VALUES (?, ?, ?)",
+      args: [name, email, message]
+    });
+
+    return new Response(JSON.stringify({ success: true }), {
       headers: { "Content-Type": "application/json" }
     });
 
-  } catch (error) {
+  } catch (err) {
     return new Response(JSON.stringify({
       success: false,
-      error: "Invalid JSON"
-    }), {
-      status: 400,
-      headers: { "Content-Type": "application/json" }
-    });
+      error: err.message
+    }), { status: 500 });
   }
 }
 
-// Default route
-return new Response("API is working 🚀");
+return new Response("API running 🚀");
 
 
 }
