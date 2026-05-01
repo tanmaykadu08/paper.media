@@ -51,7 +51,7 @@ if (request.method === "POST" && url.pathname === "/contact") {
   }
 }
 
-return new Response("API running 🚀", {
+return new Response("NEW VERSION 🚀", {
   headers: corsHeaders
 });
 
