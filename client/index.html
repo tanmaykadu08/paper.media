@@ -52,8 +52,8 @@
       <div class="hero-badge-dot"></div>
       Creative Studio — Available for Projects
     </div>
-    <h1 class="hero-title">We Help<br>Brands Grow<br>With <em>Great</em> Content</h1>
-    <p class="hero-sub">High-quality reels, social media management &amp; content creation — built to convert views into followers and followers into customers.</p>
+    <h1 class="hero-title" id="dyn-hero-title">We Help<br>Brands Grow<br>With <em>Great</em> Content</h1>
+    <p class="hero-sub" id="dyn-hero-sub">High-quality reels, social media management &amp; content creation — built to convert views into followers and followers into customers.</p>
     <div class="hero-btns">
       <a href="#contact" class="btn-dark magnetic">Get Started</a>
       <a href="#portfolio" class="btn-outline magnetic">View Our Work →</a>
@@ -228,9 +228,11 @@
   <h2 class="section-title reveal">About Us</h2>
   <div class="about-grid">
     <div class="about-text reveal">
-      <p>We're <strong>Paper.Media</strong> — a team of passionate creators, editors, and strategists obsessed with one thing: making your brand impossible to scroll past.</p>
-      <p>We don't just make videos. We craft <strong>moments that resonate</strong>. From scripting to publishing, we handle everything.</p>
-      <p>Every brand has a story. We help you tell it in a way that <strong>grows your audience and drives real results.</strong></p>
+      <div id="dyn-about-text">
+        <p>We're <strong>Paper.Media</strong> — a team of passionate creators, editors, and strategists obsessed with one thing: making your brand impossible to scroll past.</p>
+        <p>We don't just make videos. We craft <strong>moments that resonate</strong>. From scripting to publishing, we handle everything.</p>
+        <p>Every brand has a story. We help you tell it in a way that <strong>grows your audience and drives real results.</strong></p>
+      </div>
       <a href="#contact" class="btn-dark magnetic" style="display:inline-block;margin-top:24px;">Let's Talk →</a>
     </div>
     <div class="about-visual reveal">
@@ -259,12 +261,12 @@
     <div class="reveal">
       <p style="font-size:15px;color:#666;line-height:1.8;margin-bottom:32px;">Fill in the form and your inquiry lands directly in our inbox. We'll get back to you within a few hours.</p>
       <div class="contact-links">
-        <a href="https://wa.me/91XXXXXXXXXX" class="contact-link-card" target="_blank">
+        <a href="https://wa.me/91XXXXXXXXXX" class="contact-link-card" target="_blank" id="link-whatsapp">
           <div class="contact-link-icon">💬</div>
           <div><div class="contact-link-title">WhatsApp Us</div><div class="contact-link-sub">We reply within minutes</div></div>
           <div class="contact-link-arrow">↗</div>
         </a>
-        <a href="https://instagram.com/paper.media" class="contact-link-card" target="_blank">
+        <a href="https://instagram.com/paper.media" class="contact-link-card" target="_blank" id="link-ig">
           <div class="contact-link-icon">📸</div>
           <div><div class="contact-link-title">@paper.media</div><div class="contact-link-sub">Follow us on Instagram</div></div>
           <div class="contact-link-arrow">↗</div>

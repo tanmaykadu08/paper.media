@@ -8,240 +8,609 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <style>
     :root {
-      --bg:       #09090b;
-      --sidebar:  #111118;
-      --card:     #17171f;
-      --border:   #26263a;
-      --text:     #f0f0f5;
-      --muted:    #8888a0;
-      --purple:   #5846b8;
+      --bg: #09090b;
+      --sidebar: #111118;
+      --card: #17171f;
+      --border: #26263a;
+      --text: #f0f0f5;
+      --muted: #8888a0;
+      --purple: #5846b8;
       --purple-l: #7a6dd8;
-      --purple-bg:rgba(88,70,184,0.15);
-      --green:    #187a60;
-      --green-l:  #20a078;
+      --purple-bg: rgba(88,70,184,0.15);
+      --green: #187a60;
+      --green-l: #20a078;
       --green-bg: rgba(24,122,96,0.15);
-      --red:      #c0392b;
+      --red: #c0392b;
+      --danger: #ef4444;
+      --radius: 12px;
     }
-    *,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
-    body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;display:flex;height:100vh;overflow:hidden;-webkit-font-smoothing:antialiased;}
-    a{text-decoration:none;color:inherit;}
-    button{border:none;outline:none;cursor:pointer;font-family:inherit;}
-
-    /* ── Sidebar ── */
-    .sidebar{width:260px;background:var(--sidebar);border-right:1px solid var(--border);display:flex;flex-direction:column;padding:28px 20px;flex-shrink:0;}
-    .logo{font-size:22px;font-weight:700;letter-spacing:-0.5px;margin-bottom:36px;padding:0 8px;}
-    .logo span{color:var(--purple-l);}
-    .logo sub{font-size:11px;color:var(--muted);font-weight:400;margin-left:4px;}
-    .nav-menu{display:flex;flex-direction:column;gap:4px;flex:1;}
-    .nav-item{display:flex;align-items:center;gap:12px;padding:11px 14px;border-radius:8px;color:var(--muted);font-size:14px;font-weight:500;transition:all 0.2s;cursor:pointer;}
-    .nav-item:hover{background:rgba(255,255,255,0.05);color:var(--text);}
-    .nav-item.active{background:var(--purple-bg);color:#c4b5fd;border-left:3px solid var(--purple);}
-    .nav-item .icon{font-size:16px;width:20px;text-align:center;}
-    .sidebar-footer{padding-top:20px;border-top:1px solid var(--border);}
-    .logout-btn{display:flex;align-items:center;gap:12px;padding:11px 14px;border-radius:8px;color:#ff6b6b;font-size:14px;font-weight:500;cursor:pointer;transition:background 0.2s;width:100%;background:none;}
-    .logout-btn:hover{background:rgba(255,107,107,0.1);}
-
-    /* ── Main ── */
-    .main{flex:1;padding:40px 48px;overflow-y:auto;display:flex;flex-direction:column;gap:40px;}
-    .page-header{display:flex;justify-content:space-between;align-items:center;}
-    .page-header h1{font-size:26px;font-weight:600;letter-spacing:-0.5px;}
-    .btn-primary{background:var(--purple);color:#fff;padding:11px 22px;border-radius:8px;font-size:14px;font-weight:600;display:flex;align-items:center;gap:8px;transition:background 0.2s,transform 0.15s;}
-    .btn-primary:hover{background:var(--purple-l);transform:translateY(-1px);}
-
-    /* System banner */
-    .sys-banner{background:rgba(255,255,255,0.03);border:1px solid var(--border);padding:14px 22px;border-radius:10px;display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;}
-    .sys-banner-text{font-size:13px;color:var(--muted);}
-    .sys-banner-text strong{color:var(--text);}
-    .badge{background:var(--purple-bg);color:#c4b5fd;padding:4px 10px;border-radius:5px;font-size:12px;font-weight:600;display:inline-flex;align-items:center;gap:6px;}
-    .badge::before{content:'';display:block;width:6px;height:6px;background:#c4b5fd;border-radius:50%;}
-    .badge.green{background:var(--green-bg);color:#4ade80;}
-    .badge.green::before{background:#4ade80;}
-
-    /* Section titles */
-    .section-head{display:flex;align-items:center;gap:10px;font-size:15px;font-weight:600;color:var(--text);margin-bottom:20px;}
-    .dot{width:10px;height:10px;border-radius:3px;}
-    .dot.purple{background:var(--purple);}
-    .dot.green{background:var(--green);}
-
-    /* Grids */
-    .grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;}
-
-    /* Action Cards — purple */
-    .action-card{background:linear-gradient(145deg,var(--card),#1b1b28);border:1px solid var(--border);border-top:3px solid var(--purple);padding:28px;border-radius:14px;cursor:pointer;transition:transform 0.2s,box-shadow 0.2s,border-color 0.2s;position:relative;overflow:hidden;}
-    .action-card::before{content:'';position:absolute;inset:0;background:radial-gradient(circle at top right,rgba(88,70,184,0.12),transparent 70%);opacity:0;transition:opacity 0.3s;}
-    .action-card:hover{transform:translateY(-4px);box-shadow:0 12px 24px rgba(0,0,0,0.3);border-color:rgba(88,70,184,0.55);}
-    .action-card:hover::before{opacity:1;}
-    .action-icon{font-size:30px;margin-bottom:18px;}
-    .action-card h3{font-size:17px;font-weight:600;color:#e2e8f0;margin-bottom:8px;}
-    .action-card p{font-size:13px;color:var(--muted);line-height:1.55;}
-    .action-card .card-link{display:inline-flex;align-items:center;gap:6px;margin-top:20px;font-size:12px;font-weight:600;color:var(--purple-l);transition:gap 0.2s;}
-    .action-card:hover .card-link{gap:10px;}
-
-    /* Stat Cards — green */
-    .stat-card{background:var(--card);border:1px solid var(--border);border-top:3px solid var(--green);padding:28px;border-radius:14px;transition:transform 0.2s,border-color 0.2s;}
-    .stat-card:hover{transform:translateY(-2px);border-color:rgba(24,122,96,0.4);}
-    .stat-head{display:flex;align-items:center;gap:10px;margin-bottom:18px;color:var(--muted);font-size:13px;font-weight:500;}
-    .stat-icon{width:32px;height:32px;background:var(--green-bg);color:#4ade80;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0;}
-    .stat-value{font-size:40px;font-weight:700;letter-spacing:-1.5px;margin-bottom:8px;}
-    .stat-trend{font-size:13px;color:#4ade80;display:flex;align-items:center;gap:4px;}
-    .stat-trend.neutral{color:var(--muted);}
-
-    /* Login info bar */
-    .login-bar{background:rgba(255,255,255,0.025);border:1px dashed var(--border);border-radius:8px;padding:12px 18px;font-size:12px;color:var(--muted);}
-    .login-bar strong{color:var(--text);}
-
-    /* ── Quick-view of public site ── */
-    .site-preview-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:20px;}
-    .preview-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:24px;display:flex;flex-direction:column;gap:10px;}
-    .preview-card .pc-tag{font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;}
-    .preview-card .pc-tag.rust{color:#c87941;}
-    .preview-card h4{font-size:15px;font-weight:600;color:var(--text);}
-    .preview-card p{font-size:12px;color:var(--muted);line-height:1.6;}
-    .preview-card .pc-outcome{margin-top:auto;padding-top:14px;border-top:1px solid var(--border);font-size:11px;color:var(--muted);}
-    .preview-card .pc-btn{display:inline-flex;align-items:center;gap:6px;margin-top:14px;font-size:12px;font-weight:600;color:#c87941;transition:gap 0.2s;}
-    .preview-card:hover .pc-btn{gap:10px;}
-
-    /* Responsive */
-    @media(max-width:1100px){.grid-3{grid-template-columns:repeat(2,1fr);}.site-preview-row{grid-template-columns:1fr 1fr;}}
-    @media(max-width:768px){
-      body{flex-direction:column;height:auto;overflow:auto;}
-      .sidebar{width:100%;height:auto;padding:16px;}
-      .nav-menu{flex-direction:row;overflow-x:auto;padding-bottom:8px;}
-      .nav-item{white-space:nowrap;}
-      .main{padding:24px 16px;}
-      .grid-3{grid-template-columns:1fr;}
-      .site-preview-row{grid-template-columns:1fr;}
-    }
+    
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+    body { background: var(--bg); color: var(--text); font-family: 'Inter', sans-serif; display: flex; height: 100vh; overflow: hidden; -webkit-font-smoothing: antialiased; }
+    a { text-decoration: none; color: inherit; }
+    button { border: none; outline: none; cursor: pointer; font-family: inherit; transition: all 0.2s ease; }
+    input, select, textarea { font-family: inherit; background: rgba(255,255,255,0.05); border: 1px solid var(--border); color: var(--text); padding: 10px 14px; border-radius: 8px; outline: none; }
+    input:focus, select:focus, textarea:focus { border-color: var(--purple); }
+    
+    /* Login Screen */
+    #login-screen { position: fixed; inset: 0; background: var(--bg); display: flex; align-items: center; justify-content: center; z-index: 1000; }
+    .login-box { background: var(--card); padding: 40px; border-radius: var(--radius); border: 1px solid var(--border); width: 100%; max-width: 400px; text-align: center; box-shadow: 0 20px 40px rgba(0,0,0,0.4); }
+    .login-box h2 { margin-bottom: 24px; font-weight: 600; }
+    .login-box input { width: 100%; margin-bottom: 16px; padding: 12px; }
+    .btn-primary { background: var(--purple); color: #fff; padding: 12px 24px; border-radius: 8px; font-size: 14px; font-weight: 600; width: 100%; display: inline-flex; align-items: center; justify-content: center; gap: 8px; }
+    .btn-primary:hover { background: var(--purple-l); transform: translateY(-1px); }
+    
+    /* Layout */
+    #app { display: flex; width: 100%; height: 100%; }
+    .sidebar { width: 260px; background: var(--sidebar); border-right: 1px solid var(--border); display: flex; flex-direction: column; padding: 28px 20px; flex-shrink: 0; }
+    .logo { font-size: 22px; font-weight: 700; letter-spacing: -0.5px; margin-bottom: 36px; padding: 0 8px; }
+    .logo span { color: var(--purple-l); }
+    .nav-menu { display: flex; flex-direction: column; gap: 4px; flex: 1; }
+    .nav-item { display: flex; align-items: center; gap: 12px; padding: 11px 14px; border-radius: 8px; color: var(--muted); font-size: 14px; font-weight: 500; transition: all 0.2s; cursor: pointer; }
+    .nav-item:hover { background: rgba(255,255,255,0.05); color: var(--text); }
+    .nav-item.active { background: var(--purple-bg); color: #c4b5fd; border-left: 3px solid var(--purple); }
+    .logout-btn { background: none; color: var(--danger); text-align: left; margin-top: auto; padding: 11px 14px; font-weight: 500; font-size: 14px; border-radius: 8px; }
+    .logout-btn:hover { background: rgba(239, 68, 68, 0.1); }
+    
+    .main { flex: 1; overflow-y: auto; padding: 40px 48px; display: flex; flex-direction: column; gap: 32px; }
+    .page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+    .page-header h1 { font-size: 26px; font-weight: 600; }
+    
+    /* Views */
+    .view { display: none; animation: fadeIn 0.3s ease; }
+    .view.active { display: block; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    
+    /* Cards & Grids */
+    .grid-3 { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; }
+    .stat-card { background: var(--card); border: 1px solid var(--border); padding: 24px; border-radius: var(--radius); }
+    .stat-card h3 { font-size: 14px; color: var(--muted); margin-bottom: 12px; font-weight: 500; }
+    .stat-card .value { font-size: 36px; font-weight: 700; }
+    
+    /* Tables */
+    .table-container { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; }
+    table { width: 100%; border-collapse: collapse; text-align: left; }
+    th, td { padding: 16px 20px; border-bottom: 1px solid var(--border); font-size: 14px; }
+    th { color: var(--muted); font-weight: 500; font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px; }
+    tr:last-child td { border-bottom: none; }
+    tbody tr:hover { background: rgba(255,255,255,0.02); }
+    
+    .status-badge { padding: 4px 10px; border-radius: 20px; font-size: 12px; font-weight: 600; display: inline-block; }
+    .status-new { background: rgba(239, 68, 68, 0.2); color: #fca5a5; }
+    .status-read { background: rgba(234, 179, 8, 0.2); color: #fde047; }
+    .status-replied { background: rgba(34, 197, 94, 0.2); color: #86efac; }
+    
+    /* Utility */
+    .hidden { display: none !important; }
+    .flex { display: flex; gap: 8px; }
+    .btn-sm { padding: 6px 12px; font-size: 12px; border-radius: 6px; font-weight: 500; background: rgba(255,255,255,0.1); color: var(--text); }
+    .btn-sm:hover { background: rgba(255,255,255,0.2); }
+    .text-muted { color: var(--muted); font-size: 13px; }
+    
+    /* Portfolio Grid */
+    .port-card { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; display: flex; flex-direction: column; }
+    .port-preview { height: 160px; display: flex; align-items: center; justify-content: center; font-size: 48px; background: #222; position: relative; }
+    .port-preview img, .port-preview video { width: 100%; height: 100%; object-fit: cover; position: absolute; inset: 0; }
+    .port-info { padding: 16px; flex: 1; }
+    .port-info h4 { margin-bottom: 4px; font-size: 16px; }
+    .port-info span { font-size: 12px; color: var(--purple-l); background: var(--purple-bg); padding: 2px 8px; border-radius: 4px; }
+    .port-actions { display: flex; justify-content: space-between; padding: 12px 16px; border-top: 1px solid var(--border); background: rgba(0,0,0,0.2); }
+    
+    /* Toast */
+    #toast { position: fixed; bottom: 20px; right: 20px; background: var(--green); color: white; padding: 12px 24px; border-radius: 8px; box-shadow: 0 10px 20px rgba(0,0,0,0.2); transform: translateY(100px); opacity: 0; transition: all 0.3s; z-index: 2000; font-weight: 500; }
+    #toast.show { transform: translateY(0); opacity: 1; }
+    #toast.error { background: var(--danger); }
   </style>
 </head>
 <body>
 
-<!-- ── Sidebar ── -->
-<aside class="sidebar">
-  <div class="logo">Paper<span>.</span>Media <sub>Admin</sub></div>
-  <nav class="nav-menu">
-    <a href="#" class="nav-item active"><span class="icon">📊</span> Overview</a>
-    <a href="#" class="nav-item"><span class="icon">📸</span> Media Library</a>
-    <a href="#" class="nav-item"><span class="icon">📝</span> Edit Content</a>
-    <a href="#" class="nav-item"><span class="icon">🔗</span> Share Links</a>
-    <a href="#" class="nav-item"><span class="icon">📥</span> Client Inbox</a>
-    <a href="#" class="nav-item"><span class="icon">⚙️</span> Settings</a>
-  </nav>
-  <div class="sidebar-footer">
-    <a href="online_viewer_net.html" class="nav-item" style="color:var(--muted);margin-bottom:4px;" target="_blank"><span class="icon">🌐</span> View Public Site</a>
-    <button class="logout-btn"><span>🚪</span> Logout</button>
-  </div>
-</aside>
-
-<!-- ── Main Content ── -->
-<main class="main">
-
-  <!-- Header -->
-  <div class="page-header">
-    <h1>Owner Panel</h1>
-    <button class="btn-primary"><span>＋</span> Upload Media</button>
+  <!-- Login Screen -->
+  <div id="login-screen">
+    <div class="login-box">
+      <h2>Admin Login</h2>
+      <p class="text-muted" style="margin-bottom:20px;">Enter your admin secret key to access.</p>
+      <input type="password" id="admin-key" placeholder="Enter Secret Key" />
+      <button class="btn-primary" onclick="login()">Access Dashboard</button>
+      <p id="login-error" class="text-muted" style="color:var(--danger); margin-top:12px; display:none;">Invalid key or connection error.</p>
+    </div>
   </div>
 
-  <!-- System Banner -->
-  <div class="sys-banner">
-    <div class="sys-banner-text"><strong>Backend / CMS</strong> — Stores all media, content, links, and settings.</div>
-    <span class="badge">Authenticated</span>
+  <!-- App Layout -->
+  <div id="app" class="hidden">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="logo">Paper<span>.</span>Media <sub>Admin</sub></div>
+      <nav class="nav-menu">
+      <div class="nav-item active" data-target="dashboard"><span>📊</span> Dashboard</div>
+      <div class="nav-item" data-target="inquiries"><span>📥</span> Inquiries</div>
+      <div class="nav-item" data-target="portfolio"><span>📸</span> Portfolio</div>
+      <div class="nav-item" data-target="content"><span>📝</span> Site Content</div>
+      <a href="../client/index.html" class="nav-item" target="_blank"><span>🌐</span> Public Site</a>
+      </nav>
+      <button class="logout-btn" onclick="logout()"><span>🚪</span> Logout</button>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main">
+      
+      <!-- DASHBOARD VIEW -->
+      <section id="view-dashboard" class="view active">
+        <div class="page-header">
+          <h1>Dashboard Overview</h1>
+        </div>
+        <div class="grid-3">
+          <div class="stat-card">
+            <h3>Total Inquiries</h3>
+            <div class="value" id="stat-inquiries">-</div>
+          </div>
+          <div class="stat-card">
+            <h3>New Inquiries</h3>
+            <div class="value" id="stat-new" style="color: #fca5a5;">-</div>
+          </div>
+          <div class="stat-card">
+            <h3>Portfolio Items</h3>
+            <div class="value" id="stat-portfolio">-</div>
+          </div>
+        </div>
+        <br>
+        <div class="page-header">
+          <h2>Recent Inquiries</h2>
+        </div>
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Name</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody id="dashboard-recent-table">
+              <tr><td colspan="3" class="text-muted">Loading...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- INQUIRIES VIEW -->
+      <section id="view-inquiries" class="view">
+        <div class="page-header">
+          <h1>Client Inquiries</h1>
+          <button class="btn-sm" onclick="loadInquiries()">↻ Refresh</button>
+        </div>
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Client</th>
+                <th>Message</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="inquiries-table">
+              <tr><td colspan="5" class="text-muted">Loading...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- PORTFOLIO VIEW -->
+      <section id="view-portfolio" class="view">
+        <div class="page-header">
+          <h1>Portfolio Management</h1>
+          <button class="btn-primary" onclick="document.getElementById('upload-modal').classList.remove('hidden')" style="width:auto;"><span>＋</span> Add Item</button>
+        </div>
+        <div class="grid-3" id="portfolio-grid">
+          <p class="text-muted">Loading portfolio...</p>
+        </div>
+      </section>
+
+      <!-- CONTENT VIEW -->
+      <section id="view-content" class="view">
+        <div class="page-header">
+          <h1>Edit Site Content</h1>
+          <button class="btn-primary" onclick="saveContent()" style="width:auto;"><span>💾</span> Save Changes</button>
+        </div>
+        <div class="table-container" style="padding: 24px; display:flex; flex-direction:column; gap:20px;">
+          <div>
+            <label class="text-muted" style="display:block;margin-bottom:8px;">Hero Title (HTML allowed)</label>
+            <input type="text" id="content-hero_title" style="width:100%" placeholder="e.g. We Help<br>Brands Grow..." />
+          </div>
+          <div>
+            <label class="text-muted" style="display:block;margin-bottom:8px;">Hero Subtitle</label>
+            <input type="text" id="content-hero_sub" style="width:100%" placeholder="e.g. High-quality reels..." />
+          </div>
+          <div>
+            <label class="text-muted" style="display:block;margin-bottom:8px;">About Text (HTML allowed)</label>
+            <textarea id="content-about_text" style="width:100%; height:120px;"></textarea>
+          </div>
+          <div>
+            <label class="text-muted" style="display:block;margin-bottom:8px;">WhatsApp Link</label>
+            <input type="text" id="content-contact_whatsapp" style="width:100%" placeholder="https://wa.me/..." />
+          </div>
+          <div>
+            <label class="text-muted" style="display:block;margin-bottom:8px;">Instagram Link</label>
+            <input type="text" id="content-contact_ig" style="width:100%" placeholder="https://instagram.com/..." />
+          </div>
+        </div>
+      </section>
+
+    </main>
   </div>
 
-  <!-- Content Management (Purple) -->
-  <div>
-    <div class="section-head"><div class="dot purple"></div> Content Management</div>
-    <div class="grid-3">
-      <div class="action-card">
-        <div class="action-icon">📸</div>
-        <h3>Upload media</h3>
-        <p>Add new photos &amp; videos to the portfolio gallery visible to clients.</p>
-        <span class="card-link">Open Library →</span>
-      </div>
-      <div class="action-card">
-        <div class="action-icon">📝</div>
-        <h3>Edit site content</h3>
-        <p>Update website text, services section, and the about page copy.</p>
-        <span class="card-link">Edit Content →</span>
-      </div>
-      <div class="action-card">
-        <div class="action-icon">🔗</div>
-        <h3>Share links</h3>
-        <p>Manage shared URLs and external plugins published to clients.</p>
-        <a href="links.html" class="card-link" target="_blank">Open Links Page →</a>
+  <!-- Upload Modal -->
+  <div id="upload-modal" class="hidden" style="position:fixed;inset:0;background:rgba(0,0,0,0.8);display:flex;align-items:center;justify-content:center;z-index:1500;">
+    <div style="background:var(--card);padding:32px;border-radius:12px;border:1px solid var(--border);width:100%;max-width:500px;">
+      <h2 style="margin-bottom:20px;">Add Portfolio Item</h2>
+      
+      <label class="text-muted" style="display:block;margin-bottom:8px;">Project Title</label>
+      <input type="text" id="port-title" style="width:100%;margin-bottom:16px;" placeholder="e.g. Summer Campaign" />
+      
+      <label class="text-muted" style="display:block;margin-bottom:8px;">Tag (Category)</label>
+      <input type="text" id="port-tag" style="width:100%;margin-bottom:16px;" placeholder="e.g. Reels, Social Media" />
+      
+      <label class="text-muted" style="display:block;margin-bottom:8px;">Media File (Image or Video)</label>
+      <input type="file" id="port-file" style="width:100%;margin-bottom:24px;" accept="image/*,video/*" />
+      
+      <div style="display:flex;gap:12px;justify-content:flex-end;">
+        <button class="btn-sm" onclick="document.getElementById('upload-modal').classList.add('hidden')">Cancel</button>
+        <button class="btn-primary" id="port-upload-btn" onclick="uploadPortfolioItem()" style="width:auto;">Upload & Save</button>
       </div>
     </div>
   </div>
 
-  <!-- Insights (Green) -->
-  <div>
-    <div class="section-head"><div class="dot green"></div> Insights &amp; Operations</div>
-    <div class="grid-3">
-      <div class="stat-card">
-        <div class="stat-head"><div class="stat-icon">📥</div> Client inbox</div>
-        <div class="stat-value">12</div>
-        <div class="stat-trend">↑ 3 new contact form emails</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-head"><div class="stat-icon">📊</div> Analytics</div>
-        <div class="stat-value">14.2k</div>
-        <div class="stat-trend">Reach, views &amp; traffic this month</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-head"><div class="stat-icon">📁</div> Media library</div>
-        <div class="stat-value">156</div>
-        <div class="stat-trend neutral">Manage &amp; organise items</div>
-      </div>
-    </div>
-  </div>
+  <div id="toast">Message</div>
 
-  <!-- Client-side preview -->
-  <div>
-    <div class="section-head" style="margin-bottom:8px;"><span style="font-size:11px;color:var(--muted);font-weight:400;margin-left:4px;">public website (no login required)</span></div>
-    <div class="site-preview-row">
-      <div class="preview-card">
-        <div class="pc-tag rust">Client View</div>
-        <h4>Portfolio gallery</h4>
-        <p>Photos &amp; videos uploaded by owner, displayed publicly for clients to browse.</p>
-        <div class="pc-outcome">Browse work samples · decide to hire</div>
-        <a href="online_viewer_net.html#portfolio" class="pc-btn" target="_blank">View Portfolio →</a>
-      </div>
-      <div class="preview-card">
-        <div class="pc-tag rust">Client View</div>
-        <h4>Contact us</h4>
-        <p>Name, email &amp; message form — inquiry lands directly in owner inbox.</p>
-        <div class="pc-outcome">Inquiry lands in owner's inbox</div>
-        <a href="online_viewer_net.html#contact" class="pc-btn" target="_blank">View Contact →</a>
-      </div>
-      <div class="preview-card">
-        <div class="pc-tag rust">Client View</div>
-        <h4>Shared links page</h4>
-        <p>Links &amp; plugins shared by owner — opens external tool or resource.</p>
-        <div class="pc-outcome">Opens external tool or resource</div>
-        <a href="links.html" class="pc-btn" target="_blank">View Links →</a>
-      </div>
-    </div>
-  </div>
+  <script>
+    // --- Config ---
+    const API_URL = "https://papermediaapi.paper-mediaa.workers.dev";
+    
+    // --- State ---
+    let key = localStorage.getItem("paper_admin_key");
 
-  <!-- Login info -->
-  <div class="login-bar">Login: <strong>/admin</strong> &nbsp;•&nbsp; Secured with password &nbsp;•&nbsp; Both access the same backend — owner writes, client reads.</div>
+    // --- UI Helpers ---
+    function showToast(msg, isError = false) {
+      const t = document.getElementById("toast");
+      t.textContent = msg;
+      t.className = isError ? "error show" : "show";
+      setTimeout(() => t.classList.remove("show"), 3000);
+    }
 
-</main>
+    function formatDate(isoStr) {
+      if(!isoStr) return "N/A";
+      const d = new Date(isoStr);
+      return d.toLocaleDateString() + " " + d.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+    }
 
-<script>
-  // Nav active state
-  document.querySelectorAll('.nav-item').forEach(item => {
-    item.addEventListener('click', function(e) {
-      if (this.tagName === 'A' && this.href.includes('#')) return;
-      document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
-      this.classList.add('active');
+    // --- Navigation ---
+    document.querySelectorAll('.nav-item[data-target]').forEach(item => {
+      item.addEventListener('click', () => {
+        document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+        item.classList.add('active');
+        
+        document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+        document.getElementById(`view-${item.dataset.target}`).classList.add('active');
+        
+        if (item.dataset.target === 'dashboard') loadDashboard();
+        if (item.dataset.target === 'inquiries') loadInquiries();
+        if (item.dataset.target === 'portfolio') loadPortfolio();
+        if (item.dataset.target === 'content') loadContent();
+      });
     });
-  });
 
-  // Logout placeholder
-  document.querySelector('.logout-btn').addEventListener('click', () => {
-    if (confirm('Log out of admin panel?')) window.location.href = 'online_viewer_net.html';
-  });
-</script>
+    // --- API Wrapper ---
+    async function api(path, options = {}) {
+      const headers = {
+        "Content-Type": "application/json",
+        "X-Admin-Key": key,
+        ...options.headers
+      };
+      const res = await fetch(`${API_URL}${path}`, { ...options, headers });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'API Error');
+      return data;
+    }
+
+    // --- Auth ---
+    async function checkAuth() {
+      if (!key) {
+        document.getElementById('login-screen').classList.remove('hidden');
+        return;
+      }
+      try {
+        // Test key with inquiries
+        await api('/admin/inquiries');
+        document.getElementById('login-screen').classList.add('hidden');
+        document.getElementById('app').classList.remove('hidden');
+        loadDashboard();
+      } catch (e) {
+        key = null;
+        localStorage.removeItem("paper_admin_key");
+        document.getElementById('login-screen').classList.remove('hidden');
+      }
+    }
+
+    async function login() {
+      const input = document.getElementById('admin-key').value;
+      const errEl = document.getElementById('login-error');
+      try {
+        errEl.style.display = 'none';
+        key = input;
+        await api('/admin/inquiries'); // Test auth
+        localStorage.setItem("paper_admin_key", key);
+        document.getElementById('login-screen').classList.add('hidden');
+        document.getElementById('app').classList.remove('hidden');
+        showToast("Logged in successfully!");
+        loadDashboard();
+      } catch (e) {
+        key = null;
+        errEl.style.display = 'block';
+        errEl.textContent = e.message === "Unauthorized" ? "Invalid Secret Key" : "Connection Error";
+      }
+    }
+
+    function logout() {
+      if(confirm('Are you sure you want to log out?')) {
+        localStorage.removeItem("paper_admin_key");
+        window.location.reload();
+      }
+    }
+
+    // --- Loaders ---
+    async function loadDashboard() {
+      try {
+        const [inqRes, portRes] = await Promise.all([
+          api('/admin/inquiries'),
+          api('/portfolio')
+        ]);
+        
+        const inquiries = inqRes.inquiries || [];
+        const newCount = inquiries.filter(i => i.status === 'new').length;
+        
+        document.getElementById('stat-inquiries').textContent = inquiries.length;
+        document.getElementById('stat-new').textContent = newCount;
+        document.getElementById('stat-portfolio').textContent = portRes.count || 0;
+
+        // Render recent
+        const tbody = document.getElementById('dashboard-recent-table');
+        tbody.innerHTML = '';
+        inquiries.slice(0, 5).forEach(i => {
+          tbody.innerHTML += `
+            <tr>
+              <td>${formatDate(i.created_at)}</td>
+              <td><strong>${i.name}</strong></td>
+              <td><span class="status-badge status-${i.status}">${i.status}</span></td>
+            </tr>
+          `;
+        });
+        if(inquiries.length === 0) tbody.innerHTML = `<tr><td colspan="3" class="text-muted">No recent inquiries</td></tr>`;
+
+      } catch (e) {
+        showToast("Error loading dashboard", true);
+      }
+    }
+
+    async function loadInquiries() {
+      const tbody = document.getElementById('inquiries-table');
+      tbody.innerHTML = `<tr><td colspan="5" class="text-muted">Loading...</td></tr>`;
+      try {
+        const data = await api('/admin/inquiries');
+        tbody.innerHTML = '';
+        
+        if (!data.inquiries || data.inquiries.length === 0) {
+          tbody.innerHTML = `<tr><td colspan="5" class="text-muted">No inquiries found.</td></tr>`;
+          return;
+        }
+
+        data.inquiries.forEach(i => {
+          tbody.innerHTML += `
+            <tr>
+              <td>${formatDate(i.created_at)}</td>
+              <td>
+                <strong>${i.name}</strong><br>
+                <a href="mailto:${i.email}" style="color:var(--purple-l);font-size:12px;">${i.email}</a>
+              </td>
+              <td style="max-width:300px; white-space:pre-wrap; font-size:13px; color:var(--muted);">${i.message}</td>
+              <td>
+                <select onchange="updateStatus(${i.id}, this.value)" style="padding:4px 8px; font-size:12px;">
+                  <option value="new" ${i.status==='new'?'selected':''}>New</option>
+                  <option value="read" ${i.status==='read'?'selected':''}>Read</option>
+                  <option value="replied" ${i.status==='replied'?'selected':''}>Replied</option>
+                </select>
+              </td>
+              <td>
+                <button class="btn-sm" onclick="window.location.href='mailto:${i.email}'">Reply</button>
+              </td>
+            </tr>
+          `;
+        });
+      } catch (e) {
+        tbody.innerHTML = `<tr><td colspan="5" class="text-muted" style="color:var(--danger)">Failed to load.</td></tr>`;
+        showToast("Error loading inquiries", true);
+      }
+    }
+
+    async function updateStatus(id, newStatus) {
+      try {
+        await api(`/admin/inquiries/${id}`, {
+          method: 'PUT',
+          body: JSON.stringify({ status: newStatus })
+        });
+        showToast("Status updated");
+        loadDashboard(); // Refresh stats in background
+      } catch (e) {
+        showToast("Failed to update status", true);
+        loadInquiries(); // Revert change visually
+      }
+    }
+
+    async function loadPortfolio() {
+      const grid = document.getElementById('portfolio-grid');
+      grid.innerHTML = `<p class="text-muted">Loading portfolio...</p>`;
+      try {
+        const data = await api('/portfolio');
+        grid.innerHTML = '';
+        
+        if (!data.items || data.items.length === 0) {
+          grid.innerHTML = `<p class="text-muted" style="grid-column:1/-1;">No portfolio items yet.</p>`;
+          return;
+        }
+
+        data.items.forEach(p => {
+          const hasMedia = p.image_url || p.video_url;
+          let mediaHtml = `<div style="background:${p.bg_color || '#333'}; width:100%; height:100%; display:flex; align-items:center; justify-content:center;">${p.emoji || '📸'}</div>`;
+          
+          if (p.image_url) mediaHtml = `<img src="${p.image_url}" alt="${p.title}">`;
+          if (p.video_url) mediaHtml = `<video src="${p.video_url}" muted loop autoplay></video>`;
+
+          grid.innerHTML += `
+            <div class="port-card">
+              <div class="port-preview">
+                ${mediaHtml}
+              </div>
+              <div class="port-info">
+                <h4>${p.title}</h4>
+                <span>${p.tag}</span>
+              </div>
+              <div class="port-actions">
+                <button class="btn-sm" onclick="alert('Edit coming soon')">✏️ Edit</button>
+                <button class="btn-sm" style="color:var(--danger)" onclick="deletePortfolio(${p.id})">🗑️ Delete</button>
+              </div>
+            </div>
+          `;
+        });
+      } catch (e) {
+        grid.innerHTML = `<p class="text-muted" style="color:var(--danger)">Failed to load portfolio.</p>`;
+        showToast("Error loading portfolio", true);
+      }
+    }
+
+    async function deletePortfolio(id) {
+      if(!confirm("Are you sure you want to delete this item?")) return;
+      try {
+        await api(`/admin/portfolio/${id}`, { method: 'DELETE' });
+        showToast("Deleted successfully");
+        loadPortfolio();
+        loadDashboard();
+      } catch(e) {
+        showToast("Failed to delete", true);
+      }
+    }
+
+    async function uploadPortfolioItem() {
+      const title = document.getElementById('port-title').value;
+      const tag = document.getElementById('port-tag').value;
+      const fileInput = document.getElementById('port-file');
+      const file = fileInput.files[0];
+      const btn = document.getElementById('port-upload-btn');
+      
+      if (!title || !tag || !file) {
+        showToast("Please fill all fields and select a file.", true);
+        return;
+      }
+      
+      try {
+        btn.textContent = "Signing...";
+        btn.disabled = true;
+        
+        // 1. Get Signature from backend
+        const signRes = await api('/admin/media/sign');
+        
+        btn.textContent = "Uploading to Cloudinary...";
+        
+        // 2. Upload to Cloudinary
+        const formData = new FormData();
+        formData.append("file", file);
+        formData.append("api_key", signRes.api_key);
+        formData.append("timestamp", signRes.timestamp);
+        formData.append("signature", signRes.signature);
+        
+        const resourceType = file.type.startsWith('video/') ? 'video' : 'image';
+        const cloudinaryUrl = `https://api.cloudinary.com/v1_1/${signRes.cloud_name}/${resourceType}/upload`;
+        
+        const uploadReq = await fetch(cloudinaryUrl, {
+          method: "POST",
+          body: formData
+        });
+        
+        const uploadRes = await uploadReq.json();
+        if (!uploadReq.ok) throw new Error(uploadRes.error?.message || "Cloudinary error");
+        
+        const mediaUrl = uploadRes.secure_url;
+        
+        btn.textContent = "Saving to Database...";
+        
+        // 3. Save to Turso
+        const dbPayload = {
+          title,
+          tag,
+          emoji: '✨',
+          bg_color: '#333',
+          image_url: resourceType === 'image' ? mediaUrl : null,
+          video_url: resourceType === 'video' ? mediaUrl : null
+        };
+        
+        await api('/admin/portfolio', {
+          method: 'POST',
+          body: JSON.stringify(dbPayload)
+        });
+        
+        showToast("Portfolio item added successfully!");
+        document.getElementById('upload-modal').classList.add('hidden');
+        document.getElementById('port-title').value = '';
+        document.getElementById('port-tag').value = '';
+        fileInput.value = '';
+        
+        loadPortfolio();
+        loadDashboard();
+      } catch (err) {
+        console.error(err);
+        showToast(err.message, true);
+      } finally {
+        btn.textContent = "Upload & Save";
+        btn.disabled = false;
+      }
+    }
+
+    async function loadContent() {
+      try {
+        const data = await api('/content');
+        if (data.content) {
+          document.getElementById('content-hero_title').value = data.content.hero_title || '';
+          document.getElementById('content-hero_sub').value = data.content.hero_sub || '';
+          document.getElementById('content-about_text').value = data.content.about_text || '';
+          document.getElementById('content-contact_whatsapp').value = data.content.contact_whatsapp || '';
+          document.getElementById('content-contact_ig').value = data.content.contact_ig || '';
+        }
+      } catch (e) {
+        showToast("Error loading content", true);
+      }
+    }
+
+    async function saveContent() {
+      const updates = {
+        hero_title: document.getElementById('content-hero_title').value,
+        hero_sub: document.getElementById('content-hero_sub').value,
+        about_text: document.getElementById('content-about_text').value,
+        contact_whatsapp: document.getElementById('content-contact_whatsapp').value,
+        contact_ig: document.getElementById('content-contact_ig').value
+      };
+      
+      try {
+        await api('/admin/content', {
+          method: 'POST',
+          body: JSON.stringify(updates)
+        });
+        showToast("Content saved successfully!");
+      } catch (e) {
+        showToast("Failed to save content", true);
+      }
+    }
+
+    // --- Init ---
+    checkAuth();
+  </script>
 </body>
 </html>
