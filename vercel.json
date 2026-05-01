@@ -1,7 +1,7 @@
 {
 "routes": [
 { "src": "^/$", "dest": "/client/index.html" },
-{ "src": "^/admin$", "dest": "/client/admin.html" },
+{ "src": "^/admin$", "dest": "/owner/admin.html" },
 { "src": "^/links$", "dest": "/client/links.html" },
 { "src": "^/(.*)", "dest": "/client/$1" }
 ]
