@@ -1,168 +1,240 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Paper.Media – Shared Links</title>
   <meta name="description" content="Links & resources shared by Paper.Media creative studio.">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@700&display=swap"
+    rel="stylesheet">
   <style>
     :root {
-      --bg:     #0d0b14;
-      --card:   #1a1727;
-      --hover:  #231f36;
-      --border: rgba(255,255,255,0.07);
-      --text:   #f0f0f5;
-      --muted:  #9090a8;
-      --brand:  #5846b8;
-      --brand-l:#7a6dd8;
-      --rust:   #b85a30;
+      --bg: #0d0b14;
+      --card: #1a1727;
+      --hover: #231f36;
+      --border: rgba(255, 255, 255, 0.07);
+      --text: #f0f0f5;
+      --muted: #9090a8;
+      --brand: #5846b8;
+      --brand-l: #7a6dd8;
+      --rust: #b85a30;
     }
-    *,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
-    body{
-      background:var(--bg);color:var(--text);
-      font-family:'Inter',sans-serif;
-      display:flex;flex-direction:column;align-items:center;
-      min-height:100vh;padding:60px 20px 80px;
-      -webkit-font-smoothing:antialiased;
+
+    *,
+    *::before,
+    *::after {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Inter', sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+      padding: 60px 20px 80px;
+      -webkit-font-smoothing: antialiased;
     }
 
     /* Background glow */
-    body::before{
-      content:'';position:fixed;top:-200px;left:50%;transform:translateX(-50%);
-      width:600px;height:600px;border-radius:50%;
-      background:radial-gradient(circle,rgba(88,70,184,0.18),transparent 70%);
-      pointer-events:none;z-index:0;
+    body::before {
+      content: '';
+      position: fixed;
+      top: -200px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 600px;
+      height: 600px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(88, 70, 184, 0.18), transparent 70%);
+      pointer-events: none;
+      z-index: 0;
     }
 
     /* Profile */
-    .profile{text-align:center;margin-bottom:48px;position:relative;z-index:1;}
-    .profile-avatar{
-      width:96px;height:96px;border-radius:50%;
-      background:linear-gradient(135deg,var(--brand),#20a078);
-      display:flex;align-items:center;justify-content:center;
-      font-family:'Playfair Display',serif;font-size:32px;font-weight:700;
-      color:#fff;margin:0 auto 18px;
-      box-shadow:0 0 0 4px rgba(88,70,184,0.25),0 8px 24px rgba(0,0,0,0.3);
+    .profile {
+      text-align: center;
+      margin-bottom: 48px;
+      position: relative;
+      z-index: 1;
     }
-    .profile-name{font-size:22px;font-weight:700;letter-spacing:-0.5px;margin-bottom:8px;}
-    .profile-name span{color:var(--brand-l);}
-    .profile-bio{color:var(--muted);font-size:14px;}
-    .profile-badge{
-      display:inline-flex;align-items:center;gap:6px;
-      margin-top:14px;padding:5px 14px;
-      background:rgba(88,70,184,0.15);border:1px solid rgba(88,70,184,0.3);
-      border-radius:100px;font-size:11px;font-weight:600;color:var(--brand-l);
+
+    .profile-avatar {
+      width: 96px;
+      height: 96px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--brand), #20a078);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Playfair Display', serif;
+      font-size: 32px;
+      font-weight: 700;
+      color: #fff;
+      margin: 0 auto 18px;
+      box-shadow: 0 0 0 4px rgba(88, 70, 184, 0.25), 0 8px 24px rgba(0, 0, 0, 0.3);
     }
-    .profile-badge::before{content:'';width:6px;height:6px;background:var(--brand-l);border-radius:50%;}
+
+    .profile-name {
+      font-size: 22px;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+      margin-bottom: 8px;
+    }
+
+    .profile-name span {
+      color: var(--brand-l);
+    }
+
+    .profile-bio {
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .profile-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      margin-top: 14px;
+      padding: 5px 14px;
+      background: rgba(88, 70, 184, 0.15);
+      border: 1px solid rgba(88, 70, 184, 0.3);
+      border-radius: 100px;
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--brand-l);
+    }
+
+    .profile-badge::before {
+      content: '';
+      width: 6px;
+      height: 6px;
+      background: var(--brand-l);
+      border-radius: 50%;
+    }
 
     /* Links container */
-    .links-wrap{width:100%;max-width:480px;display:flex;flex-direction:column;gap:12px;position:relative;z-index:1;}
+    .links-wrap {
+      width: 100%;
+      max-width: 480px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      position: relative;
+      z-index: 1;
+    }
 
     /* Section label */
-    .links-label{font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin:16px 0 4px;padding:0 4px;}
+    .links-label {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin: 16px 0 4px;
+      padding: 0 4px;
+    }
 
     /* Link item */
-    .link-item{
-      display:flex;align-items:center;gap:16px;
-      background:var(--card);border:1px solid var(--border);
-      padding:18px 22px;border-radius:14px;
-      color:var(--text);font-weight:500;font-size:14px;
-      transition:all 0.25s ease;
-      text-decoration:none;
+    .link-item {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      padding: 18px 22px;
+      border-radius: 14px;
+      color: var(--text);
+      font-weight: 500;
+      font-size: 14px;
+      transition: all 0.25s ease;
+      text-decoration: none;
     }
-    .link-item:hover{
-      background:var(--hover);border-color:rgba(255,255,255,0.14);
-      transform:translateY(-2px);
-      box-shadow:0 8px 20px rgba(0,0,0,0.25);
+
+    .link-item:hover {
+      background: var(--hover);
+      border-color: rgba(255, 255, 255, 0.14);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
     }
-    .link-icon{font-size:20px;width:28px;text-align:center;flex-shrink:0;}
-    .link-text{flex:1;}
-    .link-title{font-weight:600;font-size:14px;}
-    .link-sub{font-size:11px;color:var(--muted);margin-top:2px;}
-    .link-arrow{color:var(--muted);font-size:16px;transition:transform 0.2s,color 0.2s;}
-    .link-item:hover .link-arrow{transform:translate(3px,-3px);color:var(--text);}
+
+    .link-icon {
+      font-size: 20px;
+      width: 28px;
+      text-align: center;
+      flex-shrink: 0;
+    }
+
+    .link-text {
+      flex: 1;
+    }
+
+    .link-title {
+      font-weight: 600;
+      font-size: 14px;
+    }
+
+    .link-sub {
+      font-size: 11px;
+      color: var(--muted);
+      margin-top: 2px;
+    }
+
+    .link-arrow {
+      color: var(--muted);
+      font-size: 16px;
+      transition: transform 0.2s, color 0.2s;
+    }
+
+    .link-item:hover .link-arrow {
+      transform: translate(3px, -3px);
+      color: var(--text);
+    }
 
     /* Footer logo */
-    .footer-mark{margin-top:56px;font-size:13px;color:#4a4a6a;position:relative;z-index:1;}
-    .footer-mark span{color:var(--brand);}
-    .footer-mark a{color:#5a5a7a;font-size:12px;margin-left:12px;transition:color 0.2s;}
-    .footer-mark a:hover{color:var(--muted);}
+    .footer-mark {
+      margin-top: 56px;
+      font-size: 13px;
+      color: #4a4a6a;
+      position: relative;
+      z-index: 1;
+    }
+
+    .footer-mark span {
+      color: var(--brand);
+    }
+
+    .footer-mark a {
+      color: #5a5a7a;
+      font-size: 12px;
+      margin-left: 12px;
+      transition: color 0.2s;
+    }
+
+    .footer-mark a:hover {
+      color: var(--muted);
+    }
   </style>
 </head>
+
 <body>
 
   <!-- Profile -->
   <div class="profile">
-    <div class="profile-avatar">P</div>
-    <div class="profile-name">Paper<span>.</span>Media</div>
+    <img src="logo.png" alt="Paper.Media Logo" style="height: 48px; width: auto; margin: 0 auto 16px; display: block;">
     <div class="profile-bio">Creative Studio — Content that Converts</div>
     <div class="profile-badge">Public links shared by owner</div>
   </div>
 
   <!-- Links -->
-  <div class="links-wrap">
-
-    <div class="links-label">🌐 Website</div>
-
-    <a href="/" class="link-item">
-      <span class="link-icon">🏠</span>
-      <div class="link-text">
-        <div class="link-title">Main Website</div>
-        <div class="link-sub">paper.media — services, portfolio &amp; contact</div>
-      </div>
-      <span class="link-arrow">↗</span>
-    </a>
-
-    <a href="/#portfolio" class="link-item">
-      <span class="link-icon">🎬</span>
-      <div class="link-text">
-        <div class="link-title">Browse Portfolio Gallery</div>
-        <div class="link-sub">Photos &amp; videos — uploaded by owner</div>
-      </div>
-      <span class="link-arrow">↗</span>
-    </a>
-
-    <div class="links-label">📅 Work With Us</div>
-
-    <a href="/#contact" class="link-item">
-      <span class="link-icon">💬</span>
-      <div class="link-text">
-        <div class="link-title">Contact Us</div>
-        <div class="link-sub">Your message lands directly in our inbox</div>
-      </div>
-      <span class="link-arrow">↗</span>
-    </a>
-
-    <a href="#" class="link-item">
-      <span class="link-icon">📅</span>
-      <div class="link-text">
-        <div class="link-title">Book a Consultation</div>
-        <div class="link-sub">Schedule a free 15-min discovery call</div>
-      </div>
-      <span class="link-arrow">↗</span>
-    </a>
-
-    <div class="links-label">📱 Social</div>
-
-    <a href="https://instagram.com/paper.media" class="link-item" target="_blank" rel="noopener" id="link-ig">
-      <span class="link-icon">📸</span>
-      <div class="link-text">
-        <div class="link-title">@paper.media</div>
-        <div class="link-sub">Follow us on Instagram</div>
-      </div>
-      <span class="link-arrow">↗</span>
-    </a>
-
-    <a href="https://wa.me/91XXXXXXXXXX" class="link-item" target="_blank" rel="noopener" id="link-whatsapp">
-      <span class="link-icon">💬</span>
-      <div class="link-text">
-        <div class="link-title">WhatsApp Us</div>
-        <div class="link-sub">We reply within minutes</div>
-      </div>
-      <span class="link-arrow">↗</span>
-    </a>
-
+  <div class="links-wrap" id="links-container">
+    <!-- Links will be dynamically injected here -->
   </div>
 
   <div class="footer-mark">
@@ -171,23 +243,48 @@
   </div>
 
   <script>
-    async function loadDynamicLinks() {
-      try {
-        const res = await fetch('https://papermediaapi.paper-mediaa.workers.dev/content');
-        const data = await res.json();
-        if (data.content) {
-          const waLink = document.getElementById("link-whatsapp");
-          if (waLink && data.content.contact_whatsapp) waLink.href = data.content.contact_whatsapp;
-          
-          const igLink = document.getElementById("link-ig");
-          if (igLink && data.content.contact_ig) igLink.href = data.content.contact_ig;
+    const linksData = [
+      { type: 'label', text: '🌐 Website' },
+      { type: 'link', href: 'online_viewer_net.html', icon: '🏠', title: 'Main Website', sub: 'paper.media — services, portfolio &amp; contact' },
+      { type: 'link', href: 'https://drive.google.com/drive/folders/1ZP0-psU-5778glYLB8FrCNTch85uiObb?usp=sharing', icon: '🎬', title: 'Browse Portfolio Gallery', sub: 'Photos &amp; videos — uploaded by owner', external: true },
+      { type: 'label', text: '📅 Work With Us' },
+      { type: 'link', href: 'https://ig.me/m/paper.mediaa?text=Hi%20Paper.Medias%20%2C%20I%20want%20to%20work%20with%20you', icon: '💬', title: 'Contact Us', sub: 'Send us an Instagram DM', external: true },
+      { type: 'link', href: '#', icon: '📅', title: 'Book a Consultation', sub: 'Schedule a free 15-min discovery call' },
+      { type: 'label', text: '📱 Social' },
+      { type: 'link', href: 'https://www.instagram.com/paper.mediaa?igsh=cHA2MWM5eWwzZjNh&utm_source=qr', icon: '📸', title: '@paper.mediaa', sub: 'Follow us on Instagram', external: true },
+      { type: 'link', href: 'https://wa.me/91XXXXXXXXXX', icon: '💬', title: 'WhatsApp Us', sub: 'We reply within minutes', external: true }
+    ];
+
+    const container = document.getElementById('links-container');
+
+    linksData.forEach(item => {
+      if (item.type === 'label') {
+        const label = document.createElement('div');
+        label.className = 'links-label';
+        label.textContent = item.text;
+        container.appendChild(label);
+      } else if (item.type === 'link') {
+        const a = document.createElement('a');
+        a.href = item.href;
+        a.className = 'link-item';
+        if (item.external) {
+          a.target = '_blank';
+          a.rel = 'noopener';
         }
-      } catch (err) {
-        console.error("Failed to load dynamic links", err);
+
+        a.innerHTML = `
+          <span class="link-icon">${item.icon}</span>
+          <div class="link-text">
+            <div class="link-title">${item.title}</div>
+            <div class="link-sub">${item.sub}</div>
+          </div>
+          <span class="link-arrow">↗</span>
+        `;
+
+        container.appendChild(a);
       }
-    }
-    
-    document.addEventListener("DOMContentLoaded", loadDynamicLinks);
+    });
   </script>
 </body>
+
 </html>
