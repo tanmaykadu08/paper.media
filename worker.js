@@ -97,7 +97,6 @@ export default {
     try {
       // Setup Route - Creates necessary tables if they don't exist
       if (method === "GET" && url.pathname === "/setup") {
-        checkAdmin();
         await turso(`CREATE TABLE IF NOT EXISTS inquiries (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT, email TEXT, message TEXT, status TEXT DEFAULT 'new', created_at DATETIME DEFAULT CURRENT_TIMESTAMP)`);
         await turso(`CREATE TABLE IF NOT EXISTS portfolio (id INTEGER PRIMARY KEY AUTOINCREMENT, title TEXT, tag TEXT, bg_color TEXT, emoji TEXT, image_url TEXT, video_url TEXT, created_at DATETIME DEFAULT CURRENT_TIMESTAMP)`);
         await turso(`CREATE TABLE IF NOT EXISTS site_content (key TEXT PRIMARY KEY, value TEXT)`);
