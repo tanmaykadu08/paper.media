@@ -108,11 +108,10 @@
   <div id="login-screen">
     <div class="login-box">
       <h2>Admin Login</h2>
-      <p class="text-muted" style="margin-bottom:20px;">Enter your admin credentials.</p>
-      <input type="text" id="admin-user" placeholder="Username (e.g. paper.media)" />
-      <input type="password" id="admin-key" placeholder="Password / Secret Key" />
+      <p class="text-muted" style="margin-bottom:20px;">Enter your admin secret key to access.</p>
+      <input type="password" id="admin-key" placeholder="Enter Secret Key" />
       <button class="btn-primary" onclick="login()">Access Dashboard</button>
-      <p id="login-error" class="text-muted" style="color:var(--danger); margin-top:12px; display:none;">Invalid credentials or connection error.</p>
+      <p id="login-error" class="text-muted" style="color:var(--danger); margin-top:12px; display:none;">Invalid key or connection error.</p>
     </div>
   </div>
 
@@ -269,7 +268,6 @@
     const API_URL = "https://papermediaapi.paper-mediaa.workers.dev";
     
     // --- State ---
-    let username = localStorage.getItem("paper_admin_user");
     let key = localStorage.getItem("paper_admin_key");
 
     // --- UI Helpers ---
@@ -306,7 +304,6 @@
     async function api(path, options = {}) {
       const headers = {
         "Content-Type": "application/json",
-        "X-Admin-User": username || "",
         "X-Admin-Key": key || "",
         ...options.headers
       };
@@ -330,23 +327,18 @@
         loadDashboard();
       } catch (e) {
         key = null;
-        username = null;
-        localStorage.removeItem("paper_admin_user");
         localStorage.removeItem("paper_admin_key");
         document.getElementById('login-screen').classList.remove('hidden');
       }
     }
 
     async function login() {
-      const userIn = document.getElementById('admin-user').value;
       const keyIn = document.getElementById('admin-key').value;
       const errEl = document.getElementById('login-error');
       try {
         errEl.style.display = 'none';
-        username = userIn;
         key = keyIn;
         await api('/admin/inquiries'); // Test auth
-        localStorage.setItem("paper_admin_user", username);
         localStorage.setItem("paper_admin_key", key);
         document.getElementById('login-screen').classList.add('hidden');
         document.getElementById('app').classList.remove('hidden');
@@ -354,15 +346,13 @@
         loadDashboard();
       } catch (e) {
         key = null;
-        username = null;
         errEl.style.display = 'block';
-        errEl.textContent = e.message === "Unauthorized" ? "Invalid Username or Password" : "Connection Error";
+        errEl.textContent = e.message === "Unauthorized" ? "Invalid Secret Key" : "Connection Error";
       }
     }
 
     function logout() {
       if(confirm('Are you sure you want to log out?')) {
-        localStorage.removeItem("paper_admin_user");
         localStorage.removeItem("paper_admin_key");
         window.location.reload();
       }

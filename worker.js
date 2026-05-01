@@ -79,12 +79,8 @@ export default {
     }
 
     function checkAdmin() {
-      const userHeader = request.headers.get("X-Admin-User");
       const keyHeader = request.headers.get("X-Admin-Key");
       
-      if (env.ADMIN_USERNAME && userHeader !== env.ADMIN_USERNAME) {
-        throw new Error("Unauthorized");
-      }
       if (keyHeader !== env.ADMIN_SECRET_KEY) {
         throw new Error("Unauthorized");
       }
