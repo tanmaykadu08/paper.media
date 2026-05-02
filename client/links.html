@@ -251,8 +251,8 @@
       { type: 'link', href: 'https://ig.me/m/paper.mediaa?text=Hi%20Paper.Medias%20%2C%20I%20want%20to%20work%20with%20you', icon: '💬', title: 'Contact Us', sub: 'Send us an Instagram DM', external: true },
       { type: 'link', href: '#', icon: '📅', title: 'Book a Consultation', sub: 'Schedule a free 15-min discovery call' },
       { type: 'label', text: '📱 Social' },
-      { type: 'link', href: 'https://www.instagram.com/paper.mediaa?igsh=cHA2MWM5eWwzZjNh&utm_source=qr', icon: '📸', title: '@paper.mediaa', sub: 'Follow us on Instagram', external: true },
-      { type: 'link', href: 'https://wa.me/91XXXXXXXXXX', icon: '💬', title: 'WhatsApp Us', sub: 'We reply within minutes', external: true }
+      { type: 'link', id: 'link-ig', href: 'https://instagram.com/', icon: '📸', title: '@paper.mediaa', sub: 'Follow us on Instagram', external: true },
+      { type: 'link', id: 'link-wa', href: 'https://wa.me/', icon: '💬', title: 'WhatsApp Us', sub: 'We reply within minutes', external: true }
     ];
 
     const container = document.getElementById('links-container');
@@ -271,6 +271,9 @@
           a.target = '_blank';
           a.rel = 'noopener';
         }
+        if (item.id) {
+          a.id = item.id;
+        }
 
         a.innerHTML = `
           <span class="link-icon">${item.icon}</span>
@@ -284,6 +287,25 @@
         container.appendChild(a);
       }
     });
+
+    async function loadContent() {
+      try {
+        const response = await fetch('https://papermediaapi.paper-mediaa.workers.dev/content');
+        const data = await response.json();
+        const content = data.content;
+        if (content) {
+          if (content.contact_whatsapp && document.getElementById('link-wa')) {
+             document.getElementById('link-wa').href = content.contact_whatsapp;
+          }
+          if (content.contact_ig && document.getElementById('link-ig')) {
+             document.getElementById('link-ig').href = content.contact_ig;
+          }
+        }
+      } catch (err) {
+        console.error('Error loading content:', err);
+      }
+    }
+    loadContent();
   </script>
 </body>
 
