@@ -2,6 +2,9 @@
 "routes": [
 { "src": "^/$", "dest": "/client/index.html" },
 { "src": "^/admin$", "dest": "/owner/admin.html" },
+{ "src": "^/admin-dashboard.html$", "dest": "/owner/admin-dashboard.html" },
+{ "src": "^/admin-cms.js$", "dest": "/owner/admin-cms.js" },
+{ "src": "^/admin.js$", "dest": "/owner/admin.js" },
 { "src": "^/admin.css$", "dest": "/owner/admin.css" },
 { "src": "^/links$", "dest": "/client/links.html" },
 { "src": "^/(.*)", "dest": "/client/$1" }
