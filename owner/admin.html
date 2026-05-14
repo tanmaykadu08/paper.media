@@ -36,181 +36,45 @@
     </button>
   </div>
 
-  <<<<<<< HEAD <!-- App Layout -->
-    <div id="app" class="hidden">
-      <!-- Sidebar -->
-      <aside class="sidebar">
-        <div class="logo">Paper<span>.</span>Media <sub>Admin</sub></div>
-        <nav class="nav-menu">
-          <div class="nav-item active" data-target="dashboard"><span>📊</span> Dashboard</div>
-          <div class="nav-item" data-target="inquiries"><span>📥</span> Inquiries</div>
-          <div class="nav-item" data-target="portfolio"><span>📸</span> Portfolio</div>
-          <div class="nav-item" data-target="content"><span>📝</span> Site Content</div>
-          <a href="/" class="nav-item" target="_blank"><span>🌐</span> Public Site</a>
-        </nav>
-        <button class="logout-btn" onclick="logout()"><span>🚪</span> Logout</button>
-      </aside>
+  <script>
+    async function loginAdmin() {
+      const secret = document.getElementById("adminSecret").value.trim();
+      const btn = document.querySelector(".btn-primary");
 
-      <!-- Main Content -->
-      <main class="main">
+      if (!secret) {
+        alert("Please enter a secret key.");
+        return;
+      }
 
-        <!-- DASHBOARD VIEW -->
-        <section id="view-dashboard" class="view active">
-          <div class="page-header">
-            <h1>Dashboard Overview</h1>
-          </div>
-          <div class="grid-3">
-            <div class="stat-card">
-              <h3>Total Inquiries</h3>
-              <div class="value" id="stat-inquiries">-</div>
-            </div>
-            <div class="stat-card">
-              <h3>New Inquiries</h3>
-              <div class="value" id="stat-new" style="color: #fca5a5;">-</div>
-            </div>
-            <div class="stat-card">
-              <h3>Portfolio Items</h3>
-              <div class="value" id="stat-portfolio">-</div>
-            </div>
-          </div>
-          <br>
-          <div class="page-header">
-            <h2>Recent Inquiries</h2>
-          </div>
-          <div class="table-container">
-            <table>
-              <thead>
-                <tr>
-                  <th>Date</th>
-                  <th>Name</th>
-                  <th>Status</th>
-                </tr>
-              </thead>
-              <tbody id="dashboard-recent-table">
-                <tr>
-                  <td colspan="3" class="text-muted">Loading...</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </section>
+      btn.textContent = "Verifying...";
+      btn.disabled = true;
 
-        <!-- INQUIRIES VIEW -->
-        <section id="view-inquiries" class="view">
-          <div class="page-header">
-            <h1>Client Inquiries</h1>
-            <button class="btn-sm" onclick="loadInquiries()">↻ Refresh</button>
-          </div>
-          <div class="table-container">
-            <table>
-              <thead>
-                <tr>
-                  <th>Date</th>
-                  <th>Client</th>
-                  <th>Message</th>
-                  <th>Status</th>
-                  <th>Actions</th>
-                </tr>
-              </thead>
-              <tbody id="inquiries-table">
-                <tr>
-                  <td colspan="5" class="text-muted">Loading...</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </section>
+      try {
+        const response = await fetch("https://papermediaapi.paper-mediaa.workers.dev/admin/verify", {
+          method: "GET",
+          headers: {
+            "X-Admin-Key": secret
+          }
+        });
 
-        <!-- PORTFOLIO VIEW -->
-        <section id="view-portfolio" class="view">
-          <div class="page-header">
-            <h1>Portfolio Management</h1>
-            <button class="btn-primary" onclick="document.getElementById('upload-modal').classList.remove('hidden')"
-              style="width:auto;"><span>＋</span> Add Item</button>
-          </div>
-          <div class="grid-3" id="portfolio-grid">
-            <p class="text-muted">Loading portfolio...</p>
-          </div>
-        </section>
-
-        <!-- CONTENT VIEW -->
-        <section id="view-content" class="view">
-          <div class="page-header">
-            <h1>Edit Site Content</h1>
-            <button class="btn-primary" onclick="saveContent()" style="width:auto;"><span>💾</span> Save
-              Changes</button>
-          </div>
-          <div class="table-container" style="padding: 24px; display:flex; flex-direction:column; gap:20px;">
-            <div>
-              <label class="text-muted" style="display:block;margin-bottom:8px;">Hero Title (HTML allowed)</label>
-              <input type="text" id="content-hero_title" style="width:100%"
-                placeholder="e.g. We Help<br>Brands Grow..." />
-            </div>
-            <div>
-              <label class="text-muted" style="display:block;margin-bottom:8px;">Hero Subtitle</label>
-              <input type="text" id="content-hero_sub" style="width:100%" placeholder="e.g. High-quality reels..." />
-            </div>
-            <div>
-              <label class="text-muted" style="display:block;margin-bottom:8px;">About Text (HTML allowed)</label>
-              <textarea id="content-about_text" style="width:100%; height:120px;"></textarea>
-            </div>
-            <div>
-              <label class="text-muted" style="display:block;margin-bottom:8px;">WhatsApp Link</label>
-              <input type="text" id="content-contact_whatsapp" style="width:100%" placeholder="https://wa.me/..." />
-            </div>
-            <div>
-              <label class="text-muted" style="display:block;margin-bottom:8px;">Instagram Link</label>
-              <input type="text" id="content-contact_ig" style="width:100%" placeholder="https://instagram.com/..." />
-            </div>
-          </div>
-        </section>
-
-      </main>
-    </div>
-
-    <!-- Upload Modal -->
-    <div id="upload-modal" class="hidden"
-      style="position:fixed;inset:0;background:rgba(0,0,0,0.8);display:flex;align-items:center;justify-content:center;z-index:1500;">
-      <div
-        style="background:var(--card);padding:32px;border-radius:12px;border:1px solid var(--border);width:100%;max-width:500px;">
-        <h2 style="margin-bottom:20px;">Add Portfolio Item</h2>
-
-        <label class="text-muted" style="display:block;margin-bottom:8px;">Project Title</label>
-        <input type="text" id="port-title" style="width:100%;margin-bottom:16px;" placeholder="e.g. Summer Campaign" />
-
-        <label class="text-muted" style="display:block;margin-bottom:8px;">Tag (Category)</label>
-        <input type="text" id="port-tag" style="width:100%;margin-bottom:16px;"
-          placeholder="e.g. Reels, Social Media" />
-
-        <label class="text-muted" style="display:block;margin-bottom:8px;">Media File (Image or Video)</label>
-        <input type="file" id="port-file" style="width:100%;margin-bottom:24px;" accept="image/*,video/*" />
-
-        <div style="display:flex;gap:12px;justify-content:flex-end;">
-          <button class="btn-sm"
-            onclick="document.getElementById('upload-modal').classList.add('hidden')">Cancel</button>
-          <button class="btn-primary" id="port-upload-btn" onclick="uploadPortfolioItem()" style="width:auto;">Upload &
-            Save</button>
-        </div>
-      </div>
-    </div>
-
-    <div id="toast">Message</div>
-
-    =======
-    >>>>>>> 8d2b945 (update the ui and change the function)
-    <script>
-      function loginAdmin() {
-        const secret = document.getElementById("adminSecret").value.trim();
-
-        if (secret === "papermediaadmin2026") {
+        if (response.ok) {
           localStorage.setItem("papermedia_admin_auth", "true");
+          localStorage.setItem("papermedia_admin_secret", secret);
           console.log("AUTH SAVED");
           window.location.href = "admin-dashboard.html";
         } else {
           alert("Invalid Secret Key");
+          btn.textContent = "Access Dashboard";
+          btn.disabled = false;
         }
+      } catch (err) {
+        console.error(err);
+        alert("Error verifying secret key. Please try again.");
+        btn.textContent = "Access Dashboard";
+        btn.disabled = false;
       }
-    </script>
+    }
+  </script>
 
 </body>
 
