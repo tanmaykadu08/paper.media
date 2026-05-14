@@ -124,8 +124,8 @@
             ${(!item.video_url && !item.image_url) ? `<div style="display:flex;align-items:center;justify-content:center;height:100%;font-size:48px;">${item.emoji || '📸'}</div>` : ''}
           </div>
           <div class="port-info">
-            <span class="port-tag">${item.tag || 'Portfolio'}</span>
-            <div class="port-name">${item.title || 'Portfolio Item'}</div>
+            <span class="port-tag" style="display:none;"></span>
+            <div class="port-name" style="font-size:14px; font-weight:normal;">${item.description || 'Media Entry'}</div>
           </div>
         `;
           container.appendChild(card);

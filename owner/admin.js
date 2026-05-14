@@ -47,9 +47,8 @@ const PAGES = {
             <div class="card">
                 <h2>Quick Actions</h2>
                 <div style="display:flex; flex-direction:column; gap:12px; margin-top:12px;">
-                    <button class="btn-secondary" style="text-align:left;" onclick="renderPage('portfolio')">📸 Add Portfolio Project</button>
+                    <button class="btn-secondary" style="text-align:left;" onclick="renderPage('portfolio')">📁 Media Library</button>
                     <button class="btn-secondary" style="text-align:left;" onclick="renderPage('homepage')">🏠 Edit Homepage Hero</button>
-                    <button class="btn-secondary" style="text-align:left;" onclick="renderPage('medialib')">📁 Browse Media Assets</button>
                 </div>
             </div>
         </div>
@@ -113,8 +112,8 @@ const PAGES = {
     `,
     portfolio: () => `
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:40px;">
-            <h1>Portfolio Manager</h1>
-            <button class="btn-primary" onclick="openProjectModal()">Add New Project</button>
+            <h1>Media Library</h1>
+            <button class="btn-primary" onclick="openProjectModal()">Add Media</button>
         </div>
         <div id="portfolio-grid" class="grid-2">
             <!-- Dynamic projects -->
@@ -123,22 +122,10 @@ const PAGES = {
         <!-- Project Modal -->
         <div id="project-modal" class="modal hidden">
             <div class="modal-content">
-                <h2 id="modal-title">Add Project</h2>
+                <h2 id="modal-title">Add Media</h2>
                 <div class="form-group">
-                    <label>Project Title</label>
-                    <input type="text" id="p-title" placeholder="Brand Name / Project Title">
-                </div>
-                <div class="form-group">
-                    <label>Category / Tag</label>
-                    <input type="text" id="p-tag" placeholder="e.g. Fashion Film, Social Edit">
-                </div>
-                <div class="form-group">
-                    <label>Description</label>
-                    <textarea id="p-desc" style="height:80px;" placeholder="Brief project details..."></textarea>
-                </div>
-                <div class="form-group">
-                    <label>Instagram / Reel Link</label>
-                    <input type="text" id="p-link" placeholder="https://instagram.com/reels/...">
+                    <label>Description (Optional)</label>
+                    <textarea id="p-desc" style="height:80px;" placeholder="Brief details..."></textarea>
                 </div>
                 <div class="grid-2">
                     <div class="form-group">
@@ -199,11 +186,7 @@ const PAGES = {
         </div>
         <div id="founders-container"></div>
     `,
-    medialib: () => `
-        <h1>Media Library</h1>
-        <p>Manage all assets used across the site.</p>
-        <div id="media-grid" class="grid-3" style="margin-top:32px;"></div>
-    `,
+
     appearance: () => `
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:40px;">
             <h1>Appearance</h1>
@@ -350,7 +333,6 @@ async function loadPageData(page) {
             case 'services': await initServices(); break;
             case 'pricing': await initPricing(); break;
             case 'founders': await initFounders(); break;
-            case 'medialib': await initMediaLib(); break;
             case 'appearance': await initAppearance(); break;
             case 'settings': await initSettings(); break;
         }
@@ -457,8 +439,7 @@ function renderPortfolioGrid() {
             <div style="padding:20px;">
                 <div style="display:flex; justify-content:space-between; align-items:start; margin-bottom:8px;">
                     <div>
-                        <h4 style="font-size:14px; font-weight:700;">${item.title}</h4>
-                        <p style="font-size:11px;">${item.tag}</p>
+                        <p style="font-size:12px; color:var(--muted);">${item.description || "No description"}</p>
                     </div>
                 </div>
                 <div style="display:flex; gap:8px; margin-top:16px;">
@@ -472,11 +453,8 @@ function renderPortfolioGrid() {
 
 function openProjectModal() {
     editingProjectId = null;
-    document.getElementById('modal-title').innerText = "Add Project";
-    document.getElementById('p-title').value = "";
-    document.getElementById('p-tag').value = "";
+    document.getElementById('modal-title').innerText = "Add Media";
     document.getElementById('p-desc').value = "";
-    document.getElementById('p-link').value = "";
     document.getElementById('p-image').value = "";
     document.getElementById('p-video').value = "";
     document.getElementById('p-featured').checked = false;
@@ -492,11 +470,8 @@ function editProject(id) {
     if (!item) return;
 
     editingProjectId = id;
-    document.getElementById('modal-title').innerText = "Edit Project";
-    document.getElementById('p-title').value = item.title || "";
-    document.getElementById('p-tag').value = item.tag || "";
+    document.getElementById('modal-title').innerText = "Edit Media";
     document.getElementById('p-desc').value = item.description || "";
-    document.getElementById('p-link').value = item.link || "";
     document.getElementById('p-image').value = item.image_url || "";
     document.getElementById('p-video').value = item.video_url || "";
     document.getElementById('p-featured').checked = item.is_featured === 1;
@@ -505,16 +480,14 @@ function editProject(id) {
 
 async function saveProject() {
     const payload = {
-        title: document.getElementById('p-title').value,
-        tag: document.getElementById('p-tag').value,
+        title: "Media",
+        tag: "",
         description: document.getElementById('p-desc').value,
-        link: document.getElementById('p-link').value,
+        link: "",
         image_url: document.getElementById('p-image').value,
         video_url: document.getElementById('p-video').value,
         is_featured: document.getElementById('p-featured').checked ? 1 : 0
     };
-
-    if (!payload.title) return showToast("Title is required", true);
 
     const btn = document.getElementById('btn-save-project');
     btn.disabled = true;
@@ -662,17 +635,7 @@ function renderFounders() {
 }
 function addFounderRow() { foundersData.push({ name: '', role: '', image: '' }); renderFounders(); }
 
-async function initMediaLib() {
-    const data = await api('/portfolio');
-    document.getElementById('media-grid').innerHTML = data.items.map(item => `
-        <div class="card" style="padding:10px; text-align:center;">
-            <div style="height:80px; background:#f0f0f0; margin-bottom:10px;">
-                ${item.video_url ? '🎥 Video' : `<img src="${item.image_url}" style="width:100%; height:100%; object-fit:contain;">`}
-            </div>
-            <button class="btn-secondary" style="font-size:10px; width:100%;" onclick="navigator.clipboard.writeText('${item.image_url || item.video_url}'); showToast('URL Copied')">Copy URL</button>
-        </div>
-    `).join('') || '<p>No assets in library.</p>';
-}
+
 
 async function initAppearance() {
     const data = await api('/content');

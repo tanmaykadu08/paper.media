@@ -79,7 +79,7 @@
       <nav class="nav-section" style="margin-top: 30px;">
         <button class="nav-btn active" data-module="dashboard" onclick="renderModule('dashboard')">🏠 Dashboard</button>
         <button class="nav-btn" data-module="homepage" onclick="renderModule('homepage')">📰 Homepage Hero</button>
-        <button class="nav-btn" data-module="portfolio" onclick="renderModule('portfolio')">📸 Featured Projects</button>
+        <button class="nav-btn" data-module="portfolio" onclick="renderModule('portfolio')">📁 Media Library</button>
         <button class="nav-btn" data-module="reviews" onclick="renderModule('reviews')">⭐ Client Reviews</button>
         <button class="nav-btn" data-module="services" onclick="renderModule('services')">⚡ Services</button>
         <button class="nav-btn" data-module="pricing" onclick="renderModule('pricing')">💰 Pricing Plans</button>
@@ -87,7 +87,6 @@
         <button class="nav-btn" data-module="about" onclick="renderModule('about')">📖 About Text</button>
         <button class="nav-btn" data-module="contact" onclick="renderModule('contact')">📞 Contact Info</button>
         <button class="nav-btn" data-module="navigation" onclick="renderModule('navigation')">🔗 Navigation</button>
-        <button class="nav-btn" data-module="medialib" onclick="renderModule('medialib')">📁 Media Library</button>
         <button class="nav-btn" data-module="appearance" onclick="renderModule('appearance')">🎨 Appearance</button>
         <button class="nav-btn logout-btn" onclick="logoutAdmin()" style="margin-top: 20px;">🚪 Logout</button>
       </nav>
@@ -119,22 +118,6 @@
       window.location.href = "admin.html";
     }
 
-    // DEBUG OVERLAY
-    document.body.innerHTML += `
-      <div style="
-        position:fixed;
-        top:20px;
-        right:20px;
-        background:black;
-        color:white;
-        padding:10px 16px;
-        border-radius:12px;
-        z-index:999999;
-        font-family:sans-serif;
-      ">
-        AUTH: ${localStorage.getItem("papermedia_admin_auth")}
-      </div>
-    `;
   </script>
   <script src="admin-cms.js"></script>
 </body>

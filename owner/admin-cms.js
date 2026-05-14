@@ -16,7 +16,11 @@ const DEFAULT_DATA = {
         { title: "Reels Editing", icon: "🎬", desc: "Scroll-stopping reels designed to boost engagement and retention." },
         { title: "Social Management", icon: "📱", desc: "We manage your growth so you focus on your business." }
     ],
-    pricing: [],
+    pricing: [
+        { title: "Starter", price: "₹14,999/mo", desc: "Perfect for individual creators starting their journey.", features: ["8 High-Quality Reels", "Professional Color Grading", "Basic Content Strategy", "48-Hour Turnaround"] },
+        { title: "Growth", price: "₹29,999/mo", desc: "For brands ready to scale their social presence.", features: ["15 High-Quality Reels", "Social Media Management", "Advanced Strategy & SEO", "Monthly Growth Reports"] },
+        { title: "Agency", price: "Custom", desc: "Tailored solutions for established businesses.", features: ["Unlimited Reels Editing", "Dedicated Content Manager", "Full Production Support", "Priority Support"] }
+    ],
     founders: [],
     about: {
         intro: "We are a digital creative studio obsessed with high-impact storytelling.",
@@ -163,8 +167,8 @@ const MODULES = {
         const projects = getSiteData().projects;
         let html = `
             <div style="display:flex; justify-content:space-between; align-items:center;">
-                <h1>Featured Projects</h1>
-                <button onclick="addProject()" style="padding:10px 20px; background:#000; color:#fff; border:none; border-radius:6px; cursor:pointer;">+ Add Project</button>
+                <h1>Media Library</h1>
+                <button onclick="addProject()" style="padding:10px 20px; background:#000; color:#fff; border:none; border-radius:6px; cursor:pointer;">+ Add Media</button>
             </div>
             <div id="projects-container" style="margin-top:24px; display:grid; gap:16px;">
         `;
@@ -172,13 +176,16 @@ const MODULES = {
         projects.forEach((p, idx) => {
             html += `
                 <div class="card" style="display:flex; justify-content:space-between; align-items:center; padding:16px 24px;">
-                    <div>
-                        <div style="font-weight:700; font-size:16px;">${p.title}</div>
-                        <div style="font-size:13px; color:#666;">${p.category}</div>
+                    <div style="display:flex; align-items:center; gap:16px;">
+                        <img src="${p.thumbnail}" style="width:60px; height:60px; object-fit:cover; border-radius:8px; background:#eee;" onerror="this.src='https://via.placeholder.com/60'">
+                        <div>
+                            <div style="font-weight:700; font-size:16px;">${p.desc ? 'Media' : 'Media (No Description)'}</div>
+                            <div style="font-size:13px; color:#666; max-width:300px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${p.desc || "No description"}</div>
+                        </div>
                     </div>
                     <div>
-                        <button onclick="editProject(${idx})" style="padding:6px 12px; border:1px solid #ddd; border-radius:4px; background:#fff; cursor:pointer; margin-right:8px;">Edit</button>
-                        <button onclick="deleteProject(${idx})" style="padding:6px 12px; border:1px solid #ff4444; color:#ff4444; border-radius:4px; background:#fff; cursor:pointer;">Delete</button>
+                        <button onclick="editProject(${idx})" style="padding:6px 12px; border:1px solid #ddd; border-radius:4px; background:#fff; cursor:pointer; margin-right:8px;">Edit Desc</button>
+                        <button onclick="deleteProject(${idx})" style="padding:6px 12px; border:1px solid #ff4444; color:#ff4444; border-radius:4px; background:#fff; cursor:pointer;">Remove</button>
                     </div>
                 </div>
             `;
@@ -326,10 +333,10 @@ const MODULES = {
         plans.forEach((p, idx) => {
             html += `
                 <div class="card" style="padding:24px;">
-                    <input type="text" id="pr-title-${idx}" value="${p.title}" placeholder="Plan Name" style="width:100%; padding:8px; margin-bottom:8px; border:1px solid #ddd; border-radius:4px;">
-                    <input type="text" id="pr-price-${idx}" value="${p.price}" placeholder="Price (e.g. $999)" style="width:100%; padding:8px; margin-bottom:8px; border:1px solid #ddd; border-radius:4px;">
+                    <input type="text" id="pr-title-${idx}" value="${p.title}" placeholder="Plan Name (e.g. Prime, Basic)" style="width:100%; padding:8px; margin-bottom:8px; border:1px solid #ddd; border-radius:4px;">
+                    <input type="text" id="pr-price-${idx}" value="${p.price}" placeholder="Price (e.g. ₹9,999/mo)" style="width:100%; padding:8px; margin-bottom:8px; border:1px solid #ddd; border-radius:4px;">
                     <textarea id="pr-desc-${idx}" placeholder="Description" style="width:100%; padding:8px; margin-bottom:12px; border:1px solid #ddd; border-radius:4px; height:60px;">${p.desc}</textarea>
-                    <textarea id="pr-features-${idx}" placeholder="Features (comma separated)" style="width:100%; padding:8px; margin-bottom:12px; border:1px solid #ddd; border-radius:4px; height:60px;">${p.features.join(',')}</textarea>
+                    <textarea id="pr-features-${idx}" placeholder="Features (one per line)" style="width:100%; padding:8px; margin-bottom:12px; border:1px solid #ddd; border-radius:4px; height:60px;">${p.features.join('\n')}</textarea>
                     <button onclick="deletePricing(${idx})" style="padding:6px 12px; border:1px solid #ff4444; color:#ff4444; border-radius:4px; background:#fff; cursor:pointer;">Remove</button>
                 </div>
             `;
@@ -404,18 +411,7 @@ const MODULES = {
             </div>
         `;
     },
-    medialib: () => {
-        return `
-            <div style="display:flex; justify-content:space-between; align-items:center;">
-                <h1>Media Library</h1>
-                <button onclick="alert('Mock Uploading... Image Saved!')" style="padding:10px 20px; background:#000; color:#fff; border:none; border-radius:6px; cursor:pointer;">+ Upload File</button>
-            </div>
-            <div class="card" style="margin-top:24px; text-align:center; padding:60px;">
-                <h2>Local Media Library</h2>
-                <p>Media storage is currently simulated. In a real environment, this connects to AWS S3 or Cloudinary.</p>
-            </div>
-        `;
-    }
+
 };
 
 // === ACTION HANDLERS ===
@@ -432,35 +428,100 @@ window.saveHomepage = function() {
     saveSiteData(data);
 };
 
-// Projects
+let editingIdx = null;
+
+function showMediaModal(idx = null) {
+    editingIdx = idx;
+    let existingDesc = "";
+    let existingUrl = "";
+    if(idx !== null) {
+        const p = getSiteData().projects[idx];
+        existingDesc = p.desc || "";
+        existingUrl = p.thumbnail || "";
+    }
+    
+    let modal = document.getElementById('media-modal');
+    if(!modal) {
+        modal = document.createElement('div');
+        modal.id = 'media-modal';
+        modal.className = 'modal hidden';
+        modal.innerHTML = `
+            <div class="modal-content">
+                <h2 id="media-modal-title" style="margin-bottom: 24px;">Add Media</h2>
+                <div class="form-group">
+                    <label>Upload File (Image / Video)</label>
+                    <input type="file" id="media-file-input" accept="image/*,video/*" style="margin-bottom:8px; padding: 12px; border: 2px dashed #ddd; width: 100%; border-radius: 8px; cursor: pointer;">
+                    <div style="font-size:11px; color:var(--muted); margin-bottom:16px;">Files are processed locally. For large files, use the URL field instead.</div>
+                </div>
+                <div style="text-align:center; font-size:12px; font-weight:bold; color:#aaa; margin-bottom:16px;">OR</div>
+                <div class="form-group">
+                    <label>Paste Media URL</label>
+                    <input type="text" id="media-url-input" placeholder="https://...">
+                </div>
+                <div class="form-group">
+                    <label>Description (Optional)</label>
+                    <textarea id="media-desc-input" style="height:80px;" placeholder="Brief details..."></textarea>
+                </div>
+                <div style="display:flex; gap:12px; margin-top:32px;">
+                    <button class="btn-primary" onclick="saveMediaModal()">Save Media</button>
+                    <button class="btn-secondary" onclick="document.getElementById('media-modal').classList.add('hidden')">Cancel</button>
+                </div>
+            </div>
+        `;
+        document.body.appendChild(modal);
+        
+        // Handle file selection and convert to data URL for local preview
+        document.getElementById('media-file-input').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if(!file) return;
+            const reader = new FileReader();
+            reader.onload = function(evt) {
+                document.getElementById('media-url-input').value = evt.target.result;
+            };
+            reader.readAsDataURL(file);
+        });
+    }
+    
+    document.getElementById('media-modal-title').innerText = idx !== null ? "Edit Media" : "Add Media";
+    document.getElementById('media-url-input').value = existingUrl;
+    document.getElementById('media-desc-input').value = existingDesc;
+    document.getElementById('media-file-input').value = ""; // reset file input
+    modal.classList.remove('hidden');
+}
+
 window.deleteProject = function(idx) {
-    if(!confirm("Delete this project?")) return;
+    if(!confirm("Delete this media?")) return;
     const data = getSiteData();
     data.projects.splice(idx, 1);
     saveSiteData(data);
     renderModule('portfolio');
 };
+
 window.addProject = function() {
-    const title = prompt("Project Title:");
-    if(!title) return;
-    const cat = prompt("Category (e.g., Reel, Strategy):");
-    const imgUrl = prompt("Thumbnail Image URL:");
-    const vidUrl = prompt("Video URL (optional):");
+    showMediaModal(null);
+};
+
+window.editProject = function(idx) {
+    showMediaModal(idx);
+};
+
+window.saveMediaModal = function() {
+    const url = document.getElementById('media-url-input').value;
+    const desc = document.getElementById('media-desc-input').value;
+    if(!url) {
+        alert("Please provide a media URL or upload a file.");
+        return;
+    }
     
     const data = getSiteData();
-    data.projects.push({ title, category: cat||"", thumbnail: imgUrl||"", video: vidUrl||"" });
+    if(editingIdx !== null) {
+        data.projects[editingIdx].thumbnail = url;
+        data.projects[editingIdx].desc = desc;
+    } else {
+        data.projects.push({ title: "Media", category: "", thumbnail: url, video: "", desc: desc || "" });
+    }
     saveSiteData(data);
-    renderModule('portfolio');
-};
-window.editProject = function(idx) {
-    const data = getSiteData();
-    const p = data.projects[idx];
-    const newTitle = prompt("Edit Title:", p.title);
-    if(newTitle === null) return;
-    p.title = newTitle;
-    p.category = prompt("Edit Category:", p.category) || p.category;
-    p.thumbnail = prompt("Edit Thumbnail URL:", p.thumbnail) || p.thumbnail;
-    saveSiteData(data);
+    document.getElementById('media-modal').classList.add('hidden');
     renderModule('portfolio');
 };
 
@@ -541,7 +602,7 @@ window.saveAppearance = function() {
 // Pricing
 window.addPricing = function() {
     const data = getSiteData();
-    data.pricing.push({ title: "New Plan", price: "$0", desc: "Plan description", features: ["Feature 1"] });
+    data.pricing.push({ title: "New Plan", price: "₹9,999/mo", desc: "Plan description", features: ["Feature 1"] });
     saveSiteData(data);
     renderModule('pricing');
 };
@@ -557,7 +618,7 @@ window.savePricing = function() {
         p.title = document.getElementById(`pr-title-${idx}`).value;
         p.price = document.getElementById(`pr-price-${idx}`).value;
         p.desc = document.getElementById(`pr-desc-${idx}`).value;
-        p.features = document.getElementById(`pr-features-${idx}`).value.split(',').map(f => f.trim()).filter(f => f);
+        p.features = document.getElementById(`pr-features-${idx}`).value.split(/\r?\n/).map(f => f.trim()).filter(f => f);
     });
     saveSiteData(data);
 };

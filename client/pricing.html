@@ -55,50 +55,63 @@
       <span class="section-label reveal">TRANSPARENT PLANS</span>
       <h2 class="section-title reveal">Investment for Your Brand</h2>
       
-      <div class="services-grid" style="align-items: stretch;">
-        <!-- Starter Plan -->
-        <div class="service-card reveal" style="border: 1px solid var(--border);">
-          <div class="service-name">Starter</div>
-          <div style="font-size: 36px; font-weight: 800; margin: 20px 0;">$499<span style="font-size: 14px; font-weight: 400; color: #999;">/mo</span></div>
-          <p style="font-size: 14px; color: #666; margin-bottom: 24px;">Perfect for individual creators starting their journey.</p>
-          <ul style="list-style: none; padding: 0; margin-bottom: 30px; text-align: left;">
-            <li style="margin-bottom: 12px;">✓ 8 High-Quality Reels</li>
-            <li style="margin-bottom: 12px;">✓ Professional Color Grading</li>
-            <li style="margin-bottom: 12px;">✓ Basic Content Strategy</li>
-            <li style="margin-bottom: 12px;">✓ 48-Hour Turnaround</li>
-          </ul>
-          <a href="contact.html" class="btn-outline magnetic" style="width: 100%; display: block; text-align: center;">Choose Starter</a>
-        </div>
-
-        <!-- Growth Plan (Featured) -->
-        <div class="service-card reveal spotlight-card" style="border: 2px solid var(--primary); transform: scale(1.05); z-index: 2;">
-          <div style="position: absolute; top: -15px; left: 50%; transform: translateX(-50%); background: var(--primary); color: #fff; padding: 4px 16px; border-radius: 20px; font-size: 12px; font-weight: 600;">MOST POPULAR</div>
-          <div class="service-name">Growth</div>
-          <div style="font-size: 36px; font-weight: 800; margin: 20px 0;">$999<span style="font-size: 14px; font-weight: 400; color: #fff;">/mo</span></div>
-          <p style="font-size: 14px; color: rgba(255,255,255,0.7); margin-bottom: 24px;">For brands ready to scale their social presence.</p>
-          <ul style="list-style: none; padding: 0; margin-bottom: 30px; text-align: left;">
-            <li style="margin-bottom: 12px;">✓ 15 High-Quality Reels</li>
-            <li style="margin-bottom: 12px;">✓ Social Media Management</li>
-            <li style="margin-bottom: 12px;">✓ Advanced Strategy & SEO</li>
-            <li style="margin-bottom: 12px;">✓ Monthly Growth Reports</li>
-          </ul>
-          <a href="contact.html" class="btn-dark magnetic" style="width: 100%; display: block; text-align: center;">Choose Growth</a>
-        </div>
-
-        <!-- Agency Plan -->
-        <div class="service-card reveal" style="border: 1px solid var(--border);">
-          <div class="service-name">Agency</div>
-          <div style="font-size: 36px; font-weight: 800; margin: 20px 0;">Custom</div>
-          <p style="font-size: 14px; color: #666; margin-bottom: 24px;">Tailored solutions for established businesses.</p>
-          <ul style="list-style: none; padding: 0; margin-bottom: 30px; text-align: left;">
-            <li style="margin-bottom: 12px;">✓ Unlimited Reels Editing</li>
-            <li style="margin-bottom: 12px;">✓ Dedicated Content Manager</li>
-            <li style="margin-bottom: 12px;">✓ Full Production Support</li>
-            <li style="margin-bottom: 12px;">✓ Priority Support</li>
-          </ul>
-          <a href="contact.html" class="btn-outline magnetic" style="width: 100%; display: block; text-align: center;">Contact Us</a>
-        </div>
+      <div class="services-grid" id="pricing-grid" style="align-items: stretch;">
+        <!-- Dynamic pricing will be loaded here -->
       </div>
+    </div>
+  </section>
+
+  <script>
+    function loadPricing() {
+      const raw = localStorage.getItem('papermedia_cms_data');
+      let plans = [];
+      if (raw) {
+        try {
+          const data = JSON.parse(raw);
+          plans = data.pricing || [];
+        } catch(e) {}
+      }
+      
+
+      const container = document.getElementById('pricing-grid');
+      if (!container) return;
+
+      container.innerHTML = '';
+      
+      plans.forEach((plan, idx) => {
+        // Highlight middle or second plan as 'Growth' / 'Most Popular'
+        const isFeatured = idx === 1; 
+        const borderStyle = isFeatured ? 'border: 2px solid var(--primary); transform: scale(1.05); z-index: 2;' : 'border: 1px solid var(--border);';
+        const badge = isFeatured ? '<div style="position: absolute; top: -15px; left: 50%; transform: translateX(-50%); background: var(--primary); color: #fff; padding: 4px 16px; border-radius: 20px; font-size: 12px; font-weight: 600;">MOST POPULAR</div>' : '';
+        
+        let featuresHtml = '';
+        if(plan.features && plan.features.length > 0) {
+           featuresHtml = '<ul style="list-style: none; padding: 0; margin-bottom: 30px; text-align: left;">';
+           plan.features.forEach(f => {
+              if(f.trim()) featuresHtml += `<li style="margin-bottom: 12px;">✓ ${f.trim()}</li>`;
+           });
+           featuresHtml += '</ul>';
+        }
+
+        const card = document.createElement('div');
+        card.className = `service-card reveal ${isFeatured ? 'spotlight-card' : ''}`;
+        card.style.cssText = borderStyle;
+        
+        card.innerHTML = `
+          ${badge}
+          <div class="service-name">${plan.title}</div>
+          <div style="font-size: 36px; font-weight: 800; margin: 20px 0;">${plan.price}</div>
+          <p style="font-size: 14px; color: ${isFeatured ? 'rgba(255,255,255,0.7)' : '#666'}; margin-bottom: 24px;">${plan.desc}</p>
+          ${featuresHtml}
+          <a href="contact.html" class="${isFeatured ? 'btn-dark' : 'btn-outline'} magnetic" style="width: 100%; display: block; text-align: center;">Choose ${plan.title}</a>
+        `;
+        
+        container.appendChild(card);
+      });
+    }
+
+    document.addEventListener('DOMContentLoaded', loadPricing);
+  </script>
     </div>
   </section>
 
