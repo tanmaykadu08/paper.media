@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Contact Us – Paper.Media</title>
+  <meta name="description" content="Get in touch with Paper.Media. Start your journey towards high-impact content and social media growth today.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preload" href="logo.png" as="image">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Sora:wght@600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+  <!-- Custom Cursor -->
+  <div class="cursor" id="cursor">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M22 2L11 13M22 2L15 22L11 13M11 13L2 9L22 2" />
+    </svg>
+  </div>
+
+  <!-- NAV -->
+  <nav id="navbar">
+    <div class="logo">
+      <a href="index.html"><img src="logo.png" alt="Paper.Media Logo" class="brand-logo"></a>
+    </div>
+    <ul class="nav-links">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="services.html">Services</a></li>
+      <li><a href="portfolio.html">Portfolio</a></li>
+      <li><a href="about.html">About</a></li>
+      <li><a href="contact.html" class="active">Contact</a></li>
+    </ul>
+    <a href="contact.html" class="nav-cta magnetic">Get Started</a>
+    <button class="hamburger" id="hamburger" aria-label="Menu">
+      <span></span><span></span><span></span>
+    </button>
+  </nav>
+
+  <!-- MOBILE NAV -->
+  <div class="mobile-nav" id="mobileNav">
+    <a href="index.html">Home</a>
+    <a href="services.html">Services</a>
+    <a href="portfolio.html">Portfolio</a>
+    <a href="about.html">About</a>
+    <a href="contact.html" class="active">Contact</a>
+    <a href="contact.html" class="mob-cta">Get Started →</a>
+  </div>
+
+  <!-- CONTACT PAGE CONTENT -->
+  <section class="section" style="padding-top: 150px;">
+    <div class="container">
+      <span class="section-label reveal">GET IN TOUCH</span>
+      <h2 class="section-title reveal">Let's Build Your Presence</h2>
+      
+      <div class="contact-grid">
+        <div class="reveal">
+          <p style="font-size: 16px; color: #666; line-height: 1.8; margin-bottom: var(--space-md);">Ready to take your content to the next level? Fill out the form or reach out via social media. We typically reply within 30 minutes.</p>
+          
+          <div class="contact-links">
+            <a href="https://wa.me/" class="contact-link-card" target="_blank">
+              <div class="contact-link-icon">💬</div>
+              <div>
+                <div class="contact-link-title">WhatsApp Us</div>
+                <div class="contact-link-sub">Fastest response time</div>
+              </div>
+              <div class="contact-link-arrow">↗</div>
+            </a>
+            <a href="https://instagram.com/" class="contact-link-card" target="_blank">
+              <div class="contact-link-icon">📸</div>
+              <div>
+                <div class="contact-link-title">@paper.mediaa</div>
+                <div class="contact-link-sub">DM us on Instagram</div>
+              </div>
+              <div class="contact-link-arrow">↗</div>
+            </a>
+          </div>
+        </div>
+
+        <form class="form reveal" id="contactForm" action="https://papermediaapi.paper-mediaa.workers.dev/contact" method="POST">
+          <div class="form-row">
+            <div class="input-wrap">
+              <label class="input-label">Name</label>
+              <input class="input" type="text" name="name" placeholder="Your name" required>
+            </div>
+            <div class="input-wrap">
+              <label class="input-label">Email</label>
+              <input class="input" type="email" name="email" placeholder="you@email.com" required>
+            </div>
+          </div>
+          <div class="input-wrap">
+            <label class="input-label">Message</label>
+            <textarea class="textarea" name="message" placeholder="Tell us about your brand and goals..." required></textarea>
+          </div>
+          <button type="submit" class="form-btn magnetic">Send Message →</button>
+        </form>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="container" style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: var(--space-md);">
+      <div class="footer-logo">
+        <img src="logo.png" alt="Paper.Media Logo" style="height: 40px; width: auto;" loading="lazy" decoding="async">
+      </div>
+      <div class="footer-nav">
+        <a href="index.html">Home</a>
+        <a href="services.html">Services</a>
+        <a href="portfolio.html">Portfolio</a>
+        <a href="pricing.html">Pricing</a>
+        <a href="contact.html" class="active">Contact</a>
+      </div>
+      <div class="footer-copy">© 2025 Paper.Media. All rights reserved.</div>
+    </div>
+  </footer>
+
+  <script src="app.js"></script>
+  <script>
+    // Specific form submit logic for this page
+    async function handleSubmit(event) {
+      event.preventDefault();
+      const form = document.getElementById("contactForm");
+      const btn = form.querySelector('.form-btn');
+      const data = {
+        name: form.elements.name.value,
+        email: form.elements.email.value,
+        message: form.elements.message.value
+      };
+      const originalText = btn.textContent;
+      btn.textContent = 'Sending...'; btn.style.opacity = '0.7'; btn.disabled = true;
+
+      fetch(event.target.action, {
+        method: form.method,
+        body: JSON.stringify(data),
+        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' }
+      })
+      .then(response => {
+        if (response.ok) {
+          btn.textContent = 'Sent ✓'; btn.style.background = '#27ae60'; btn.style.opacity = '1'; form.reset();
+          setTimeout(() => { btn.textContent = originalText; btn.style.background = ''; btn.disabled = false; }, 3000);
+        } else {
+          btn.textContent = 'Error!'; btn.style.background = '#e63946'; btn.style.opacity = '1';
+          setTimeout(() => { btn.textContent = originalText; btn.style.background = ''; btn.disabled = false; }, 3000);
+        }
+      }).catch(() => {
+        btn.textContent = 'Error!'; btn.style.background = '#e63946'; btn.style.opacity = '1';
+        setTimeout(() => { btn.textContent = originalText; btn.style.background = ''; btn.disabled = false; }, 3000);
+      });
+    }
+    document.getElementById("contactForm").addEventListener("submit", handleSubmit);
+  </script>
+</body>
+
+</html>

@@ -1,0 +1,642 @@
+// === PAPER.MEDIA DYNAMIC CMS ENGINE ===
+const CMS_KEY = "papermedia_cms_data";
+
+// Default Data Structure
+const DEFAULT_DATA = {
+    homepage: {
+        hero_title: "We Turn Content<br>Into Real Growth.",
+        hero_sub: "Short-form videos, reels, and edits that grab attention, build audience, and drive results.",
+        hero_cta_text: "Get Started",
+        hero_cta_link: "contact.html",
+        banner_active: false,
+        banner_text: "Available for new projects!"
+    },
+    projects: [],
+    services: [
+        { title: "Reels Editing", icon: "🎬", desc: "Scroll-stopping reels designed to boost engagement and retention." },
+        { title: "Social Management", icon: "📱", desc: "We manage your growth so you focus on your business." }
+    ],
+    pricing: [],
+    founders: [],
+    about: {
+        intro: "We are a digital creative studio obsessed with high-impact storytelling.",
+        process: []
+    },
+    contact: {
+        email: "hello@paper.media",
+        instagram: "https://instagram.com",
+        whatsapp: ""
+    },
+    appearance: {
+        primary_color: "#000000",
+        bg_color: "#f5f1ea",
+        heading_font: "Sora"
+    },
+    seo: {
+        description: "Paper.Media — High-quality reels, social media management & content creation built to convert views into followers and followers into customers.",
+        og_image: "https://papermedia.co.in/logo.png",
+        ga_id: ""
+    }
+};
+
+// State Management
+function getSiteData() {
+    const raw = localStorage.getItem(CMS_KEY);
+    if (!raw) {
+        localStorage.setItem(CMS_KEY, JSON.stringify(DEFAULT_DATA));
+        return DEFAULT_DATA;
+    }
+    return JSON.parse(raw);
+}
+
+function saveSiteData(data) {
+    localStorage.setItem(CMS_KEY, JSON.stringify(data));
+    showToast("Changes saved successfully!");
+}
+
+// Reviews State Management
+const REVIEWS_KEY = "papermedia_reviews";
+function getReviewsData() {
+    const raw = localStorage.getItem(REVIEWS_KEY);
+    if (!raw) return [];
+    return JSON.parse(raw);
+}
+function saveReviewsData(data) {
+    localStorage.setItem(REVIEWS_KEY, JSON.stringify(data));
+    showToast("Reviews saved successfully!");
+}
+
+// Toast System
+function showToast(msg, isError = false) {
+    let toast = document.getElementById('cms-toast');
+    if (!toast) {
+        toast = document.createElement('div');
+        toast.id = 'cms-toast';
+        toast.style.cssText = `
+            position: fixed; bottom: 30px; right: 30px; padding: 16px 24px;
+            background: #000; color: #fff; border-radius: 8px; font-weight: 600;
+            z-index: 999999; transform: translateY(100px); opacity: 0;
+            transition: all 0.3s ease; box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        `;
+        document.body.appendChild(toast);
+    }
+    toast.innerText = msg;
+    toast.style.background = isError ? "#ef4444" : "#10b981";
+    toast.style.transform = "translateY(0)";
+    toast.style.opacity = "1";
+    
+    setTimeout(() => {
+        toast.style.transform = "translateY(100px)";
+        toast.style.opacity = "0";
+    }, 3000);
+}
+
+// === TEMPLATES & RENDERERS ===
+const MODULES = {
+    dashboard: () => {
+        const data = getSiteData();
+        return `
+            <div class="dashboard-home">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 24px;">
+                    <h1>Dashboard Overview</h1>
+                    <span style="font-size:12px; color:#888;">Live Data Synced</span>
+                </div>
+                <div class="stats-grid">
+                    <div class="card">
+                        <div style="font-size:32px; margin-bottom:8px;">${data.projects.length}</div>
+                        <div style="color:var(--muted); font-size:14px;">Total Projects</div>
+                    </div>
+                    <div class="card">
+                        <div style="font-size:32px; margin-bottom:8px;">${data.services.length}</div>
+                        <div style="color:var(--muted); font-size:14px;">Active Services</div>
+                    </div>
+                    <div class="card">
+                        <div style="font-size:32px; margin-bottom:8px;">${data.pricing.length}</div>
+                        <div style="color:var(--muted); font-size:14px;">Pricing Plans</div>
+                    </div>
+                    <div class="card">
+                        <div style="font-size:32px; margin-bottom:8px;">${data.founders.length}</div>
+                        <div style="color:var(--muted); font-size:14px;">Team Members</div>
+                    </div>
+                </div>
+            </div>
+        `;
+    },
+    homepage: () => {
+        const data = getSiteData().homepage;
+        return `
+            <h1>Homepage Hero CMS</h1>
+            <div class="card" style="margin-top:20px;">
+                <label style="display:block; margin-bottom:8px; font-weight:600;">Main Title</label>
+                <input type="text" id="hp-title" style="width:100%; padding:12px; border:1px solid #ddd; border-radius:6px; margin-bottom:16px;" value="${data.hero_title}">
+                
+                <label style="display:block; margin-bottom:8px; font-weight:600;">Subtitle</label>
+                <textarea id="hp-sub" style="width:100%; padding:12px; border:1px solid #ddd; border-radius:6px; height:80px; margin-bottom:16px;">${data.hero_sub}</textarea>
+                
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:16px;">
+                    <div>
+                        <label style="display:block; margin-bottom:8px; font-weight:600;">CTA Text</label>
+                        <input type="text" id="hp-cta-text" style="width:100%; padding:12px; border:1px solid #ddd; border-radius:6px;" value="${data.hero_cta_text}">
+                    </div>
+                    <div>
+                        <label style="display:block; margin-bottom:8px; font-weight:600;">CTA Link</label>
+                        <input type="text" id="hp-cta-link" style="width:100%; padding:12px; border:1px solid #ddd; border-radius:6px;" value="${data.hero_cta_link}">
+                    </div>
+                </div>
+
+                <hr style="border:0; border-top:1px solid #eee; margin:24px 0;">
+                
+                <label style="display:block; margin-bottom:8px; font-weight:600;">Banner Active?</label>
+                <select id="hp-banner-active" style="width:100%; padding:12px; border:1px solid #ddd; border-radius:6px; margin-bottom:16px;">
+                    <option value="true" ${data.banner_active ? "selected" : ""}>Yes, display banner</option>
+                    <option value="false" ${!data.banner_active ? "selected" : ""}>No, hide banner</option>
+                </select>
+
+                <label style="display:block; margin-bottom:8px; font-weight:600;">Banner Text</label>
+                <input type="text" id="hp-banner-text" style="width:100%; padding:12px; border:1px solid #ddd; border-radius:6px; margin-bottom:24px;" value="${data.banner_text}">
+
+                <button class="btn-primary" onclick="saveHomepage()" style="padding:12px 24px; background:#000; color:#fff; border:none; border-radius:6px; cursor:pointer;">Save Changes</button>
+            </div>
+        `;
+    },
+    portfolio: () => {
+        const projects = getSiteData().projects;
+        let html = `
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+                <h1>Featured Projects</h1>
+                <button onclick="addProject()" style="padding:10px 20px; background:#000; color:#fff; border:none; border-radius:6px; cursor:pointer;">+ Add Project</button>
+            </div>
+            <div id="projects-container" style="margin-top:24px; display:grid; gap:16px;">
+        `;
+        
+        projects.forEach((p, idx) => {
+            html += `
+                <div class="card" style="display:flex; justify-content:space-between; align-items:center; padding:16px 24px;">
+                    <div>
+                        <div style="font-weight:700; font-size:16px;">${p.title}</div>
+                        <div style="font-size:13px; color:#666;">${p.category}</div>
+                    </div>
+                    <div>
+                        <button onclick="editProject(${idx})" style="padding:6px 12px; border:1px solid #ddd; border-radius:4px; background:#fff; cursor:pointer; margin-right:8px;">Edit</button>
+                        <button onclick="deleteProject(${idx})" style="padding:6px 12px; border:1px solid #ff4444; color:#ff4444; border-radius:4px; background:#fff; cursor:pointer;">Delete</button>
+                    </div>
+                </div>
+            `;
+        });
+        html += `</div>`;
+        return html;
+    },
+    reviews: () => {
+        const reviews = getReviewsData();
+        let html = `
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+                <h1>Client Reviews</h1>
+                <button onclick="addReview()" style="padding:10px 20px; background:#000; color:#fff; border:none; border-radius:6px; cursor:pointer;">+ Add Review</button>
+            </div>
+            <p style="color:#666; margin-top:8px;">Manage testimonials that appear on the homepage. Use arrows to reorder.</p>
+            <div style="margin-top:24px; display:grid; gap:16px;">
+        `;
+        if (reviews.length === 0) {
+            html += `<div class="card" style="text-align:center; padding:40px; color:#888;">No reviews yet. Add one!</div>`;
+        }
+        reviews.forEach((r, idx) => {
+            html += `
+                <div class="card" style="padding:24px; position:relative;">
+                    <div style="position:absolute; top:24px; right:24px; display:flex; gap:8px;">
+                        <button onclick="moveReview(${idx}, -1)" ${idx === 0 ? 'disabled style="opacity:0.5"' : ''} style="padding:6px; border:1px solid #ddd; border-radius:4px; background:#fff; cursor:pointer;">↑</button>
+                        <button onclick="moveReview(${idx}, 1)" ${idx === reviews.length - 1 ? 'disabled style="opacity:0.5"' : ''} style="padding:6px; border:1px solid #ddd; border-radius:4px; background:#fff; cursor:pointer;">↓</button>
+                        <button onclick="deleteReview(${idx})" style="padding:6px 12px; border:1px solid #ff4444; color:#ff4444; border-radius:4px; background:#fff; cursor:pointer; margin-left:8px;">Remove</button>
+                    </div>
+                    
+                    <div style="display:flex; gap:16px; margin-bottom:16px;">
+                        <input type="text" id="rev-name-${idx}" value="${r.name}" placeholder="Client Name" style="flex:1; padding:10px; border:1px solid #ddd; border-radius:6px;">
+                        <input type="text" id="rev-role-${idx}" value="${r.role}" placeholder="Client Role / Business Type" style="flex:1; padding:10px; border:1px solid #ddd; border-radius:6px;">
+                    </div>
+                    
+                    <div style="display:flex; gap:16px; margin-bottom:16px;">
+                        <div style="flex:1;">
+                            <input type="text" id="rev-img-${idx}" value="${r.image || ''}" placeholder="Optional Profile Image URL" style="width:100%; padding:10px; border:1px solid #ddd; border-radius:6px;">
+                        </div>
+                        <div style="width:150px;">
+                            <select id="rev-rating-${idx}" style="width:100%; padding:10px; border:1px solid #ddd; border-radius:6px;">
+                                <option value="5" ${r.rating == 5 ? 'selected' : ''}>⭐⭐⭐⭐⭐ (5)</option>
+                                <option value="4" ${r.rating == 4 ? 'selected' : ''}>⭐⭐⭐⭐ (4)</option>
+                                <option value="3" ${r.rating == 3 ? 'selected' : ''}>⭐⭐⭐ (3)</option>
+                                <option value="2" ${r.rating == 2 ? 'selected' : ''}>⭐⭐ (2)</option>
+                                <option value="1" ${r.rating == 1 ? 'selected' : ''}>⭐ (1)</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <textarea id="rev-text-${idx}" placeholder="Review Text" style="width:100%; padding:10px; border:1px solid #ddd; border-radius:6px; height:80px;">${r.text}</textarea>
+                    
+                    <div style="margin-top:16px; padding:16px; background:#faf9f6; border-radius:8px; border:1px dashed #ccc;">
+                        <div style="font-size:12px; color:#888; margin-bottom:8px; text-transform:uppercase; font-weight:700;">Live Preview</div>
+                        <div style="font-style:italic; margin-bottom:12px;">"${r.text}"</div>
+                        <div style="display:flex; align-items:center; gap:12px;">
+                            ${r.image ? `<img src="${r.image}" style="width:40px; height:40px; border-radius:50%; object-fit:cover;">` : `<div style="width:40px; height:40px; border-radius:50%; background:#ddd; display:flex; align-items:center; justify-content:center; font-weight:bold;">${r.name ? r.name[0] : '?'}</div>`}
+                            <div>
+                                <div style="font-weight:600; font-size:14px;">${r.name || 'Name'}</div>
+                                <div style="font-size:12px; color:#666;">${r.role || 'Role'}</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        });
+        html += `</div>
+        <button onclick="saveAllReviews()" style="margin-top:24px; padding:12px 24px; background:#000; color:#fff; border:none; border-radius:6px; cursor:pointer;">Save All Reviews</button>
+        `;
+        return html;
+    },
+    services: () => {
+        const services = getSiteData().services;
+        let html = `
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+                <h1>Services CMS</h1>
+                <button onclick="addService()" style="padding:10px 20px; background:#000; color:#fff; border:none; border-radius:6px; cursor:pointer;">+ Add Service</button>
+            </div>
+            <div style="margin-top:24px; display:grid; gap:16px;">
+        `;
+        services.forEach((s, idx) => {
+            html += `
+                <div class="card" style="padding:24px;">
+                    <input type="text" id="svc-icon-${idx}" value="${s.icon}" placeholder="Emoji/Icon" style="width:60px; padding:8px; border:1px solid #ddd; border-radius:4px; margin-bottom:8px;">
+                    <input type="text" id="svc-title-${idx}" value="${s.title}" placeholder="Service Name" style="width:calc(100% - 76px); padding:8px; border:1px solid #ddd; border-radius:4px; margin-bottom:8px;">
+                    <textarea id="svc-desc-${idx}" placeholder="Description" style="width:100%; padding:8px; border:1px solid #ddd; border-radius:4px; height:60px; margin-bottom:12px;">${s.desc}</textarea>
+                    <button onclick="deleteService(${idx})" style="padding:6px 12px; border:1px solid #ff4444; color:#ff4444; border-radius:4px; background:#fff; cursor:pointer;">Remove</button>
+                </div>
+            `;
+        });
+        html += `</div>
+        <button onclick="saveServices()" style="margin-top:24px; padding:12px 24px; background:#000; color:#fff; border:none; border-radius:6px; cursor:pointer;">Save All Services</button>
+        `;
+        return html;
+    },
+    appearance: () => {
+        const app = getSiteData().appearance;
+        const seo = getSiteData().seo || {};
+        return `
+            <h1>Appearance & SEO Settings</h1>
+            
+            <div class="card" style="margin-top:24px;">
+                <h2>Visuals</h2>
+                <hr style="margin: 16px 0; border: 0; border-top: 1px solid #eee;">
+                
+                <label style="display:block; margin-bottom:8px; font-weight:600;">Primary Action Color</label>
+                <input type="color" id="app-primary" value="${app.primary_color}" style="margin-bottom:16px;">
+
+                <label style="display:block; margin-bottom:8px; font-weight:600;">Background Color</label>
+                <input type="color" id="app-bg" value="${app.bg_color}" style="margin-bottom:16px;">
+
+                <label style="display:block; margin-bottom:8px; font-weight:600;">Heading Font</label>
+                <select id="app-font" style="width:100%; padding:12px; border:1px solid #ddd; border-radius:6px; margin-bottom:24px;">
+                    <option value="Sora" ${app.heading_font === 'Sora' ? 'selected' : ''}>Sora (Modern/Bold)</option>
+                    <option value="Inter" ${app.heading_font === 'Inter' ? 'selected' : ''}>Inter (Clean/Minimal)</option>
+                    <option value="Outfit" ${app.heading_font === 'Outfit' ? 'selected' : ''}>Outfit (Geometric)</option>
+                </select>
+            </div>
+            
+            <div class="card" style="margin-top:24px;">
+                <h2>SEO & Analytics</h2>
+                <hr style="margin: 16px 0; border: 0; border-top: 1px solid #eee;">
+                
+                <label style="display:block; margin-bottom:8px; font-weight:600;">SEO Description</label>
+                <textarea id="seo-desc" style="width:100%; padding:12px; border:1px solid #ddd; border-radius:6px; height:80px; margin-bottom:16px;" placeholder="Brief description for search engines...">${seo.description || ''}</textarea>
+                
+                <label style="display:block; margin-bottom:8px; font-weight:600;">Open Graph Image URL (For social sharing)</label>
+                <input type="text" id="seo-og" value="${seo.og_image || ''}" placeholder="https://..." style="width:100%; padding:12px; border:1px solid #ddd; border-radius:6px; margin-bottom:16px;">
+                
+                <label style="display:block; margin-bottom:8px; font-weight:600;">Google Analytics Measurement ID</label>
+                <input type="text" id="seo-ga" value="${seo.ga_id || ''}" placeholder="G-XXXXXXXXXX" style="width:100%; padding:12px; border:1px solid #ddd; border-radius:6px; margin-bottom:24px;">
+
+                <button class="btn-primary" onclick="saveAppearance()" style="padding:12px 24px; background:#000; color:#fff; border:none; border-radius:6px; cursor:pointer;">Save All Settings</button>
+            </div>
+        `;
+    },
+    pricing: () => {
+        const plans = getSiteData().pricing;
+        let html = `
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+                <h1>Pricing Plans</h1>
+                <button onclick="addPricing()" style="padding:10px 20px; background:#000; color:#fff; border:none; border-radius:6px; cursor:pointer;">+ Add Plan</button>
+            </div>
+            <div style="margin-top:24px; display:grid; gap:16px; grid-template-columns:1fr 1fr;">
+        `;
+        plans.forEach((p, idx) => {
+            html += `
+                <div class="card" style="padding:24px;">
+                    <input type="text" id="pr-title-${idx}" value="${p.title}" placeholder="Plan Name" style="width:100%; padding:8px; margin-bottom:8px; border:1px solid #ddd; border-radius:4px;">
+                    <input type="text" id="pr-price-${idx}" value="${p.price}" placeholder="Price (e.g. $999)" style="width:100%; padding:8px; margin-bottom:8px; border:1px solid #ddd; border-radius:4px;">
+                    <textarea id="pr-desc-${idx}" placeholder="Description" style="width:100%; padding:8px; margin-bottom:12px; border:1px solid #ddd; border-radius:4px; height:60px;">${p.desc}</textarea>
+                    <textarea id="pr-features-${idx}" placeholder="Features (comma separated)" style="width:100%; padding:8px; margin-bottom:12px; border:1px solid #ddd; border-radius:4px; height:60px;">${p.features.join(',')}</textarea>
+                    <button onclick="deletePricing(${idx})" style="padding:6px 12px; border:1px solid #ff4444; color:#ff4444; border-radius:4px; background:#fff; cursor:pointer;">Remove</button>
+                </div>
+            `;
+        });
+        html += `</div><button onclick="savePricing()" style="margin-top:24px; padding:12px 24px; background:#000; color:#fff; border:none; border-radius:6px; cursor:pointer;">Save Pricing</button>`;
+        return html;
+    },
+    founders: () => {
+        const f = getSiteData().founders;
+        let html = `
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+                <h1>Founders</h1>
+                <button onclick="addFounder()" style="padding:10px 20px; background:#000; color:#fff; border:none; border-radius:6px; cursor:pointer;">+ Add Founder</button>
+            </div>
+            <div style="margin-top:24px; display:grid; gap:16px;">
+        `;
+        f.forEach((person, idx) => {
+            html += `
+                <div class="card" style="display:flex; gap:16px; align-items:center;">
+                    <input type="text" id="f-name-${idx}" value="${person.name}" placeholder="Name" style="padding:8px; border:1px solid #ddd; border-radius:4px; flex:1;">
+                    <input type="text" id="f-role-${idx}" value="${person.role}" placeholder="Role" style="padding:8px; border:1px solid #ddd; border-radius:4px; flex:1;">
+                    <input type="text" id="f-img-${idx}" value="${person.image}" placeholder="Image URL" style="padding:8px; border:1px solid #ddd; border-radius:4px; flex:1;">
+                    <button onclick="deleteFounder(${idx})" style="padding:8px 12px; border:1px solid #ff4444; color:#ff4444; border-radius:4px; background:#fff; cursor:pointer;">Del</button>
+                </div>
+            `;
+        });
+        html += `</div><button onclick="saveFounders()" style="margin-top:24px; padding:12px 24px; background:#000; color:#fff; border:none; border-radius:6px; cursor:pointer;">Save Founders</button>`;
+        return html;
+    },
+    contact: () => {
+        const c = getSiteData().contact;
+        return `
+            <h1>Contact Section</h1>
+            <div class="card" style="margin-top:24px;">
+                <label style="display:block; margin-bottom:8px; font-weight:600;">Email</label>
+                <input type="email" id="c-email" value="${c.email}" style="width:100%; padding:12px; border:1px solid #ddd; border-radius:6px; margin-bottom:16px;">
+                
+                <label style="display:block; margin-bottom:8px; font-weight:600;">Instagram URL</label>
+                <input type="text" id="c-ig" value="${c.instagram}" style="width:100%; padding:12px; border:1px solid #ddd; border-radius:6px; margin-bottom:16px;">
+                
+                <label style="display:block; margin-bottom:8px; font-weight:600;">WhatsApp Link</label>
+                <input type="text" id="c-wa" value="${c.whatsapp}" style="width:100%; padding:12px; border:1px solid #ddd; border-radius:6px; margin-bottom:24px;">
+
+                <button class="btn-primary" onclick="saveContact()" style="padding:12px 24px; background:#000; color:#fff; border:none; border-radius:6px; cursor:pointer;">Save Contact Info</button>
+            </div>
+        `;
+    },
+    about: () => {
+        const a = getSiteData().about;
+        return `
+            <h1>About Section</h1>
+            <div class="card" style="margin-top:24px;">
+                <label style="display:block; margin-bottom:8px; font-weight:600;">Intro Text</label>
+                <textarea id="ab-intro" style="width:100%; padding:12px; border:1px solid #ddd; border-radius:6px; height:80px; margin-bottom:16px;">${a.intro}</textarea>
+                <button class="btn-primary" onclick="saveAbout()" style="padding:12px 24px; background:#000; color:#fff; border:none; border-radius:6px; cursor:pointer;">Save About</button>
+            </div>
+        `;
+    },
+    navigation: () => {
+        const nav = getSiteData().navigation;
+        return `
+            <h1>Navigation Menu</h1>
+            <div class="card" style="margin-top:24px;">
+                <p style="margin-bottom:16px; color:#666;">Toggle which links appear in the main navigation bar.</p>
+                ${Object.keys(nav).map(key => `
+                    <div style="display:flex; justify-content:space-between; padding:12px 0; border-bottom:1px solid #eee;">
+                        <span style="text-transform:capitalize; font-weight:600;">${key}</span>
+                        <input type="checkbox" id="nav-${key}" ${nav[key] ? 'checked' : ''}>
+                    </div>
+                `).join('')}
+                <button class="btn-primary" onclick="saveNavigation()" style="margin-top:24px; padding:12px 24px; background:#000; color:#fff; border:none; border-radius:6px; cursor:pointer;">Save Navigation</button>
+            </div>
+        `;
+    },
+    medialib: () => {
+        return `
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+                <h1>Media Library</h1>
+                <button onclick="alert('Mock Uploading... Image Saved!')" style="padding:10px 20px; background:#000; color:#fff; border:none; border-radius:6px; cursor:pointer;">+ Upload File</button>
+            </div>
+            <div class="card" style="margin-top:24px; text-align:center; padding:60px;">
+                <h2>Local Media Library</h2>
+                <p>Media storage is currently simulated. In a real environment, this connects to AWS S3 or Cloudinary.</p>
+            </div>
+        `;
+    }
+};
+
+// === ACTION HANDLERS ===
+
+// Homepage
+window.saveHomepage = function() {
+    const data = getSiteData();
+    data.homepage.hero_title = document.getElementById('hp-title').value;
+    data.homepage.hero_sub = document.getElementById('hp-sub').value;
+    data.homepage.hero_cta_text = document.getElementById('hp-cta-text').value;
+    data.homepage.hero_cta_link = document.getElementById('hp-cta-link').value;
+    data.homepage.banner_active = document.getElementById('hp-banner-active').value === "true";
+    data.homepage.banner_text = document.getElementById('hp-banner-text').value;
+    saveSiteData(data);
+};
+
+// Projects
+window.deleteProject = function(idx) {
+    if(!confirm("Delete this project?")) return;
+    const data = getSiteData();
+    data.projects.splice(idx, 1);
+    saveSiteData(data);
+    renderModule('portfolio');
+};
+window.addProject = function() {
+    const title = prompt("Project Title:");
+    if(!title) return;
+    const cat = prompt("Category (e.g., Reel, Strategy):");
+    const imgUrl = prompt("Thumbnail Image URL:");
+    const vidUrl = prompt("Video URL (optional):");
+    
+    const data = getSiteData();
+    data.projects.push({ title, category: cat||"", thumbnail: imgUrl||"", video: vidUrl||"" });
+    saveSiteData(data);
+    renderModule('portfolio');
+};
+window.editProject = function(idx) {
+    const data = getSiteData();
+    const p = data.projects[idx];
+    const newTitle = prompt("Edit Title:", p.title);
+    if(newTitle === null) return;
+    p.title = newTitle;
+    p.category = prompt("Edit Category:", p.category) || p.category;
+    p.thumbnail = prompt("Edit Thumbnail URL:", p.thumbnail) || p.thumbnail;
+    saveSiteData(data);
+    renderModule('portfolio');
+};
+
+// Reviews
+window.addReview = function() {
+    const data = getReviewsData();
+    data.unshift({ name: "", role: "", text: "", rating: 5, image: "" });
+    saveReviewsData(data);
+    renderModule('reviews');
+};
+window.deleteReview = function(idx) {
+    if(!confirm("Delete this review?")) return;
+    const data = getReviewsData();
+    data.splice(idx, 1);
+    saveReviewsData(data);
+    renderModule('reviews');
+};
+window.moveReview = function(idx, dir) {
+    const data = getReviewsData();
+    if(idx + dir < 0 || idx + dir >= data.length) return;
+    const temp = data[idx];
+    data[idx] = data[idx + dir];
+    data[idx + dir] = temp;
+    saveReviewsData(data);
+    renderModule('reviews');
+};
+window.saveAllReviews = function() {
+    const data = getReviewsData();
+    data.forEach((r, idx) => {
+        r.name = document.getElementById(`rev-name-${idx}`).value;
+        r.role = document.getElementById(`rev-role-${idx}`).value;
+        r.text = document.getElementById(`rev-text-${idx}`).value;
+        r.rating = parseInt(document.getElementById(`rev-rating-${idx}`).value, 10);
+        r.image = document.getElementById(`rev-img-${idx}`).value;
+    });
+    saveReviewsData(data);
+    renderModule('reviews'); // Re-render for live preview updates
+};
+
+// Services
+window.addService = function() {
+    const data = getSiteData();
+    data.services.push({ icon: "✨", title: "New Service", desc: "" });
+    saveSiteData(data);
+    renderModule('services');
+};
+window.deleteService = function(idx) {
+    const data = getSiteData();
+    data.services.splice(idx, 1);
+    saveSiteData(data);
+    renderModule('services');
+};
+window.saveServices = function() {
+    const data = getSiteData();
+    data.services.forEach((s, idx) => {
+        s.icon = document.getElementById(`svc-icon-${idx}`).value;
+        s.title = document.getElementById(`svc-title-${idx}`).value;
+        s.desc = document.getElementById(`svc-desc-${idx}`).value;
+    });
+    saveSiteData(data);
+};
+
+// Appearance & SEO
+window.saveAppearance = function() {
+    const data = getSiteData();
+    data.appearance.primary_color = document.getElementById('app-primary').value;
+    data.appearance.bg_color = document.getElementById('app-bg').value;
+    data.appearance.heading_font = document.getElementById('app-font').value;
+    
+    if (!data.seo) data.seo = {};
+    data.seo.description = document.getElementById('seo-desc').value;
+    data.seo.og_image = document.getElementById('seo-og').value;
+    data.seo.ga_id = document.getElementById('seo-ga').value;
+    
+    saveSiteData(data);
+};
+
+// Pricing
+window.addPricing = function() {
+    const data = getSiteData();
+    data.pricing.push({ title: "New Plan", price: "$0", desc: "Plan description", features: ["Feature 1"] });
+    saveSiteData(data);
+    renderModule('pricing');
+};
+window.deletePricing = function(idx) {
+    const data = getSiteData();
+    data.pricing.splice(idx, 1);
+    saveSiteData(data);
+    renderModule('pricing');
+};
+window.savePricing = function() {
+    const data = getSiteData();
+    data.pricing.forEach((p, idx) => {
+        p.title = document.getElementById(`pr-title-${idx}`).value;
+        p.price = document.getElementById(`pr-price-${idx}`).value;
+        p.desc = document.getElementById(`pr-desc-${idx}`).value;
+        p.features = document.getElementById(`pr-features-${idx}`).value.split(',').map(f => f.trim()).filter(f => f);
+    });
+    saveSiteData(data);
+};
+
+// Founders
+window.addFounder = function() {
+    const data = getSiteData();
+    data.founders.push({ name: "New Founder", role: "Role", image: "" });
+    saveSiteData(data);
+    renderModule('founders');
+};
+window.deleteFounder = function(idx) {
+    const data = getSiteData();
+    data.founders.splice(idx, 1);
+    saveSiteData(data);
+    renderModule('founders');
+};
+window.saveFounders = function() {
+    const data = getSiteData();
+    data.founders.forEach((f, idx) => {
+        f.name = document.getElementById(`f-name-${idx}`).value;
+        f.role = document.getElementById(`f-role-${idx}`).value;
+        f.image = document.getElementById(`f-img-${idx}`).value;
+    });
+    saveSiteData(data);
+};
+
+// Contact
+window.saveContact = function() {
+    const data = getSiteData();
+    data.contact.email = document.getElementById('c-email').value;
+    data.contact.instagram = document.getElementById('c-ig').value;
+    data.contact.whatsapp = document.getElementById('c-wa').value;
+    saveSiteData(data);
+};
+
+// About
+window.saveAbout = function() {
+    const data = getSiteData();
+    data.about.intro = document.getElementById('ab-intro').value;
+    saveSiteData(data);
+};
+
+// Navigation
+window.saveNavigation = function() {
+    const data = getSiteData();
+    Object.keys(data.navigation).forEach(key => {
+        data.navigation[key] = document.getElementById(`nav-${key}`).checked;
+    });
+    saveSiteData(data);
+};
+
+// === ROUTER ===
+window.renderModule = function(moduleName) {
+    const container = document.getElementById('main-content');
+    if (MODULES[moduleName]) {
+        container.innerHTML = MODULES[moduleName]();
+    } else {
+        container.innerHTML = `
+            <div class="card" style="text-align:center; padding:60px;">
+                <h2>Module Under Construction</h2>
+                <p>The <strong>${moduleName}</strong> module is currently being built.</p>
+            </div>
+        `;
+    }
+
+    // Update active nav state
+    document.querySelectorAll('.nav-btn').forEach(btn => {
+        btn.classList.remove('active');
+        if(btn.dataset.module === moduleName) {
+            btn.classList.add('active');
+        }
+    });
+};
+
+// Ensure Dashboard loads on init
+window.addEventListener('DOMContentLoaded', () => {
+    // Only run if we are inside the admin dashboard
+    if(document.getElementById('main-content')) {
+        renderModule('dashboard');
+    }
+});

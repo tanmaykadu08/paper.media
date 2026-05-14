@@ -6,9 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Paper.Media – Shared Links</title>
   <meta name="description" content="Links & resources shared by Paper.Media creative studio.">
-  <link
-    href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
-    rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <style>
     :root {
       --bg: #F8FAFC;
@@ -226,7 +224,7 @@
 
   <!-- Profile -->
   <div class="profile">
-    <img src="logo.png" alt="Paper.Media Logo" style="height: 64px; width: auto; margin: 0 auto 16px; display: block;">
+    <img src="logo.png" alt="Paper.Media Logo" style="height: 64px; width: auto; margin: 0 auto 16px; display: block;" loading="lazy" decoding="async">
     <div class="profile-bio">Creative Studio — Content that Converts</div>
     <div class="profile-badge">Public links shared by owner</div>
   </div>
@@ -294,10 +292,10 @@
         const content = data.content;
         if (content) {
           if (content.contact_whatsapp && document.getElementById('link-wa')) {
-             document.getElementById('link-wa').href = content.contact_whatsapp;
+            document.getElementById('link-wa').href = content.contact_whatsapp;
           }
           if (content.contact_ig && document.getElementById('link-ig')) {
-             document.getElementById('link-ig').href = content.contact_ig;
+            document.getElementById('link-ig').href = content.contact_ig;
           }
         }
       } catch (err) {
