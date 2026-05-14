@@ -21,7 +21,7 @@ const DEFAULT_DATA = {
         { title: "Growth", price: "₹29,999/mo", desc: "For brands ready to scale their social presence.", features: ["15 High-Quality Reels", "Social Media Management", "Advanced Strategy & SEO", "Monthly Growth Reports"] },
         { title: "Agency", price: "Custom", desc: "Tailored solutions for established businesses.", features: ["Unlimited Reels Editing", "Dedicated Content Manager", "Full Production Support", "Priority Support"] }
     ],
-    founders: [],
+
     about: {
         intro: "We are a digital creative studio obsessed with high-impact storytelling.",
         process: []
@@ -118,12 +118,36 @@ const MODULES = {
                         <div style="font-size:32px; margin-bottom:8px;">${data.pricing.length}</div>
                         <div style="color:var(--muted); font-size:14px;">Pricing Plans</div>
                     </div>
-                    <div class="card">
-                        <div style="font-size:32px; margin-bottom:8px;">${data.founders.length}</div>
-                        <div style="color:var(--muted); font-size:14px;">Team Members</div>
+                </div>
+
+                <div class="card" style="margin-top: 24px;">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+                        <h2>Recent Inquiries</h2>
+                        <button class="btn-secondary" onclick="fetchInquiries()" style="padding:6px 12px; font-size:12px;">Refresh</button>
+                    </div>
+                    <div style="overflow-x:auto;">
+                        <table style="width:100%; border-collapse:collapse; text-align:left;">
+                            <thead>
+                                <tr style="border-bottom:1px solid #eee;">
+                                    <th style="padding:12px 8px; color:#666; font-weight:600;">Name</th>
+                                    <th style="padding:12px 8px; color:#666; font-weight:600;">Message</th>
+                                    <th style="padding:12px 8px; color:#666; font-weight:600;">Date</th>
+                                    <th style="padding:12px 8px; color:#666; font-weight:600;">Status</th>
+                                    <th style="padding:12px 8px; color:#666; font-weight:600; text-align:right;">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="inquiries-list">
+                                <tr><td colspan="5" style="padding:24px; text-align:center; color:#888;">Fetching inquiries...</td></tr>
+                            </tbody>
+                        </table>
                     </div>
                 </div>
             </div>
+            <script>
+                if (typeof fetchInquiries === "function") {
+                    setTimeout(fetchInquiries, 100);
+                }
+            </script>
         `;
     },
     homepage: () => {
@@ -344,28 +368,7 @@ const MODULES = {
         html += `</div><button onclick="savePricing()" style="margin-top:24px; padding:12px 24px; background:#000; color:#fff; border:none; border-radius:6px; cursor:pointer;">Save Pricing</button>`;
         return html;
     },
-    founders: () => {
-        const f = getSiteData().founders;
-        let html = `
-            <div style="display:flex; justify-content:space-between; align-items:center;">
-                <h1>Founders</h1>
-                <button onclick="addFounder()" style="padding:10px 20px; background:#000; color:#fff; border:none; border-radius:6px; cursor:pointer;">+ Add Founder</button>
-            </div>
-            <div style="margin-top:24px; display:grid; gap:16px;">
-        `;
-        f.forEach((person, idx) => {
-            html += `
-                <div class="card" style="display:flex; gap:16px; align-items:center;">
-                    <input type="text" id="f-name-${idx}" value="${person.name}" placeholder="Name" style="padding:8px; border:1px solid #ddd; border-radius:4px; flex:1;">
-                    <input type="text" id="f-role-${idx}" value="${person.role}" placeholder="Role" style="padding:8px; border:1px solid #ddd; border-radius:4px; flex:1;">
-                    <input type="text" id="f-img-${idx}" value="${person.image}" placeholder="Image URL" style="padding:8px; border:1px solid #ddd; border-radius:4px; flex:1;">
-                    <button onclick="deleteFounder(${idx})" style="padding:8px 12px; border:1px solid #ff4444; color:#ff4444; border-radius:4px; background:#fff; cursor:pointer;">Del</button>
-                </div>
-            `;
-        });
-        html += `</div><button onclick="saveFounders()" style="margin-top:24px; padding:12px 24px; background:#000; color:#fff; border:none; border-radius:6px; cursor:pointer;">Save Founders</button>`;
-        return html;
-    },
+
     contact: () => {
         const c = getSiteData().contact;
         return `
@@ -377,8 +380,8 @@ const MODULES = {
                 <label style="display:block; margin-bottom:8px; font-weight:600;">Instagram URL</label>
                 <input type="text" id="c-ig" value="${c.instagram}" style="width:100%; padding:12px; border:1px solid #ddd; border-radius:6px; margin-bottom:16px;">
                 
-                <label style="display:block; margin-bottom:8px; font-weight:600;">WhatsApp Link</label>
-                <input type="text" id="c-wa" value="${c.whatsapp}" style="width:100%; padding:12px; border:1px solid #ddd; border-radius:6px; margin-bottom:24px;">
+                <label style="display:block; margin-bottom:8px; font-weight:600;">WhatsApp Number</label>
+                <input type="text" id="c-wa" value="${c.whatsapp}" placeholder="e.g. +1234567890" style="width:100%; padding:12px; border:1px solid #ddd; border-radius:6px; margin-bottom:24px;">
 
                 <button class="btn-primary" onclick="saveContact()" style="padding:12px 24px; background:#000; color:#fff; border:none; border-radius:6px; cursor:pointer;">Save Contact Info</button>
             </div>
@@ -395,22 +398,7 @@ const MODULES = {
             </div>
         `;
     },
-    navigation: () => {
-        const nav = getSiteData().navigation;
-        return `
-            <h1>Navigation Menu</h1>
-            <div class="card" style="margin-top:24px;">
-                <p style="margin-bottom:16px; color:#666;">Toggle which links appear in the main navigation bar.</p>
-                ${Object.keys(nav).map(key => `
-                    <div style="display:flex; justify-content:space-between; padding:12px 0; border-bottom:1px solid #eee;">
-                        <span style="text-transform:capitalize; font-weight:600;">${key}</span>
-                        <input type="checkbox" id="nav-${key}" ${nav[key] ? 'checked' : ''}>
-                    </div>
-                `).join('')}
-                <button class="btn-primary" onclick="saveNavigation()" style="margin-top:24px; padding:12px 24px; background:#000; color:#fff; border:none; border-radius:6px; cursor:pointer;">Save Navigation</button>
-            </div>
-        `;
-    },
+
 
 };
 
@@ -623,28 +611,6 @@ window.savePricing = function() {
     saveSiteData(data);
 };
 
-// Founders
-window.addFounder = function() {
-    const data = getSiteData();
-    data.founders.push({ name: "New Founder", role: "Role", image: "" });
-    saveSiteData(data);
-    renderModule('founders');
-};
-window.deleteFounder = function(idx) {
-    const data = getSiteData();
-    data.founders.splice(idx, 1);
-    saveSiteData(data);
-    renderModule('founders');
-};
-window.saveFounders = function() {
-    const data = getSiteData();
-    data.founders.forEach((f, idx) => {
-        f.name = document.getElementById(`f-name-${idx}`).value;
-        f.role = document.getElementById(`f-role-${idx}`).value;
-        f.image = document.getElementById(`f-img-${idx}`).value;
-    });
-    saveSiteData(data);
-};
 
 // Contact
 window.saveContact = function() {
@@ -662,14 +628,7 @@ window.saveAbout = function() {
     saveSiteData(data);
 };
 
-// Navigation
-window.saveNavigation = function() {
-    const data = getSiteData();
-    Object.keys(data.navigation).forEach(key => {
-        data.navigation[key] = document.getElementById(`nav-${key}`).checked;
-    });
-    saveSiteData(data);
-};
+
 
 // === ROUTER ===
 window.renderModule = function(moduleName) {
@@ -701,3 +660,65 @@ window.addEventListener('DOMContentLoaded', () => {
         renderModule('dashboard');
     }
 });
+
+// === INQUIRIES API INTEGRATION ===
+window.fetchInquiries = async function() {
+    const list = document.getElementById('inquiries-list');
+    if (!list) return;
+
+    list.innerHTML = '<tr><td colspan="5" style="padding:24px; text-align:center; color:#888;">Loading...</td></tr>';
+    const secret = localStorage.getItem("papermedia_admin_secret");
+    
+    try {
+        const res = await fetch("https://papermediaapi.paper-mediaa.workers.dev/admin/inquiries", {
+            headers: { "X-Admin-Key": secret }
+        });
+        const data = await res.json();
+        
+        if (data.inquiries && data.inquiries.length > 0) {
+            list.innerHTML = data.inquiries.map(inq => {
+                const isReplied = inq.status === 'replied';
+                return `
+                    <tr style="border-bottom:1px solid #eee;">
+                        <td style="padding:12px 8px; font-weight:600;">${inq.name}</td>
+                        <td style="padding:12px 8px; max-width:300px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;" title="${inq.message}">
+                            ${inq.message}
+                        </td>
+                        <td style="padding:12px 8px; font-size:12px; color:#666;">
+                            ${new Date(inq.created_at + 'Z').toLocaleDateString()}
+                        </td>
+                        <td style="padding:12px 8px;">
+                            <label style="display:flex; align-items:center; gap:6px; cursor:pointer; font-size:12px; color:${isReplied ? '#10b981' : '#f59e0b'}; font-weight:600;">
+                                <input type="checkbox" onchange="updateInquiryStatus(${inq.id}, this.checked)" ${isReplied ? 'checked' : ''}>
+                                ${isReplied ? 'Replied' : 'Pending'}
+                            </label>
+                        </td>
+                        <td style="padding:12px 8px; text-align:right;">
+                            <a href="mailto:${inq.email}?subject=Reply from Paper.Media" class="btn-secondary" style="padding:6px 12px; text-decoration:none; display:inline-block; font-size:12px;">Reply Email</a>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        } else {
+            list.innerHTML = '<tr><td colspan="5" style="padding:24px; text-align:center; color:#888;">No inquiries found.</td></tr>';
+        }
+    } catch (err) {
+        list.innerHTML = '<tr><td colspan="5" style="padding:24px; text-align:center; color:red;">Failed to load inquiries.</td></tr>';
+        console.error(err);
+    }
+};
+
+window.updateInquiryStatus = async function(id, isChecked) {
+    const status = isChecked ? 'replied' : 'new';
+    const secret = localStorage.getItem("papermedia_admin_secret");
+    try {
+        await fetch(`https://papermediaapi.paper-mediaa.workers.dev/admin/inquiries/${id}`, {
+            method: "PUT",
+            headers: { "X-Admin-Key": secret, "Content-Type": "application/json" },
+            body: JSON.stringify({ status })
+        });
+        fetchInquiries(); // Refresh to update colors and labels
+    } catch (err) {
+        alert("Failed to update status.");
+    }
+};

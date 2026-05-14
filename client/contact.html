@@ -58,25 +58,81 @@
       <div class="contact-grid">
         <div class="reveal">
           <p style="font-size: 16px; color: #666; line-height: 1.8; margin-bottom: var(--space-md);">Ready to take your content to the next level? Fill out the form or reach out via social media. We typically reply within 30 minutes.</p>
-          
-          <div class="contact-links">
-            <a href="https://wa.me/" class="contact-link-card" target="_blank">
-              <div class="contact-link-icon">💬</div>
-              <div>
-                <div class="contact-link-title">WhatsApp Us</div>
-                <div class="contact-link-sub">Fastest response time</div>
-              </div>
-              <div class="contact-link-arrow">↗</div>
-            </a>
-            <a href="https://instagram.com/" class="contact-link-card" target="_blank">
-              <div class="contact-link-icon">📸</div>
-              <div>
-                <div class="contact-link-title">@paper.mediaa</div>
-                <div class="contact-link-sub">DM us on Instagram</div>
-              </div>
-              <div class="contact-link-arrow">↗</div>
-            </a>
+          <div class="contact-links" id="dynamic-contact-links">
+            <!-- Populated by JS -->
           </div>
+
+          <script>
+            function loadContactInfo() {
+              const raw = localStorage.getItem('papermedia_cms_data');
+              let contact = { email: "", instagram: "", whatsapp: "" };
+              if (raw) {
+                try {
+                  const data = JSON.parse(raw);
+                  if (data.contact) contact = data.contact;
+                } catch(e) {}
+              }
+              
+              const container = document.getElementById('dynamic-contact-links');
+              if (!container) return;
+              
+              let html = '';
+
+              // 1. Instagram
+              if (contact.instagram && contact.instagram.trim() !== '') {
+                let igHandle = contact.instagram.split('instagram.com/')[1] || 'Instagram';
+                igHandle = igHandle.split('?')[0]; // Remove URL parameters like ?igsh=...
+                igHandle = igHandle.replace(/\//g, '');
+                if (!igHandle || igHandle === 'Instagram') igHandle = 'paper.mediaa';
+                
+                let igLink = contact.instagram.includes('http') ? contact.instagram : 'https://instagram.com/' + contact.instagram;
+                html += `
+                  <a href="${igLink}" class="contact-link-card" target="_blank">
+                    <div class="contact-link-icon">📸</div>
+                    <div>
+                      <div class="contact-link-title">@${igHandle}</div>
+                      <div class="contact-link-sub">DM us on Instagram</div>
+                    </div>
+                    <div class="contact-link-arrow">↗</div>
+                  </a>
+                `;
+              }
+              
+              // 2. WhatsApp
+              if (contact.whatsapp && contact.whatsapp.trim() !== '') {
+                let waClean = contact.whatsapp.replace(/[^0-9]/g, '');
+                let waLink = contact.whatsapp.includes('http') ? contact.whatsapp : 'https://wa.me/' + waClean;
+                html += `
+                  <a href="${waLink}" class="contact-link-card" target="_blank">
+                    <div class="contact-link-icon">💬</div>
+                    <div>
+                      <div class="contact-link-title">WhatsApp Us</div>
+                      <div class="contact-link-sub">Fastest response time</div>
+                    </div>
+                    <div class="contact-link-arrow">↗</div>
+                  </a>
+                `;
+              }
+              
+              // 3. Email
+              if (contact.email && contact.email.trim() !== '') {
+                html += `
+                  <a href="mailto:${contact.email}" class="contact-link-card" target="_blank">
+                    <div class="contact-link-icon">✉️</div>
+                    <div>
+                      <div class="contact-link-title">Email Us</div>
+                      <div class="contact-link-sub">${contact.email}</div>
+                    </div>
+                    <div class="contact-link-arrow">↗</div>
+                  </a>
+                `;
+              }
+              
+              container.innerHTML = html;
+            }
+            
+            document.addEventListener('DOMContentLoaded', loadContactInfo);
+          </script>
         </div>
 
         <form class="form reveal" id="contactForm" action="https://papermediaapi.paper-mediaa.workers.dev/contact" method="POST">
@@ -124,14 +180,37 @@
       event.preventDefault();
       const form = document.getElementById("contactForm");
       const btn = form.querySelector('.form-btn');
+      const raw = localStorage.getItem('papermedia_cms_data');
+      let adminEmail = "";
+      if (raw) {
+        try {
+          const cmsData = JSON.parse(raw);
+          if (cmsData.contact && cmsData.contact.email) {
+            adminEmail = cmsData.contact.email;
+          }
+        } catch(e) {}
+      }
+
       const data = {
         name: form.elements.name.value,
         email: form.elements.email.value,
-        message: form.elements.message.value
+        message: form.elements.message.value,
+        _replyto: form.elements.email.value // Helps FormSubmit set reply-to address
       };
+      
       const originalText = btn.textContent;
       btn.textContent = 'Sending...'; btn.style.opacity = '0.7'; btn.disabled = true;
 
+      // 1. Send to FormSubmit for direct email (if configured)
+      if (adminEmail && adminEmail.includes('@')) {
+        fetch(`https://formsubmit.co/ajax/${adminEmail}`, {
+          method: form.method,
+          body: JSON.stringify(data),
+          headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' }
+        }).catch(() => {}); // Fire and forget
+      }
+
+      // 2. Save to Turso Database via Worker API
       fetch(event.target.action, {
         method: form.method,
         body: JSON.stringify(data),
