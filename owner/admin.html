@@ -1,522 +1,217 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Paper.Media – Owner Panel</title>
-  <meta name="robots" content="noindex">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <title>Paper.Media Admin | Login</title>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Sora:wght@400;600;700;800&display=swap"
+    rel="stylesheet">
   <link rel="stylesheet" href="admin.css">
+  <style>
+    body {
+      background: #f5f1ea;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      overflow: hidden;
+    }
+  </style>
 </head>
+
 <body>
 
-  <!-- Login Screen -->
-  <div id="login-screen">
-    <div class="login-box">
-      <h2>Admin Login</h2>
-      <p class="text-muted" style="margin-bottom:20px;">Enter your admin secret key to access.</p>
-      <input type="password" id="admin-key" placeholder="Enter Secret Key" />
-      <button class="btn-primary" onclick="login()">Access Dashboard</button>
-      <p id="login-error" class="text-muted" style="color:var(--danger); margin-top:12px; display:none;">Invalid key or connection error.</p>
+  <div class="login-card">
+    <div class="admin-logo">Paper<span>.</span>Media <sub>CMS</sub></div>
+    <p>Authentication Required</p>
+
+    <div class="form-group">
+      <input type="password" id="adminSecret" placeholder="Enter Secret Key" autofocus />
     </div>
+
+    <button class="btn-primary" onclick="loginAdmin()" style="width:100%;">
+      Access Dashboard
+    </button>
   </div>
 
-  <!-- App Layout -->
-  <div id="app" class="hidden">
-    <!-- Sidebar -->
-    <aside class="sidebar">
-      <div class="logo">Paper<span>.</span>Media <sub>Admin</sub></div>
-      <nav class="nav-menu">
-      <div class="nav-item active" data-target="dashboard"><span>📊</span> Dashboard</div>
-      <div class="nav-item" data-target="inquiries"><span>📥</span> Inquiries</div>
-      <div class="nav-item" data-target="portfolio"><span>📸</span> Portfolio</div>
-      <div class="nav-item" data-target="content"><span>📝</span> Site Content</div>
-      <a href="/" class="nav-item" target="_blank"><span>🌐</span> Public Site</a>
-      </nav>
-      <button class="logout-btn" onclick="logout()"><span>🚪</span> Logout</button>
-    </aside>
+  <<<<<<< HEAD <!-- App Layout -->
+    <div id="app" class="hidden">
+      <!-- Sidebar -->
+      <aside class="sidebar">
+        <div class="logo">Paper<span>.</span>Media <sub>Admin</sub></div>
+        <nav class="nav-menu">
+          <div class="nav-item active" data-target="dashboard"><span>📊</span> Dashboard</div>
+          <div class="nav-item" data-target="inquiries"><span>📥</span> Inquiries</div>
+          <div class="nav-item" data-target="portfolio"><span>📸</span> Portfolio</div>
+          <div class="nav-item" data-target="content"><span>📝</span> Site Content</div>
+          <a href="/" class="nav-item" target="_blank"><span>🌐</span> Public Site</a>
+        </nav>
+        <button class="logout-btn" onclick="logout()"><span>🚪</span> Logout</button>
+      </aside>
 
-    <!-- Main Content -->
-    <main class="main">
-      
-      <!-- DASHBOARD VIEW -->
-      <section id="view-dashboard" class="view active">
-        <div class="page-header">
-          <h1>Dashboard Overview</h1>
-        </div>
-        <div class="grid-3">
-          <div class="stat-card">
-            <h3>Total Inquiries</h3>
-            <div class="value" id="stat-inquiries">-</div>
-          </div>
-          <div class="stat-card">
-            <h3>New Inquiries</h3>
-            <div class="value" id="stat-new" style="color: #fca5a5;">-</div>
-          </div>
-          <div class="stat-card">
-            <h3>Portfolio Items</h3>
-            <div class="value" id="stat-portfolio">-</div>
-          </div>
-        </div>
-        <br>
-        <div class="page-header">
-          <h2>Recent Inquiries</h2>
-        </div>
-        <div class="table-container">
-          <table>
-            <thead>
-              <tr>
-                <th>Date</th>
-                <th>Name</th>
-                <th>Status</th>
-              </tr>
-            </thead>
-            <tbody id="dashboard-recent-table">
-              <tr><td colspan="3" class="text-muted">Loading...</td></tr>
-            </tbody>
-          </table>
-        </div>
-      </section>
+      <!-- Main Content -->
+      <main class="main">
 
-      <!-- INQUIRIES VIEW -->
-      <section id="view-inquiries" class="view">
-        <div class="page-header">
-          <h1>Client Inquiries</h1>
-          <button class="btn-sm" onclick="loadInquiries()">↻ Refresh</button>
-        </div>
-        <div class="table-container">
-          <table>
-            <thead>
-              <tr>
-                <th>Date</th>
-                <th>Client</th>
-                <th>Message</th>
-                <th>Status</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody id="inquiries-table">
-              <tr><td colspan="5" class="text-muted">Loading...</td></tr>
-            </tbody>
-          </table>
-        </div>
-      </section>
+        <!-- DASHBOARD VIEW -->
+        <section id="view-dashboard" class="view active">
+          <div class="page-header">
+            <h1>Dashboard Overview</h1>
+          </div>
+          <div class="grid-3">
+            <div class="stat-card">
+              <h3>Total Inquiries</h3>
+              <div class="value" id="stat-inquiries">-</div>
+            </div>
+            <div class="stat-card">
+              <h3>New Inquiries</h3>
+              <div class="value" id="stat-new" style="color: #fca5a5;">-</div>
+            </div>
+            <div class="stat-card">
+              <h3>Portfolio Items</h3>
+              <div class="value" id="stat-portfolio">-</div>
+            </div>
+          </div>
+          <br>
+          <div class="page-header">
+            <h2>Recent Inquiries</h2>
+          </div>
+          <div class="table-container">
+            <table>
+              <thead>
+                <tr>
+                  <th>Date</th>
+                  <th>Name</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody id="dashboard-recent-table">
+                <tr>
+                  <td colspan="3" class="text-muted">Loading...</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
 
-      <!-- PORTFOLIO VIEW -->
-      <section id="view-portfolio" class="view">
-        <div class="page-header">
-          <h1>Portfolio Management</h1>
-          <button class="btn-primary" onclick="document.getElementById('upload-modal').classList.remove('hidden')" style="width:auto;"><span>＋</span> Add Item</button>
-        </div>
-        <div class="grid-3" id="portfolio-grid">
-          <p class="text-muted">Loading portfolio...</p>
-        </div>
-      </section>
+        <!-- INQUIRIES VIEW -->
+        <section id="view-inquiries" class="view">
+          <div class="page-header">
+            <h1>Client Inquiries</h1>
+            <button class="btn-sm" onclick="loadInquiries()">↻ Refresh</button>
+          </div>
+          <div class="table-container">
+            <table>
+              <thead>
+                <tr>
+                  <th>Date</th>
+                  <th>Client</th>
+                  <th>Message</th>
+                  <th>Status</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="inquiries-table">
+                <tr>
+                  <td colspan="5" class="text-muted">Loading...</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
 
-      <!-- CONTENT VIEW -->
-      <section id="view-content" class="view">
-        <div class="page-header">
-          <h1>Edit Site Content</h1>
-          <button class="btn-primary" onclick="saveContent()" style="width:auto;"><span>💾</span> Save Changes</button>
-        </div>
-        <div class="table-container" style="padding: 24px; display:flex; flex-direction:column; gap:20px;">
-          <div>
-            <label class="text-muted" style="display:block;margin-bottom:8px;">Hero Title (HTML allowed)</label>
-            <input type="text" id="content-hero_title" style="width:100%" placeholder="e.g. We Help<br>Brands Grow..." />
+        <!-- PORTFOLIO VIEW -->
+        <section id="view-portfolio" class="view">
+          <div class="page-header">
+            <h1>Portfolio Management</h1>
+            <button class="btn-primary" onclick="document.getElementById('upload-modal').classList.remove('hidden')"
+              style="width:auto;"><span>＋</span> Add Item</button>
           </div>
-          <div>
-            <label class="text-muted" style="display:block;margin-bottom:8px;">Hero Subtitle</label>
-            <input type="text" id="content-hero_sub" style="width:100%" placeholder="e.g. High-quality reels..." />
+          <div class="grid-3" id="portfolio-grid">
+            <p class="text-muted">Loading portfolio...</p>
           </div>
-          <div>
-            <label class="text-muted" style="display:block;margin-bottom:8px;">About Text (HTML allowed)</label>
-            <textarea id="content-about_text" style="width:100%; height:120px;"></textarea>
-          </div>
-          <div>
-            <label class="text-muted" style="display:block;margin-bottom:8px;">WhatsApp Link</label>
-            <input type="text" id="content-contact_whatsapp" style="width:100%" placeholder="https://wa.me/..." />
-          </div>
-          <div>
-            <label class="text-muted" style="display:block;margin-bottom:8px;">Instagram Link</label>
-            <input type="text" id="content-contact_ig" style="width:100%" placeholder="https://instagram.com/..." />
-          </div>
-        </div>
-      </section>
+        </section>
 
-    </main>
-  </div>
+        <!-- CONTENT VIEW -->
+        <section id="view-content" class="view">
+          <div class="page-header">
+            <h1>Edit Site Content</h1>
+            <button class="btn-primary" onclick="saveContent()" style="width:auto;"><span>💾</span> Save
+              Changes</button>
+          </div>
+          <div class="table-container" style="padding: 24px; display:flex; flex-direction:column; gap:20px;">
+            <div>
+              <label class="text-muted" style="display:block;margin-bottom:8px;">Hero Title (HTML allowed)</label>
+              <input type="text" id="content-hero_title" style="width:100%"
+                placeholder="e.g. We Help<br>Brands Grow..." />
+            </div>
+            <div>
+              <label class="text-muted" style="display:block;margin-bottom:8px;">Hero Subtitle</label>
+              <input type="text" id="content-hero_sub" style="width:100%" placeholder="e.g. High-quality reels..." />
+            </div>
+            <div>
+              <label class="text-muted" style="display:block;margin-bottom:8px;">About Text (HTML allowed)</label>
+              <textarea id="content-about_text" style="width:100%; height:120px;"></textarea>
+            </div>
+            <div>
+              <label class="text-muted" style="display:block;margin-bottom:8px;">WhatsApp Link</label>
+              <input type="text" id="content-contact_whatsapp" style="width:100%" placeholder="https://wa.me/..." />
+            </div>
+            <div>
+              <label class="text-muted" style="display:block;margin-bottom:8px;">Instagram Link</label>
+              <input type="text" id="content-contact_ig" style="width:100%" placeholder="https://instagram.com/..." />
+            </div>
+          </div>
+        </section>
 
-  <!-- Upload Modal -->
-  <div id="upload-modal" class="hidden" style="position:fixed;inset:0;background:rgba(0,0,0,0.8);display:flex;align-items:center;justify-content:center;z-index:1500;">
-    <div style="background:var(--card);padding:32px;border-radius:12px;border:1px solid var(--border);width:100%;max-width:500px;">
-      <h2 style="margin-bottom:20px;">Add Portfolio Item</h2>
-      
-      <label class="text-muted" style="display:block;margin-bottom:8px;">Project Title</label>
-      <input type="text" id="port-title" style="width:100%;margin-bottom:16px;" placeholder="e.g. Summer Campaign" />
-      
-      <label class="text-muted" style="display:block;margin-bottom:8px;">Tag (Category)</label>
-      <input type="text" id="port-tag" style="width:100%;margin-bottom:16px;" placeholder="e.g. Reels, Social Media" />
-      
-      <label class="text-muted" style="display:block;margin-bottom:8px;">Media File (Image or Video)</label>
-      <input type="file" id="port-file" style="width:100%;margin-bottom:24px;" accept="image/*,video/*" />
-      
-      <div style="display:flex;gap:12px;justify-content:flex-end;">
-        <button class="btn-sm" onclick="document.getElementById('upload-modal').classList.add('hidden')">Cancel</button>
-        <button class="btn-primary" id="port-upload-btn" onclick="uploadPortfolioItem()" style="width:auto;">Upload & Save</button>
+      </main>
+    </div>
+
+    <!-- Upload Modal -->
+    <div id="upload-modal" class="hidden"
+      style="position:fixed;inset:0;background:rgba(0,0,0,0.8);display:flex;align-items:center;justify-content:center;z-index:1500;">
+      <div
+        style="background:var(--card);padding:32px;border-radius:12px;border:1px solid var(--border);width:100%;max-width:500px;">
+        <h2 style="margin-bottom:20px;">Add Portfolio Item</h2>
+
+        <label class="text-muted" style="display:block;margin-bottom:8px;">Project Title</label>
+        <input type="text" id="port-title" style="width:100%;margin-bottom:16px;" placeholder="e.g. Summer Campaign" />
+
+        <label class="text-muted" style="display:block;margin-bottom:8px;">Tag (Category)</label>
+        <input type="text" id="port-tag" style="width:100%;margin-bottom:16px;"
+          placeholder="e.g. Reels, Social Media" />
+
+        <label class="text-muted" style="display:block;margin-bottom:8px;">Media File (Image or Video)</label>
+        <input type="file" id="port-file" style="width:100%;margin-bottom:24px;" accept="image/*,video/*" />
+
+        <div style="display:flex;gap:12px;justify-content:flex-end;">
+          <button class="btn-sm"
+            onclick="document.getElementById('upload-modal').classList.add('hidden')">Cancel</button>
+          <button class="btn-primary" id="port-upload-btn" onclick="uploadPortfolioItem()" style="width:auto;">Upload &
+            Save</button>
+        </div>
       </div>
     </div>
-  </div>
 
-  <div id="toast">Message</div>
+    <div id="toast">Message</div>
 
-  <script>
-    // --- Config ---
-    const API_URL = "https://papermediaapi.paper-mediaa.workers.dev";
-    
-    // --- State ---
-    let key = localStorage.getItem("paper_admin_key");
+    =======
+    >>>>>>> 8d2b945 (update the ui and change the function)
+    <script>
+      function loginAdmin() {
+        const secret = document.getElementById("adminSecret").value.trim();
 
-    // --- UI Helpers ---
-    function showToast(msg, isError = false) {
-      const t = document.getElementById("toast");
-      t.textContent = msg;
-      t.className = isError ? "error show" : "show";
-      setTimeout(() => t.classList.remove("show"), 3000);
-    }
-
-    function formatDate(isoStr) {
-      if(!isoStr) return "N/A";
-      const d = new Date(isoStr);
-      return d.toLocaleDateString() + " " + d.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
-    }
-
-    // --- Navigation ---
-    document.querySelectorAll('.nav-item[data-target]').forEach(item => {
-      item.addEventListener('click', () => {
-        document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
-        item.classList.add('active');
-        
-        document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
-        document.getElementById(`view-${item.dataset.target}`).classList.add('active');
-        
-        if (item.dataset.target === 'dashboard') loadDashboard();
-        if (item.dataset.target === 'inquiries') loadInquiries();
-        if (item.dataset.target === 'portfolio') loadPortfolio();
-        if (item.dataset.target === 'content') loadContent();
-      });
-    });
-
-    // --- API Wrapper ---
-    async function api(path, options = {}) {
-      const headers = {
-        "Content-Type": "application/json",
-        "X-Admin-Key": key || "",
-        ...options.headers
-      };
-      const res = await fetch(`${API_URL}${path}`, { ...options, headers });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || 'API Error');
-      return data;
-    }
-
-    // --- Auth ---
-    async function checkAuth() {
-      if (!key) {
-        document.getElementById('login-screen').classList.remove('hidden');
-        return;
-      }
-      try {
-        // Test key with inquiries
-        await api('/admin/inquiries');
-        document.getElementById('login-screen').classList.add('hidden');
-        document.getElementById('app').classList.remove('hidden');
-        loadDashboard();
-      } catch (e) {
-        key = null;
-        localStorage.removeItem("paper_admin_key");
-        document.getElementById('login-screen').classList.remove('hidden');
-      }
-    }
-
-    async function login() {
-      const keyIn = document.getElementById('admin-key').value;
-      const errEl = document.getElementById('login-error');
-      try {
-        errEl.style.display = 'none';
-        key = keyIn;
-        await api('/admin/inquiries'); // Test auth
-        localStorage.setItem("paper_admin_key", key);
-        document.getElementById('login-screen').classList.add('hidden');
-        document.getElementById('app').classList.remove('hidden');
-        showToast("Logged in successfully!");
-        loadDashboard();
-      } catch (e) {
-        key = null;
-        errEl.style.display = 'block';
-        errEl.textContent = e.message === "Unauthorized" ? "Invalid Secret Key" : "Connection Error";
-      }
-    }
-
-    function logout() {
-      if(confirm('Are you sure you want to log out?')) {
-        localStorage.removeItem("paper_admin_key");
-        window.location.reload();
-      }
-    }
-
-    // --- Loaders ---
-    async function loadDashboard() {
-      try {
-        const [inqRes, portRes] = await Promise.all([
-          api('/admin/inquiries'),
-          api('/portfolio')
-        ]);
-        
-        const inquiries = inqRes.inquiries || [];
-        const newCount = inquiries.filter(i => i.status === 'new').length;
-        
-        document.getElementById('stat-inquiries').textContent = inquiries.length;
-        document.getElementById('stat-new').textContent = newCount;
-        document.getElementById('stat-portfolio').textContent = portRes.count || 0;
-
-        // Render recent
-        const tbody = document.getElementById('dashboard-recent-table');
-        tbody.innerHTML = '';
-        inquiries.slice(0, 5).forEach(i => {
-          tbody.innerHTML += `
-            <tr>
-              <td>${formatDate(i.created_at)}</td>
-              <td><strong>${i.name}</strong></td>
-              <td><span class="status-badge status-${i.status}">${i.status}</span></td>
-            </tr>
-          `;
-        });
-        if(inquiries.length === 0) tbody.innerHTML = `<tr><td colspan="3" class="text-muted">No recent inquiries</td></tr>`;
-
-      } catch (e) {
-        showToast("Error loading dashboard", true);
-      }
-    }
-
-    async function loadInquiries() {
-      const tbody = document.getElementById('inquiries-table');
-      tbody.innerHTML = `<tr><td colspan="5" class="text-muted">Loading...</td></tr>`;
-      try {
-        const data = await api('/admin/inquiries');
-        tbody.innerHTML = '';
-        
-        if (!data.inquiries || data.inquiries.length === 0) {
-          tbody.innerHTML = `<tr><td colspan="5" class="text-muted">No inquiries found.</td></tr>`;
-          return;
+        if (secret === "papermediaadmin2026") {
+          localStorage.setItem("papermedia_admin_auth", "true");
+          console.log("AUTH SAVED");
+          window.location.href = "admin-dashboard.html";
+        } else {
+          alert("Invalid Secret Key");
         }
-
-        data.inquiries.forEach(i => {
-          tbody.innerHTML += `
-            <tr>
-              <td>${formatDate(i.created_at)}</td>
-              <td>
-                <strong>${i.name}</strong><br>
-                <a href="mailto:${i.email}" style="color:var(--purple-l);font-size:12px;">${i.email}</a>
-              </td>
-              <td style="max-width:300px; white-space:pre-wrap; font-size:13px; color:var(--muted);">${i.message}</td>
-              <td>
-                <select onchange="updateStatus(${i.id}, this.value)" style="padding:4px 8px; font-size:12px;">
-                  <option value="new" ${i.status==='new'?'selected':''}>New</option>
-                  <option value="read" ${i.status==='read'?'selected':''}>Read</option>
-                  <option value="replied" ${i.status==='replied'?'selected':''}>Replied</option>
-                </select>
-              </td>
-              <td>
-                <button class="btn-sm" onclick="window.location.href='mailto:${i.email}'">Reply</button>
-              </td>
-            </tr>
-          `;
-        });
-      } catch (e) {
-        tbody.innerHTML = `<tr><td colspan="5" class="text-muted" style="color:var(--danger)">Failed to load.</td></tr>`;
-        showToast("Error loading inquiries", true);
       }
-    }
+    </script>
 
-    async function updateStatus(id, newStatus) {
-      try {
-        await api(`/admin/inquiries/${id}`, {
-          method: 'PUT',
-          body: JSON.stringify({ status: newStatus })
-        });
-        showToast("Status updated");
-        loadDashboard(); // Refresh stats in background
-      } catch (e) {
-        showToast("Failed to update status", true);
-        loadInquiries(); // Revert change visually
-      }
-    }
-
-    async function loadPortfolio() {
-      const grid = document.getElementById('portfolio-grid');
-      grid.innerHTML = `<p class="text-muted">Loading portfolio...</p>`;
-      try {
-        const data = await api('/portfolio');
-        grid.innerHTML = '';
-        
-        if (!data.items || data.items.length === 0) {
-          grid.innerHTML = `<p class="text-muted" style="grid-column:1/-1;">No portfolio items yet.</p>`;
-          return;
-        }
-
-        data.items.forEach(p => {
-          const hasMedia = p.image_url || p.video_url;
-          let mediaHtml = `<div style="background:${p.bg_color || '#333'}; width:100%; height:100%; display:flex; align-items:center; justify-content:center;">${p.emoji || '📸'}</div>`;
-          
-          if (p.image_url) mediaHtml = `<img src="${p.image_url}" alt="${p.title}">`;
-          if (p.video_url) mediaHtml = `<video src="${p.video_url}" muted loop autoplay playsinline></video>`;
-
-          grid.innerHTML += `
-            <div class="port-card">
-              <div class="port-preview">
-                ${mediaHtml}
-              </div>
-              <div class="port-info">
-                <h4>${p.title}</h4>
-                <span>${p.tag}</span>
-              </div>
-              <div class="port-actions">
-                <button class="btn-sm" onclick="alert('Edit coming soon')">✏️ Edit</button>
-                <button class="btn-sm" style="color:var(--danger)" onclick="deletePortfolio(${p.id})">🗑️ Delete</button>
-              </div>
-            </div>
-          `;
-        });
-      } catch (e) {
-        grid.innerHTML = `<p class="text-muted" style="color:var(--danger)">Failed to load portfolio.</p>`;
-        showToast("Error loading portfolio", true);
-      }
-    }
-
-    async function deletePortfolio(id) {
-      if(!confirm("Are you sure you want to delete this item?")) return;
-      try {
-        await api(`/admin/portfolio/${id}`, { method: 'DELETE' });
-        showToast("Deleted successfully");
-        loadPortfolio();
-        loadDashboard();
-      } catch(e) {
-        showToast("Failed to delete", true);
-      }
-    }
-
-    async function uploadPortfolioItem() {
-      const title = document.getElementById('port-title').value;
-      const tag = document.getElementById('port-tag').value;
-      const fileInput = document.getElementById('port-file');
-      const file = fileInput.files[0];
-      const btn = document.getElementById('port-upload-btn');
-      
-      if (!title || !tag || !file) {
-        showToast("Please fill all fields and select a file.", true);
-        return;
-      }
-      
-      try {
-        btn.textContent = "Signing...";
-        btn.disabled = true;
-        
-        // 1. Get Signature from backend
-        const signRes = await api('/admin/media/sign');
-        
-        btn.textContent = "Uploading to Cloudinary...";
-        
-        // 2. Upload to Cloudinary
-        const formData = new FormData();
-        formData.append("file", file);
-        formData.append("api_key", signRes.api_key);
-        formData.append("timestamp", signRes.timestamp);
-        formData.append("signature", signRes.signature);
-        
-        const resourceType = file.type.startsWith('video/') ? 'video' : 'image';
-        const cloudinaryUrl = `https://api.cloudinary.com/v1_1/${signRes.cloud_name}/${resourceType}/upload`;
-        
-        const uploadReq = await fetch(cloudinaryUrl, {
-          method: "POST",
-          body: formData
-        });
-        
-        const uploadRes = await uploadReq.json();
-        if (!uploadReq.ok) throw new Error(uploadRes.error?.message || "Cloudinary error");
-        
-        const mediaUrl = uploadRes.secure_url;
-        
-        btn.textContent = "Saving to Database...";
-        
-        // 3. Save to Turso
-        const dbPayload = {
-          title,
-          tag,
-          emoji: '✨',
-          bg_color: '#333',
-          image_url: resourceType === 'image' ? mediaUrl : null,
-          video_url: resourceType === 'video' ? mediaUrl : null
-        };
-        
-        await api('/admin/portfolio', {
-          method: 'POST',
-          body: JSON.stringify(dbPayload)
-        });
-        
-        showToast("Portfolio item added successfully!");
-        document.getElementById('upload-modal').classList.add('hidden');
-        document.getElementById('port-title').value = '';
-        document.getElementById('port-tag').value = '';
-        fileInput.value = '';
-        
-        loadPortfolio();
-        loadDashboard();
-      } catch (err) {
-        console.error(err);
-        showToast(err.message, true);
-      } finally {
-        btn.textContent = "Upload & Save";
-        btn.disabled = false;
-      }
-    }
-
-    async function loadContent() {
-      try {
-        const data = await api('/content');
-        if (data.content) {
-          document.getElementById('content-hero_title').value = data.content.hero_title || '';
-          document.getElementById('content-hero_sub').value = data.content.hero_sub || '';
-          document.getElementById('content-about_text').value = data.content.about_text || '';
-          document.getElementById('content-contact_whatsapp').value = data.content.contact_whatsapp || '';
-          document.getElementById('content-contact_ig').value = data.content.contact_ig || '';
-        }
-      } catch (e) {
-        showToast("Error loading content", true);
-      }
-    }
-
-    async function saveContent() {
-      const updates = {
-        hero_title: document.getElementById('content-hero_title').value,
-        hero_sub: document.getElementById('content-hero_sub').value,
-        about_text: document.getElementById('content-about_text').value,
-        contact_whatsapp: document.getElementById('content-contact_whatsapp').value,
-        contact_ig: document.getElementById('content-contact_ig').value
-      };
-      
-      try {
-        await api('/admin/content', {
-          method: 'POST',
-          body: JSON.stringify(updates)
-        });
-        showToast("Content saved successfully!");
-      } catch (e) {
-        showToast("Failed to save content", true);
-      }
-    }
-
-    // --- Init ---
-    checkAuth();
-  </script>
 </body>
+
 </html>

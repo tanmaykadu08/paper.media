@@ -98,9 +98,29 @@ export default {
       // Setup Route - Creates necessary tables if they don't exist
       if (method === "GET" && url.pathname === "/setup") {
         await turso(`CREATE TABLE IF NOT EXISTS inquiries (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT, email TEXT, message TEXT, status TEXT DEFAULT 'new', created_at DATETIME DEFAULT CURRENT_TIMESTAMP)`);
-        await turso(`CREATE TABLE IF NOT EXISTS portfolio (id INTEGER PRIMARY KEY AUTOINCREMENT, title TEXT, tag TEXT, bg_color TEXT, emoji TEXT, image_url TEXT, video_url TEXT, created_at DATETIME DEFAULT CURRENT_TIMESTAMP)`);
+        await turso(`CREATE TABLE IF NOT EXISTS portfolio (
+          id INTEGER PRIMARY KEY AUTOINCREMENT, 
+          title TEXT, 
+          tag TEXT, 
+          bg_color TEXT, 
+          emoji TEXT, 
+          image_url TEXT, 
+          video_url TEXT, 
+          description TEXT,
+          link TEXT,
+          is_featured INTEGER DEFAULT 0,
+          sort_order INTEGER DEFAULT 0,
+          created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+        )`);
+        
+        // Add missing columns if table already exists (safe migration)
+        try { await turso(`ALTER TABLE portfolio ADD COLUMN description TEXT`); } catch(e){}
+        try { await turso(`ALTER TABLE portfolio ADD COLUMN link TEXT`); } catch(e){}
+        try { await turso(`ALTER TABLE portfolio ADD COLUMN is_featured INTEGER DEFAULT 0`); } catch(e){}
+        try { await turso(`ALTER TABLE portfolio ADD COLUMN sort_order INTEGER DEFAULT 0`); } catch(e){}
+        
         await turso(`CREATE TABLE IF NOT EXISTS site_content (key TEXT PRIMARY KEY, value TEXT)`);
-        return jsonResponse({ success: true, message: "Tables created successfully" });
+        return jsonResponse({ success: true, message: "Tables updated successfully" });
       }
 
       // --- PUBLIC ROUTES ---
@@ -111,7 +131,11 @@ export default {
       }
 
       if (method === "GET" && url.pathname === "/portfolio") {
-        const result = await turso("SELECT * FROM portfolio ORDER BY created_at DESC");
+        const featuredOnly = url.searchParams.get("featured") === "1";
+        const sql = featuredOnly 
+          ? "SELECT * FROM portfolio WHERE is_featured = 1 ORDER BY sort_order ASC, created_at DESC" 
+          : "SELECT * FROM portfolio ORDER BY sort_order ASC, created_at DESC";
+        const result = await turso(sql);
         return jsonResponse({ items: result.rows, count: result.rows.length });
       }
 
@@ -158,12 +182,30 @@ export default {
         }
 
         if (method === "POST" && url.pathname === "/admin/portfolio") {
-            const { title, tag, emoji, bg_color, image_url, video_url } = await request.json();
-            await turso("INSERT INTO portfolio (title, tag, emoji, bg_color, image_url, video_url) VALUES (?, ?, ?, ?, ?, ?)", [title, tag, emoji, bg_color, image_url || null, video_url || null]);
+            const { title, tag, emoji, bg_color, image_url, video_url, description, link, is_featured, sort_order } = await request.json();
+            await turso(
+              "INSERT INTO portfolio (title, tag, emoji, bg_color, image_url, video_url, description, link, is_featured, sort_order) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", 
+              [title, tag, emoji, bg_color, image_url || null, video_url || null, description || '', link || '', is_featured ? 1 : 0, sort_order || 0]
+            );
             return jsonResponse({ success: true });
         }
         
         const portMatch = url.pathname.match(/^\/admin\/portfolio\/(\d+)$/);
+        if (method === "PUT" && portMatch) {
+            const updates = await request.json();
+            const id = Number(portMatch[1]);
+            
+            // Build dynamic update query
+            const keys = Object.keys(updates);
+            if (keys.length === 0) return jsonResponse({ success: false, error: "No fields to update" });
+            
+            const setClause = keys.map(k => `${k} = ?`).join(", ");
+            const values = Object.values(updates);
+            
+            await turso(`UPDATE portfolio SET ${setClause} WHERE id = ?`, [...values, id]);
+            return jsonResponse({ success: true });
+        }
+
         if (method === "DELETE" && portMatch) {
             await turso("DELETE FROM portfolio WHERE id = ?", [Number(portMatch[1])]);
             return jsonResponse({ success: true });

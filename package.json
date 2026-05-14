@@ -4,7 +4,8 @@
   "type": "module",
   "scripts": {
     "dev":    "wrangler dev",
-    "deploy": "wrangler deploy"
+    "deploy": "wrangler deploy",
+    "sitemap": "node generate-sitemap.js"
   },
   "devDependencies": {
     "wrangler": "^3.65.0"
