@@ -184,6 +184,8 @@
       const section = container.closest('section');
       if (!container) return;
 
+      console.log("[Portfolio Page] Loading items:", items);
+
       try {
         if (items.length === 0) {
           showEmptyState(container, section);
@@ -192,31 +194,41 @@
 
         container.innerHTML = '';
         items.forEach(item => {
+          // Robust field mapping
+          const video = item.video_url || item.video || item.reel_url;
+          const image = item.image_url || item.image || item.thumbnail || item.url;
+          const title = item.title || item.name || "Portfolio Item";
+          const tag = item.tag || item.category || "Portfolio";
+          const link = item.link || '#';
+
           const card = document.createElement('div');
           card.className = 'port-card spotlight-card reveal';
 
           let mediaContent = '';
-          if (item.video_url) {
-            mediaContent = `<video src="${item.video_url}" autoplay muted loop playsinline style="width:100%; height:100%; object-fit:cover; position:absolute; top:0; left:0; border-radius:inherit;"></video>`;
-          } else if (item.image_url) {
-            mediaContent = `<img src="${item.image_url}" alt="${item.title || ''}" style="width:100%; height:100%; object-fit:cover; position:absolute; top:0; left:0; border-radius:inherit;" loading="lazy" decoding="async">`;
+          if (video) {
+            mediaContent = `<video src="${video}" autoplay muted loop playsinline style="width:100%; height:100%; object-fit:cover; position:absolute; top:0; left:0; border-radius:inherit;"></video>`;
+          } else if (image) {
+            mediaContent = `<img src="${image}" alt="${title}" style="width:100%; height:100%; object-fit:cover; position:absolute; top:0; left:0; border-radius:inherit;" loading="lazy">`;
           }
 
           card.innerHTML = `
-          <div class="port-thumb" style="background:${item.bg_color || '#f5e6e8'}; position:relative; overflow:hidden;">
-            ${mediaContent}
-            ${(!item.video_url && !item.image_url) ? `<div style="display:flex;align-items:center;justify-content:center;height:100%;font-size:48px;">${item.emoji || '📸'}</div>` : ''}
-          </div>
-          <div class="port-info">
-            <span class="port-tag">${item.tag || 'Portfolio'}</span>
-            <div class="port-name">${item.title || 'Portfolio Item'}</div>
-          </div>
+          <a href="${link}" target="_blank" style="text-decoration:none; color:inherit;">
+            <div class="port-thumb" style="background:${item.bg_color || '#f5e6e8'}; position:relative; overflow:hidden;">
+              ${mediaContent}
+              ${(!video && !image) ? `<div style="display:flex;align-items:center;justify-content:center;height:100%;font-size:48px;">${item.emoji || '📸'}</div>` : ''}
+            </div>
+            <div class="port-info">
+              <span class="port-tag">${tag}</span>
+              <div class="port-name">${title}</div>
+            </div>
+          </a>
         `;
           container.appendChild(card);
         });
         
         section.style.paddingBottom = "var(--space-xxl)"; 
       } catch (error) {
+        console.error("Render error:", error);
         showEmptyState(container, section);
       }
     }

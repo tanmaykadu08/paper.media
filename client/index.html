@@ -296,31 +296,45 @@
     function loadFeatured(items = []) {
       const container = document.getElementById('featuredPortfolio');
       if (!container) return;
-      container.innerHTML = '';
+      
+      console.log("[Portfolio] Loading items:", items);
+
       if (!items || items.length === 0) {
         container.innerHTML = '<div class="portfolio-empty-state"><p>Projects coming soon.</p></div>';
         return;
       }
+
+      container.innerHTML = '';
       items.forEach(item => {
+        // Safe field mapping to handle various API response formats
+        const video = item.video_url || item.video || item.reel_url;
+        const image = item.image_url || item.image || item.thumbnail || item.url;
+        const title = item.title || item.name || "Untitled Project";
+        const tag = item.tag || item.category || "Reel";
+        const link = item.link || 'portfolio.html';
+
         const card = document.createElement('div');
         card.className = 'port-card spotlight-card reveal';
-        const mediaHtml = item.video_url 
-          ? `<video src="${item.video_url}" muted loop playsinline class="port-video"></video>
-             <img src="${item.image_url}" alt="${item.title}" class="port-img" loading="lazy" decoding="async">`
-          : `<img src="${item.image_url}" alt="${item.title}" class="port-img" loading="lazy" decoding="async">`;
+        
+        const mediaHtml = video 
+          ? `<video src="${video}" muted loop playsinline class="port-video"></video>
+             ${image ? `<img src="${image}" alt="${title}" class="port-img" loading="lazy">` : ''}`
+          : `<img src="${image || 'preview.jpg'}" alt="${title}" class="port-img" loading="lazy">`;
+
         card.innerHTML = `
-          <a href="${item.link || 'portfolio.html'}" target="_blank" class="port-link">
+          <a href="${link}" target="_blank" class="port-link">
             <div class="port-thumb">
               ${mediaHtml}
-              <div class="port-overlay"><span class="view-btn">View Reel →</span></div>
+              <div class="port-overlay"><span class="view-btn">View Project →</span></div>
             </div>
             <div class="port-info">
-              <span class="port-tag">${item.tag || 'Reel'}</span>
-              <div class="port-name">${item.title}</div>
+              <span class="port-tag">${tag}</span>
+              <div class="port-name">${title}</div>
             </div>
           </a>
         `;
-        if (item.video_url) {
+
+        if (video) {
           const v = card.querySelector('video');
           card.addEventListener('mouseenter', () => v.play().catch(() => {}));
           card.addEventListener('mouseleave', () => { v.pause(); v.currentTime = 0; });
