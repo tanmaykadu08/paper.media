@@ -54,13 +54,17 @@
                 }
             });
 
+            console.log("Login Response Status:", response.status);
+
             if (response.ok) {
                 localStorage.setItem("papermedia_admin_auth", "true");
                 localStorage.setItem("paper_admin_key", secret);
                 console.log("AUTH SUCCESS");
                 window.location.href = "admin-dashboard.html";
             } else {
-                alert("Invalid Secret Key");
+                const errData = await response.json().catch(() => ({}));
+                console.error("Login Failed:", errData);
+                alert(`Invalid Secret Key (Error ${response.status})`);
                 btn.textContent = "Access Dashboard";
                 btn.disabled = false;
             }
