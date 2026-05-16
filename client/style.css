@@ -520,26 +520,26 @@ nav.scrolled {
   width: 85%;
   max-width: 400px;
   height: 100%;
-  background: #ffffff;
-  z-index: 190;
+  background: #ffffff !important;   /* Solid background to prevent overlap */
+  z-index: 2000;                     /* Very high z-index */
   padding: 80px 40px;
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
   align-items: flex-start;
   gap: 15px;
-  transform: translateX(100%);
-  visibility: hidden;                /* hide from AT + prevent edge bleed */
+  transform: translateX(100%) !important; /* Ensure it stays hidden by default */
+  visibility: hidden;
   transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1),
-              visibility 0s linear 0.6s; /* delay visibility until slide-out done */
+              visibility 0s linear 0.6s;
   box-shadow: -10px 0 30px rgba(0,0,0,0.1);
 }
 
 .mobile-nav.open {
-  transform: translateX(0);
+  transform: translateX(0) !important;
   visibility: visible;
   transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1),
-              visibility 0s linear 0s; /* show immediately on open */
+              visibility 0s linear 0s;
 }
 
 .mobile-nav-header {
@@ -1664,9 +1664,11 @@ nav.scrolled {
 
 /* ===== FOOTER ===== */
 footer {
-  background: #0A0A0A;
+  background: #0A0A0A !important;
   position: relative;
   overflow: hidden;
+  z-index: 10;
+  width: 100%;
 }
 
 /* Subtle paper texture overlay — matches site aesthetic on dark bg */
@@ -1705,6 +1707,15 @@ footer::after {
   gap: 60px;
   padding: 72px 0 56px;
   border-bottom: 1px solid rgba(255,255,255,0.07);
+  position: relative;
+  z-index: 2;
+}
+
+.footer-col {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  min-width: 0; /* Prevent grid blowout */
 }
 
 /* ── Brand column ── */
@@ -1938,16 +1949,17 @@ a.footer-contact-value:hover {
 
 @media (max-width: 768px) {
   .footer-top {
-    grid-template-columns: 1fr 1fr;
-    gap: 32px 24px;
+    grid-template-columns: 1fr 1fr !important;
+    gap: 40px 24px !important;
     padding: 44px 0 36px;
   }
-
-  .footer-brand {
-    grid-column: 1 / -1;
+  
+  .footer-col {
+    grid-column: span 1;
+    text-align: left;
   }
-
-  .footer-col-contact {
+  
+  .footer-brand {
     grid-column: 1 / -1;
   }
 
@@ -1963,9 +1975,12 @@ a.footer-contact-value:hover {
 
 @media (max-width: 480px) {
   .footer-top {
-    grid-template-columns: 1fr;
-    gap: 28px;
-    padding: 36px 0 28px;
+    grid-template-columns: 1fr !important;
+    gap: 32px !important;
+  }
+  
+  .footer-col {
+    grid-column: 1 / -1;
   }
 
   .footer-brand { grid-column: auto; }
@@ -2662,7 +2677,6 @@ nav,
 .mobile-nav,
 .nav-overlay {
   will-change: transform;
-  transform: translateZ(0);
 }
 
 .cursor,
