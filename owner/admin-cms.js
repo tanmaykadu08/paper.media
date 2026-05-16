@@ -1,5 +1,6 @@
 // === PAPER.MEDIA DYNAMIC CMS ENGINE ===
-const CMS_KEY = "papermedia_cms_data";
+const API_BASE = "https://papermediaapi.paper-mediaa.workers.dev";
+const adminKey = localStorage.getItem("paper_admin_key");
 
 // Default Data Structure
 const DEFAULT_DATA = {
@@ -39,30 +40,51 @@ const DEFAULT_DATA = {
     }
 };
 
-// State Management
-function getSiteData() {
-    const raw = localStorage.getItem(CMS_KEY);
-    if (!raw) {
-        localStorage.setItem(CMS_KEY, JSON.stringify(DEFAULT_DATA));
-        return DEFAULT_DATA;
+// --- API Logic ---
+async function api(path, options = {}) {
+    const headers = { 
+        'Content-Type': 'application/json', 
+        'X-Admin-Key': adminKey,
+        ...options.headers 
+    };
+    try {
+        const res = await fetch(`${API_BASE}${path}`, { ...options, headers });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || `API Error: ${res.status}`);
+        return data;
+    } catch (err) {
+        console.error(`API Call Failed [${path}]:`, err);
+        throw err;
     }
-    return JSON.parse(raw);
 }
 
-function saveSiteData(data) {
-    localStorage.setItem(CMS_KEY, JSON.stringify(data));
-    showToast("Changes saved successfully!");
+async function getSiteData() {
+    try {
+        const data = await api('/content');
+        return data.content || {};
+    } catch (e) {
+        console.error("Failed to fetch site data:", e);
+        return {};
+    }
 }
 
-// Reviews State Management
-const REVIEWS_KEY = "papermedia_reviews";
-function getReviewsData() {
-    const raw = localStorage.getItem(REVIEWS_KEY);
-    if (!raw) return [];
-    return JSON.parse(raw);
+async function saveSiteData(updates) {
+    try {
+        await api('/admin/content', { method: 'POST', body: JSON.stringify(updates) });
+        showToast("Changes saved successfully!");
+    } catch (e) {
+        showToast("Save failed", true);
+    }
 }
-function saveReviewsData(data) {
-    localStorage.setItem(REVIEWS_KEY, JSON.stringify(data));
+
+// Reviews State Management (Synced with site_content key 'reviews')
+async function getReviewsData() {
+    const data = await getSiteData();
+    return data.reviews || [];
+}
+
+async function saveReviewsData(reviews) {
+    await saveSiteData({ reviews });
     showToast("Reviews saved successfully!");
 }
 
@@ -93,37 +115,41 @@ function showToast(msg, isError = false) {
 
 // === TEMPLATES & RENDERERS ===
 const MODULES = {
-    dashboard: () => {
-        const data = getSiteData();
+    dashboard: async () => {
+        const data = await getSiteData();
+        const portfolio = await api('/portfolio');
+        const projectsCount = portfolio.items ? portfolio.items.length : 0;
+        
         return `
             <div class="dashboard-home">
                 <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 24px;">
                     <h1>Dashboard Overview</h1>
-                    <span style="font-size:12px; color:#888;">Live Data Synced</span>
+                    <span style="font-size:12px; color:#10b981; font-weight:700;">● Cloud Sync Active</span>
                 </div>
                 <div class="stats-grid">
                     <div class="card">
-                        <div style="font-size:32px; margin-bottom:8px;">${data.projects.length}</div>
+                        <div style="font-size:32px; margin-bottom:8px;">${projectsCount}</div>
                         <div style="color:var(--muted); font-size:14px;">Total Projects</div>
                     </div>
                     <div class="card">
-                        <div style="font-size:32px; margin-bottom:8px;">${data.services.length}</div>
+                        <div style="font-size:32px; margin-bottom:8px;">${(data.services || []).length}</div>
                         <div style="color:var(--muted); font-size:14px;">Active Services</div>
                     </div>
                     <div class="card">
-                        <div style="font-size:32px; margin-bottom:8px;">${data.pricing.length}</div>
+                        <div style="font-size:32px; margin-bottom:8px;">${(data.pricing || []).length}</div>
                         <div style="color:var(--muted); font-size:14px;">Pricing Plans</div>
                     </div>
                     <div class="card">
-                        <div style="font-size:32px; margin-bottom:8px;">${data.founders.length}</div>
+                        <div style="font-size:32px; margin-bottom:8px;">${(data.founders || []).length}</div>
                         <div style="color:var(--muted); font-size:14px;">Team Members</div>
                     </div>
                 </div>
             </div>
         `;
     },
-    homepage: () => {
-        const data = getSiteData().homepage;
+    homepage: async () => {
+        const fullData = await getSiteData();
+        const data = fullData.homepage || {};
         return `
             <h1>Homepage Hero CMS</h1>
             <div class="card" style="margin-top:20px;">
@@ -159,8 +185,9 @@ const MODULES = {
             </div>
         `;
     },
-    portfolio: () => {
-        const projects = getSiteData().projects;
+    portfolio: async () => {
+        const res = await api('/portfolio');
+        const projects = res.items || [];
         let html = `
             <div style="display:flex; justify-content:space-between; align-items:center;">
                 <h1>Featured Projects</h1>
@@ -186,8 +213,8 @@ const MODULES = {
         html += `</div>`;
         return html;
     },
-    reviews: () => {
-        const reviews = getReviewsData();
+    reviews: async () => {
+        const reviews = await getReviewsData();
         let html = `
             <div style="display:flex; justify-content:space-between; align-items:center;">
                 <h1>Client Reviews</h1>
@@ -249,8 +276,9 @@ const MODULES = {
         `;
         return html;
     },
-    services: () => {
-        const services = getSiteData().services;
+    services: async () => {
+        const data = await getSiteData();
+        const services = data.services || [];
         let html = `
             <div style="display:flex; justify-content:space-between; align-items:center;">
                 <h1>Services CMS</h1>
@@ -273,9 +301,10 @@ const MODULES = {
         `;
         return html;
     },
-    appearance: () => {
-        const app = getSiteData().appearance;
-        const seo = getSiteData().seo || {};
+    appearance: async () => {
+        const fullData = await getSiteData();
+        const app = fullData.appearance || {};
+        const seo = fullData.seo || {};
         return `
             <h1>Appearance & SEO Settings</h1>
             
@@ -314,8 +343,9 @@ const MODULES = {
             </div>
         `;
     },
-    pricing: () => {
-        const plans = getSiteData().pricing;
+    pricing: async () => {
+        const data = await getSiteData();
+        const plans = data.pricing || [];
         let html = `
             <div style="display:flex; justify-content:space-between; align-items:center;">
                 <h1>Pricing Plans</h1>
@@ -337,8 +367,9 @@ const MODULES = {
         html += `</div><button onclick="savePricing()" style="margin-top:24px; padding:12px 24px; background:#000; color:#fff; border:none; border-radius:6px; cursor:pointer;">Save Pricing</button>`;
         return html;
     },
-    founders: () => {
-        const f = getSiteData().founders;
+    founders: async () => {
+        const data = await getSiteData();
+        const f = data.founders || [];
         let html = `
             <div style="display:flex; justify-content:space-between; align-items:center;">
                 <h1>Founders</h1>
@@ -359,8 +390,9 @@ const MODULES = {
         html += `</div><button onclick="saveFounders()" style="margin-top:24px; padding:12px 24px; background:#000; color:#fff; border:none; border-radius:6px; cursor:pointer;">Save Founders</button>`;
         return html;
     },
-    contact: () => {
-        const c = getSiteData().contact;
+    contact: async () => {
+        const data = await getSiteData();
+        const c = data.contact || {};
         return `
             <h1>Contact Section</h1>
             <div class="card" style="margin-top:24px;">
@@ -377,8 +409,9 @@ const MODULES = {
             </div>
         `;
     },
-    about: () => {
-        const a = getSiteData().about;
+    about: async () => {
+        const data = await getSiteData();
+        const a = data.about || {};
         return `
             <h1>About Section</h1>
             <div class="card" style="margin-top:24px;">
@@ -388,8 +421,9 @@ const MODULES = {
             </div>
         `;
     },
-    navigation: () => {
-        const nav = getSiteData().navigation;
+    navigation: async () => {
+        const data = await getSiteData();
+        const nav = data.navigation || { home: true, services: true, portfolio: true, pricing: true, about: true, contact: true };
         return `
             <h1>Navigation Menu</h1>
             <div class="card" style="margin-top:24px;">
@@ -421,74 +455,84 @@ const MODULES = {
 // === ACTION HANDLERS ===
 
 // Homepage
-window.saveHomepage = function() {
-    const data = getSiteData();
+window.saveHomepage = async function() {
+    const data = await getSiteData();
+    data.homepage = data.homepage || {};
     data.homepage.hero_title = document.getElementById('hp-title').value;
     data.homepage.hero_sub = document.getElementById('hp-sub').value;
     data.homepage.hero_cta_text = document.getElementById('hp-cta-text').value;
     data.homepage.hero_cta_link = document.getElementById('hp-cta-link').value;
     data.homepage.banner_active = document.getElementById('hp-banner-active').value === "true";
     data.homepage.banner_text = document.getElementById('hp-banner-text').value;
-    saveSiteData(data);
+    await saveSiteData({ homepage: data.homepage });
 };
 
 // Projects
-window.deleteProject = function(idx) {
+window.deleteProject = async function(id) {
     if(!confirm("Delete this project?")) return;
-    const data = getSiteData();
-    data.projects.splice(idx, 1);
-    saveSiteData(data);
-    renderModule('portfolio');
+    try {
+        await api(`/admin/portfolio/${id}`, { method: 'DELETE' });
+        showToast("Project deleted");
+        renderModule('portfolio');
+    } catch(e) { showToast("Delete failed", true); }
 };
-window.addProject = function() {
+window.addProject = async function() {
     const title = prompt("Project Title:");
     if(!title) return;
     const cat = prompt("Category (e.g., Reel, Strategy):");
-    const imgUrl = prompt("Thumbnail Image URL:");
-    const vidUrl = prompt("Video URL (optional):");
     
-    const data = getSiteData();
-    data.projects.push({ title, category: cat||"", thumbnail: imgUrl||"", video: vidUrl||"" });
-    saveSiteData(data);
-    renderModule('portfolio');
+    try {
+        await api('/admin/portfolio', { 
+            method: 'POST', 
+            body: JSON.stringify({ title, tag: cat || "", is_featured: 1 }) 
+        });
+        showToast("Project added!");
+        renderModule('portfolio');
+    } catch(e) { showToast("Failed to add project", true); }
 };
-window.editProject = function(idx) {
-    const data = getSiteData();
-    const p = data.projects[idx];
+window.editProject = async function(id) {
+    const res = await api('/portfolio');
+    const p = (res.items || []).find(proj => proj.id == id);
+    if(!p) return;
+
     const newTitle = prompt("Edit Title:", p.title);
     if(newTitle === null) return;
-    p.title = newTitle;
-    p.category = prompt("Edit Category:", p.category) || p.category;
-    p.thumbnail = prompt("Edit Thumbnail URL:", p.thumbnail) || p.thumbnail;
-    saveSiteData(data);
-    renderModule('portfolio');
+    
+    try {
+        await api(`/admin/portfolio/${id}`, { 
+            method: 'PUT', 
+            body: JSON.stringify({ title: newTitle }) 
+        });
+        showToast("Project updated!");
+        renderModule('portfolio');
+    } catch(e) { showToast("Update failed", true); }
 };
 
 // Reviews
-window.addReview = function() {
-    const data = getReviewsData();
+window.addReview = async function() {
+    const data = await getReviewsData();
     data.unshift({ name: "", role: "", text: "", rating: 5, image: "" });
-    saveReviewsData(data);
+    await saveReviewsData(data);
     renderModule('reviews');
 };
-window.deleteReview = function(idx) {
+window.deleteReview = async function(idx) {
     if(!confirm("Delete this review?")) return;
-    const data = getReviewsData();
+    const data = await getReviewsData();
     data.splice(idx, 1);
-    saveReviewsData(data);
+    await saveReviewsData(data);
     renderModule('reviews');
 };
-window.moveReview = function(idx, dir) {
-    const data = getReviewsData();
+window.moveReview = async function(idx, dir) {
+    const data = await getReviewsData();
     if(idx + dir < 0 || idx + dir >= data.length) return;
     const temp = data[idx];
     data[idx] = data[idx + dir];
     data[idx + dir] = temp;
-    saveReviewsData(data);
+    await saveReviewsData(data);
     renderModule('reviews');
 };
-window.saveAllReviews = function() {
-    const data = getReviewsData();
+window.saveAllReviews = async function() {
+    const data = await getReviewsData();
     data.forEach((r, idx) => {
         r.name = document.getElementById(`rev-name-${idx}`).value;
         r.role = document.getElementById(`rev-role-${idx}`).value;
@@ -496,125 +540,141 @@ window.saveAllReviews = function() {
         r.rating = parseInt(document.getElementById(`rev-rating-${idx}`).value, 10);
         r.image = document.getElementById(`rev-img-${idx}`).value;
     });
-    saveReviewsData(data);
-    renderModule('reviews'); // Re-render for live preview updates
+    await saveReviewsData(data);
+    renderModule('reviews'); 
 };
 
 // Services
-window.addService = function() {
-    const data = getSiteData();
+window.addService = async function() {
+    const data = await getSiteData();
+    data.services = data.services || [];
     data.services.push({ icon: "✨", title: "New Service", desc: "" });
-    saveSiteData(data);
+    await saveSiteData({ services: data.services });
     renderModule('services');
 };
-window.deleteService = function(idx) {
-    const data = getSiteData();
+window.deleteService = async function(idx) {
+    const data = await getSiteData();
     data.services.splice(idx, 1);
-    saveSiteData(data);
+    await saveSiteData({ services: data.services });
     renderModule('services');
 };
-window.saveServices = function() {
-    const data = getSiteData();
+window.saveServices = async function() {
+    const data = await getSiteData();
     data.services.forEach((s, idx) => {
         s.icon = document.getElementById(`svc-icon-${idx}`).value;
         s.title = document.getElementById(`svc-title-${idx}`).value;
         s.desc = document.getElementById(`svc-desc-${idx}`).value;
     });
-    saveSiteData(data);
+    await saveSiteData({ services: data.services });
 };
 
 // Appearance & SEO
-window.saveAppearance = function() {
-    const data = getSiteData();
-    data.appearance.primary_color = document.getElementById('app-primary').value;
-    data.appearance.bg_color = document.getElementById('app-bg').value;
-    data.appearance.heading_font = document.getElementById('app-font').value;
+window.saveAppearance = async function() {
+    const data = await getSiteData();
+    const appearance = {
+        primary_color: document.getElementById('app-primary').value,
+        bg_color: document.getElementById('app-bg').value,
+        heading_font: document.getElementById('app-font').value
+    };
     
-    if (!data.seo) data.seo = {};
-    data.seo.description = document.getElementById('seo-desc').value;
-    data.seo.og_image = document.getElementById('seo-og').value;
-    data.seo.ga_id = document.getElementById('seo-ga').value;
+    const seo = {
+        description: document.getElementById('seo-desc').value,
+        og_image: document.getElementById('seo-og').value,
+        ga_id: document.getElementById('seo-ga').value
+    };
     
-    saveSiteData(data);
+    await saveSiteData({ appearance, seo });
 };
 
 // Pricing
-window.addPricing = function() {
-    const data = getSiteData();
+window.addPricing = async function() {
+    const data = await getSiteData();
+    data.pricing = data.pricing || [];
     data.pricing.push({ title: "New Plan", price: "$0", desc: "Plan description", features: ["Feature 1"] });
-    saveSiteData(data);
+    await saveSiteData({ pricing: data.pricing });
     renderModule('pricing');
 };
-window.deletePricing = function(idx) {
-    const data = getSiteData();
+window.deletePricing = async function(idx) {
+    const data = await getSiteData();
     data.pricing.splice(idx, 1);
-    saveSiteData(data);
+    await saveSiteData({ pricing: data.pricing });
     renderModule('pricing');
 };
-window.savePricing = function() {
-    const data = getSiteData();
+window.savePricing = async function() {
+    const data = await getSiteData();
     data.pricing.forEach((p, idx) => {
         p.title = document.getElementById(`pr-title-${idx}`).value;
         p.price = document.getElementById(`pr-price-${idx}`).value;
         p.desc = document.getElementById(`pr-desc-${idx}`).value;
         p.features = document.getElementById(`pr-features-${idx}`).value.split(',').map(f => f.trim()).filter(f => f);
     });
-    saveSiteData(data);
+    await saveSiteData({ pricing: data.pricing });
 };
 
 // Founders
-window.addFounder = function() {
-    const data = getSiteData();
+window.addFounder = async function() {
+    const data = await getSiteData();
+    data.founders = data.founders || [];
     data.founders.push({ name: "New Founder", role: "Role", image: "" });
-    saveSiteData(data);
+    await saveSiteData({ founders: data.founders });
     renderModule('founders');
 };
-window.deleteFounder = function(idx) {
-    const data = getSiteData();
+window.deleteFounder = async function(idx) {
+    const data = await getSiteData();
     data.founders.splice(idx, 1);
-    saveSiteData(data);
+    await saveSiteData({ founders: data.founders });
     renderModule('founders');
 };
-window.saveFounders = function() {
-    const data = getSiteData();
+window.saveFounders = async function() {
+    const data = await getSiteData();
     data.founders.forEach((f, idx) => {
         f.name = document.getElementById(`f-name-${idx}`).value;
         f.role = document.getElementById(`f-role-${idx}`).value;
         f.image = document.getElementById(`f-img-${idx}`).value;
     });
-    saveSiteData(data);
+    await saveSiteData({ founders: data.founders });
 };
 
 // Contact
-window.saveContact = function() {
-    const data = getSiteData();
-    data.contact.email = document.getElementById('c-email').value;
-    data.contact.instagram = document.getElementById('c-ig').value;
-    data.contact.whatsapp = document.getElementById('c-wa').value;
-    saveSiteData(data);
+window.saveContact = async function() {
+    const contact = {
+        email: document.getElementById('c-email').value,
+        instagram: document.getElementById('c-ig').value,
+        whatsapp: document.getElementById('c-wa').value
+    };
+    await saveSiteData({ contact });
 };
 
 // About
-window.saveAbout = function() {
-    const data = getSiteData();
-    data.about.intro = document.getElementById('ab-intro').value;
-    saveSiteData(data);
+window.saveAbout = async function() {
+    const about = {
+        intro: document.getElementById('ab-intro').value
+    };
+    await saveSiteData({ about });
 };
 
 // Navigation
-window.saveNavigation = function() {
-    const data = getSiteData();
-    Object.keys(data.navigation).forEach(key => {
-        data.navigation[key] = document.getElementById(`nav-${key}`).checked;
+window.saveNavigation = async function() {
+    const data = await getSiteData();
+    const navigation = data.navigation || {};
+    Object.keys(navigation).forEach(key => {
+        navigation[key] = document.getElementById(`nav-${key}`).checked;
     });
-    saveSiteData(data);
+    await saveSiteData({ navigation });
 };
 
 // === ROUTER ===
-window.renderModule = function(moduleName) {
+window.renderModule = async function(moduleName) {
     const container = document.getElementById('main-content');
+    container.innerHTML = `<div style="padding:100px; text-align:center; font-size:18px; color:var(--muted);">⏳ Loading Cloud Data...</div>`;
+    
     if (MODULES[moduleName]) {
-        container.innerHTML = MODULES[moduleName]();
+        try {
+            const html = await MODULES[moduleName]();
+            container.innerHTML = html;
+        } catch (e) {
+            container.innerHTML = `<div class="card" style="text-align:center; padding:60px; color:var(--danger);">Error loading module: ${e.message}</div>`;
+        }
     } else {
         container.innerHTML = `
             <div class="card" style="text-align:center; padding:60px;">

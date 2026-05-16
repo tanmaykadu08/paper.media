@@ -5,11 +5,20 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Paper.Media – Content & Reels Creative Studio</title>
-  <meta name="description" content="Paper.Media — High-quality reels, social media management & content creation built to convert views into followers and followers into customers.">
+  <meta name="description" content="High-impact reels editing, social media management & content creation built to convert views into followers and followers into customers.">
+  <meta name="keywords" content="reels editing, short-form content, content agency, social media growth, video editing, creative studio">
+  <meta name="author" content="Paper.Media">
+  <meta name="robots" content="index, follow">
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="logo.png">
+
+  <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="preload" href="logo.png" as="image">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Sora:wght@600;700;800&display=swap" rel="stylesheet">
+
   <link rel="stylesheet" href="style.css">
 </head>
 
@@ -30,6 +39,7 @@
       <li><a href="index.html" class="active">Home</a></li>
       <li><a href="services.html">Services</a></li>
       <li><a href="portfolio.html">Portfolio</a></li>
+      <li><a href="pricing.html">Pricing</a></li>
       <li><a href="about.html">About</a></li>
       <li><a href="contact.html">Contact</a></li>
     </ul>
@@ -44,102 +54,77 @@
     <a href="index.html" class="active">Home</a>
     <a href="services.html">Services</a>
     <a href="portfolio.html">Portfolio</a>
+    <a href="pricing.html">Pricing</a>
     <a href="about.html">About</a>
     <a href="contact.html">Contact</a>
     <a href="contact.html" class="mob-cta">Get Started →</a>
   </div>
 
   <!-- HERO -->
-  <section id="home">
-    <div class="hero-bg-shape shape-1"></div>
-    <div class="hero-bg-shape shape-2"></div>
-    <div class="container" style="display: flex; align-items: center; justify-content: center; gap: 40px; min-height: 100vh; max-width: 1100px;">
-      <div class="hero-inner">
-        <div class="hero-badge reveal" id="client-hero_badge">
-          <div class="hero-badge-dot"></div>
-          Creative Studio — Available for Projects
-        </div>
-        <h1 class="hero-title reveal delay-1" id="client-hero_title">We Turn Content<br>Into Real Growth.</h1>
-        <p class="hero-sub reveal delay-2" id="client-hero_sub">Short-form videos, reels, and edits that grab attention, build audience, and drive results.</p>
-        <div class="hero-btns reveal delay-3">
-          <a href="contact.html" class="btn-dark magnetic" id="client-hero_cta_primary">Get Started</a>
-          <a href="portfolio.html" class="btn-outline magnetic" id="client-hero_cta_secondary">View Our Work →</a>
-        </div>
-        <div class="hero-stats-strip" id="client-hero_stats">
-          <div class="hstat">
-            <div class="hstat-icon">🎬</div>
-            <div class="hstat-num">10+</div>
-            <div class="hstat-label">Projects</div>
-          </div>
-          <div class="hstat">
-            <div class="hstat-icon">📈</div>
-            <div class="hstat-num">Growing</div>
-            <div class="hstat-label">Brands</div>
-          </div>
-          <div class="hstat">
-            <div class="hstat-icon">⚡</div>
-            <div class="hstat-num">Fast</div>
-            <div class="hstat-label">Delivery</div>
-          </div>
-        </div>
+  <section class="hero" id="hero">
+    <div class="container">
+      <h1 id="client-hero_title" class="reveal">We Turn Content<br>Into Real Growth.</h1>
+      <p id="client-hero_sub" class="reveal" style="max-width: 600px; margin: 0 auto var(--space-lg); color: #666; font-size: 1.1rem;">
+        Short-form videos, reels, and edits that grab attention, build audience, and drive results.
+      </p>
+      <div class="reveal" style="display: flex; gap: 16px; justify-content: center;">
+        <a href="contact.html" id="client-hero_cta_primary" class="btn-dark magnetic">Start Your Project →</a>
+        <a href="portfolio.html" class="btn-outline magnetic">View Our Work</a>
       </div>
-      <div class="hero-visual" id="heroVisual">
-        <div class="hero-card">🎬<div class="hero-card-num">10+</div><div class="hero-card-label">Projects</div></div>
-        <div class="hero-card">📈<div class="hero-card-num">Growth</div><div class="hero-card-label">Strategy</div></div>
-        <div class="hero-card">⚡<div class="hero-card-num">24h</div><div class="hero-card-label">Turnaround</div></div>
+
+      <!-- HERO STATS / CARDS -->
+      <div class="hero-stats reveal">
+        <div class="hero-card spotlight-card">
+          <div class="hero-card-num">10M+</div>
+          <div class="hero-card-label">Views Generated</div>
+        </div>
+        <div class="hero-card spotlight-card">
+          <div class="hero-card-num">100+</div>
+          <div class="hero-card-label">Brands Scaled</div>
+        </div>
+        <div class="hero-card spotlight-card">
+          <div class="hero-card-num">24h</div>
+          <div class="hero-card-label">Response Time</div>
+        </div>
       </div>
     </div>
   </section>
 
-  <!-- FEATURED SERVICES -->
+  <!-- SERVICES SECTION -->
   <section class="section">
     <div class="container">
       <span class="section-label reveal">WHAT WE DO</span>
-      <h2 class="section-title reveal">Premium Creative Services</h2>
+      <h2 class="section-title reveal">Services Built to Scale</h2>
       <div class="services-grid">
-        <div class="service-card spotlight-card reveal">
-          <span class="service-emoji">🎬</span>
-          <div class="service-name">Reels Editing</div>
-          <p class="service-desc">Scroll-stopping reels designed to boost engagement and retention.</p>
-        </div>
-        <div class="service-card spotlight-card reveal">
-          <span class="service-emoji">📱</span>
-          <div class="service-name">Social Management</div>
-          <p class="service-desc">We manage your growth so you focus on your business.</p>
-        </div>
-        <div class="service-card spotlight-card reveal">
-          <span class="service-emoji">✨</span>
-          <div class="service-name">Content Strategy</div>
-          <p class="service-desc">Data-backed strategies that convert views into customers.</p>
-        </div>
+        <!-- Dynamically populated -->
       </div>
-      <div style="text-align: center; margin-top: var(--space-lg);">
-        <a href="services.html" class="btn-outline magnetic">Discover All Services →</a>
+      <div class="reveal" style="text-align: center; margin-top: var(--space-xl);">
+        <a href="services.html" class="btn-outline magnetic">Explore All Services →</a>
       </div>
     </div>
   </section>
 
-  <!-- FEATURED PORTFOLIO -->
+  <!-- PORTFOLIO SECTION (FEATURED) -->
   <section class="section" style="background: var(--bg-soft);">
     <div class="container">
-      <div class="portfolio-top reveal">
-        <div>
-          <span class="section-label">LATEST WORK</span>
-          <h2 class="section-title">Featured Projects</h2>
-        </div>
+      <span class="section-label reveal">OUR RECENT WORK</span>
+      <h2 class="section-title reveal">Featured Projects</h2>
+      <div class="portfolio-grid" id="featuredPortfolio">
+        <!-- Dynamically populated -->
+      </div>
+      <div class="reveal" style="text-align: center; margin-top: var(--space-xl);">
         <a href="portfolio.html" class="btn-dark magnetic">View Full Portfolio →</a>
       </div>
-      <div class="portfolio-grid" id="featuredPortfolio"></div>
     </div>
   </section>
 
-  <!-- TESTIMONIALS (Keep on Home) -->
+  <!-- TESTIMONIALS -->
   <section class="section" id="testimonialsSection">
     <div class="container">
       <span class="section-label reveal">SUCCESS STORIES</span>
       <h2 class="section-title reveal">What Our Clients Say</h2>
       <div class="testimonials-grid" id="testimonialsGrid">
-        <!-- Dynamically populated from localStorage -->
+        <!-- Dynamically populated -->
       </div>
     </div>
   </section>
@@ -191,12 +176,10 @@
           const card = document.createElement('div');
           card.className = 'port-card spotlight-card reveal';
           
-          // Video preview on hover logic is handled via CSS or JS
-          // We'll use a hidden video element that plays on hover
-          const mediaHtml = item.video 
-            ? `<video src="${item.video}" muted loop playsinline class="port-video"></video>
-               <img src="${item.thumbnail}" alt="${item.title}" class="port-img">`
-            : `<img src="${item.thumbnail}" alt="${item.title}" class="port-img">`;
+          const mediaHtml = item.video_url 
+            ? `<video src="${item.video_url}" muted loop playsinline class="port-video"></video>
+               <img src="${item.image_url}" alt="${item.title}" class="port-img" loading="lazy" decoding="async">`
+            : `<img src="${item.image_url}" alt="${item.title}" class="port-img" loading="lazy" decoding="async">`;
 
           card.innerHTML = `
             <a href="${item.link || 'portfolio.html'}" target="_blank" class="port-link">
@@ -207,15 +190,13 @@
                 </div>
               </div>
               <div class="port-info">
-                <span class="port-tag">${item.category}</span>
+                <span class="port-tag">${item.tag || 'Project'}</span>
                 <div class="port-name">${item.title}</div>
-                <p class="port-desc-short"></p>
               </div>
             </a>
           `;
           
-          // Play video on hover
-          if (item.video) {
+          if (item.video_url) {
             const video = card.querySelector('video');
             if (video) {
                 card.addEventListener('mouseenter', () => video.play().catch(e => {}));
@@ -244,7 +225,6 @@
       `;
       if (section) section.style.padding = "40px 0";
     }
-    loadFeatured();
   </script>
 </body>
 

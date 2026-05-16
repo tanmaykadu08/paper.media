@@ -38,6 +38,7 @@
 
         if (secret === "papermediaadmin2026") {
             localStorage.setItem("papermedia_admin_auth", "true");
+            localStorage.setItem("paper_admin_key", secret); // Added for API sync
             console.log("AUTH SAVED");
             window.location.href = "admin-dashboard.html";
         } else {

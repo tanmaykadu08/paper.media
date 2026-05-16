@@ -74,7 +74,13 @@ export default {
     function jsonResponse(data, status = 200) {
       return new Response(JSON.stringify(data), {
         status,
-        headers: { "Content-Type": "application/json", ...cors }
+        headers: { 
+          "Content-Type": "application/json", 
+          "Cache-Control": "no-store, no-cache, must-revalidate, proxy-revalidate",
+          "Pragma": "no-cache",
+          "Expires": "0",
+          ...cors 
+        }
       });
     }
 
@@ -97,30 +103,23 @@ export default {
     try {
       // Setup Route - Creates necessary tables if they don't exist
       if (method === "GET" && url.pathname === "/setup") {
-        await turso(`CREATE TABLE IF NOT EXISTS inquiries (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT, email TEXT, message TEXT, status TEXT DEFAULT 'new', created_at DATETIME DEFAULT CURRENT_TIMESTAMP)`);
-        await turso(`CREATE TABLE IF NOT EXISTS portfolio (
-          id INTEGER PRIMARY KEY AUTOINCREMENT, 
-          title TEXT, 
-          tag TEXT, 
-          bg_color TEXT, 
-          emoji TEXT, 
-          image_url TEXT, 
-          video_url TEXT, 
-          description TEXT,
-          link TEXT,
-          is_featured INTEGER DEFAULT 0,
-          sort_order INTEGER DEFAULT 0,
-          created_at DATETIME DEFAULT CURRENT_TIMESTAMP
-        )`);
+        const logs = [];
+        const run = async (q) => {
+            try { await turso(q); logs.push(`SUCCESS: ${q}`); }
+            catch(e) { logs.push(`FAIL: ${q} -> ${e.message}`); }
+        };
+
+        await run(`CREATE TABLE IF NOT EXISTS inquiries (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT, email TEXT, message TEXT, status TEXT DEFAULT 'new', created_at DATETIME DEFAULT CURRENT_TIMESTAMP)`);
+        await run(`CREATE TABLE IF NOT EXISTS portfolio (id INTEGER PRIMARY KEY AUTOINCREMENT, title TEXT, tag TEXT, bg_color TEXT, emoji TEXT, image_url TEXT, video_url TEXT, created_at DATETIME DEFAULT CURRENT_TIMESTAMP)`);
+        await run(`CREATE TABLE IF NOT EXISTS site_content (key TEXT PRIMARY KEY, value TEXT)`);
         
-        // Add missing columns if table already exists (safe migration)
-        try { await turso(`ALTER TABLE portfolio ADD COLUMN description TEXT`); } catch(e){}
-        try { await turso(`ALTER TABLE portfolio ADD COLUMN link TEXT`); } catch(e){}
-        try { await turso(`ALTER TABLE portfolio ADD COLUMN is_featured INTEGER DEFAULT 0`); } catch(e){}
-        try { await turso(`ALTER TABLE portfolio ADD COLUMN sort_order INTEGER DEFAULT 0`); } catch(e){}
+        // Safe migrations
+        await run(`ALTER TABLE portfolio ADD COLUMN description TEXT`);
+        await run(`ALTER TABLE portfolio ADD COLUMN link TEXT`);
+        await run(`ALTER TABLE portfolio ADD COLUMN is_featured INTEGER DEFAULT 0`);
+        await run(`ALTER TABLE portfolio ADD COLUMN sort_order INTEGER DEFAULT 0`);
         
-        await turso(`CREATE TABLE IF NOT EXISTS site_content (key TEXT PRIMARY KEY, value TEXT)`);
-        return jsonResponse({ success: true, message: "Tables updated successfully" });
+        return jsonResponse({ success: true, logs });
       }
 
       // --- PUBLIC ROUTES ---
@@ -132,18 +131,37 @@ export default {
 
       if (method === "GET" && url.pathname === "/portfolio") {
         const featuredOnly = url.searchParams.get("featured") === "1";
-        const sql = featuredOnly 
-          ? "SELECT * FROM portfolio WHERE is_featured = 1 ORDER BY sort_order ASC, created_at DESC" 
-          : "SELECT * FROM portfolio ORDER BY sort_order ASC, created_at DESC";
-        const result = await turso(sql);
-        return jsonResponse({ items: result.rows, count: result.rows.length });
+        // Fallback query if migrations haven't run
+        let sql = "SELECT * FROM portfolio";
+        try {
+            if (featuredOnly) sql += " WHERE is_featured = 1";
+            sql += " ORDER BY sort_order ASC, created_at DESC";
+            const result = await turso(sql);
+            return jsonResponse({ items: result.rows, count: result.rows.length });
+        } catch(e) {
+            // Fallback to basic query
+            console.error("Advanced query failed, falling back:", e.message);
+            sql = featuredOnly ? "SELECT * FROM portfolio" : "SELECT * FROM portfolio";
+            sql += " ORDER BY created_at DESC";
+            const result = await turso(sql);
+            return jsonResponse({ items: result.rows, count: result.rows.length, warning: "Using fallback query (columns missing)" });
+        }
       }
 
       if (method === "GET" && url.pathname === "/content") {
         const result = await turso("SELECT * FROM site_content");
         const content = {};
-        result.rows.forEach(r => content[r.key] = r.value);
-        return jsonResponse({ content });
+        result.rows.forEach(r => {
+          let val = r.value;
+          try {
+            // Check if it's a JSON string (starts with { or [)
+            if (val && (val.startsWith('{') || val.startsWith('['))) {
+              val = JSON.parse(val);
+            }
+          } catch(e) {}
+          content[r.key] = val;
+        });
+        return jsonResponse({ content, timestamp: Date.now() });
       }
 
       // --- ADMIN ROUTES ---
@@ -163,8 +181,12 @@ export default {
         }
 
         if (method === "POST" && url.pathname === "/admin/content") {
-          const updates = await request.json(); // { "hero_title": "New Title", "about_text": "..." }
-          for (const [key, value] of Object.entries(updates)) {
+          const updates = await request.json(); 
+          for (let [key, value] of Object.entries(updates)) {
+            // If value is object or array, stringify it for DB storage
+            if (typeof value === 'object' && value !== null) {
+              value = JSON.stringify(value);
+            }
             await turso("INSERT INTO site_content (key, value) VALUES (?, ?) ON CONFLICT(key) DO UPDATE SET value = ?", [key, value, value]);
           }
           return jsonResponse({ success: true });

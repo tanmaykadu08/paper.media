@@ -13,12 +13,10 @@ const API_BASE = 'https://papermediaapi.paper-mediaa.workers.dev';
 
 async function loadSiteData() {
     try {
-        // Read directly from LocalStorage CMS
-        const raw = localStorage.getItem('papermedia_cms_data');
-        let content = {};
-        if (raw) {
-            content = JSON.parse(raw);
-        }
+        // Fetch real-time data from Cloudflare Worker + Turso
+        const res = await fetch(`${API_BASE}/content?v=${Date.now()}`);
+        const data = await res.json();
+        const content = data.content || {};
 
         // 1. Populate Announcement Banner
         updateBanner(content.homepage || {});
@@ -36,24 +34,36 @@ async function loadSiteData() {
         applyAppearance(content.appearance || {}, content.mobile || {});
 
         // 5. Page Specific Data
-        if (window.location.pathname.includes('portfolio.html') || window.location.pathname === '/' || window.location.pathname.endsWith('index.html')) {
-            if (typeof loadFeatured === 'function') loadFeatured(content.projects || []);
+        const path = window.location.pathname;
+        const isHome = path === '/' || path.endsWith('index.html');
+
+        if (path.includes('portfolio.html') || isHome) {
+            if (typeof loadFeatured === 'function') {
+                // Fetch portfolio from DB
+                const portRes = await fetch(`${API_BASE}/portfolio?featured=${isHome ? '1' : '0'}`);
+                const portData = await portRes.json();
+                loadFeatured(portData.items || []);
+            }
         } 
-        if (window.location.pathname.includes('services.html') || window.location.pathname === '/' || window.location.pathname.endsWith('index.html')) {
+        
+        if (path.includes('services.html') || isHome) {
             if (typeof updateServices === 'function') updateServices(content.services || []);
         }
         
-        // 6. Testimonials (Client Reviews)
-        if (window.location.pathname === '/' || window.location.pathname.endsWith('index.html')) {
+        if (isHome) {
             const reviewsRaw = localStorage.getItem('papermedia_reviews');
             const reviewsData = reviewsRaw ? JSON.parse(reviewsRaw) : [];
             updateTestimonials(reviewsData);
         }
-        if (window.location.pathname.includes('pricing.html')) {
+
+        if (path.includes('pricing.html')) {
             if (typeof updatePricing === 'function') updatePricing(content.pricing || []);
         } 
-        if (window.location.pathname.includes('about.html')) {
+
+        if (path.includes('about.html')) {
             if (typeof updateFounders === 'function') updateFounders(content.founders || []);
+            const aboutTitle = document.querySelector('.cinematic-title');
+            if (aboutTitle && content.founders_intro) aboutTitle.innerHTML = content.founders_intro;
         }
 
     } catch (err) {
@@ -253,7 +263,7 @@ function updateFounders(founders) {
     founders.forEach(f => {
         grid.innerHTML += `
             <div class="creator-card reveal visible">
-                <img src="${f.image || 'placeholder.jpg'}" alt="${f.name}" class="creator-img">
+                <img src="${f.image || 'placeholder.jpg'}" alt="${f.name}" class="creator-img" loading="lazy" decoding="async">
                 <div class="creator-info">
                     <div class="creator-name">${f.name}</div>
                     <div class="creator-role">${f.role}</div>
@@ -413,15 +423,10 @@ function initNavbar() {
     }
 
     window.addEventListener('scroll', () => {
-        let winScroll = window.scrollY;
-        if (winScroll > 50) {
-            navbar.style.boxShadow = "0 4px 20px rgba(0,0,0,0.05)";
-            navbar.style.padding = "0 50px";
-            navbar.style.background = "rgba(245, 241, 234, 0.95)";
+        if (window.scrollY > 50) {
+            navbar.classList.add('scrolled');
         } else {
-            navbar.style.boxShadow = "none";
-            navbar.style.padding = "0 60px";
-            navbar.style.background = "rgba(245, 241, 234, 0.85)";
+            navbar.classList.remove('scrolled');
         }
     });
 }
