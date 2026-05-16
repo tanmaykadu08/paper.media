@@ -563,18 +563,27 @@ function initNavbar() {
         });
     }
 
+    // Throttled scroll listener using rAF — prevents layout thrashing
+    let ticking = false;
     window.addEventListener('scroll', () => {
-        if (window.scrollY > 50) {
-            navbar.classList.add('scrolled');
-        } else {
-            navbar.classList.remove('scrolled');
+        if (!ticking) {
+            requestAnimationFrame(() => {
+                if (window.scrollY > 50) {
+                    navbar.classList.add('scrolled');
+                } else {
+                    navbar.classList.remove('scrolled');
+                }
+                ticking = false;
+            });
+            ticking = true;
         }
-    });
+    }, { passive: true });
 }
 
 // === SCROLL REVEAL ===
 function initScrollReveal() {
     const reveals = document.querySelectorAll('.reveal');
+    if (!reveals.length) return;
     const obs = new IntersectionObserver((entries) => {
         entries.forEach((entry) => {
             if (entry.isIntersecting) {
@@ -582,12 +591,16 @@ function initScrollReveal() {
                 obs.unobserve(entry.target);
             }
         });
-    }, { threshold: 0.1 });
+    }, { threshold: 0.08, rootMargin: '0px 0px -40px 0px' });
     reveals.forEach(r => obs.observe(r));
 }
 
 // === MAGNETIC ELEMENTS ===
 function initMagnetic() {
+    // Skip entirely on touch devices — no hover to respond to
+    const isTouch = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
+    if (isTouch) return;
+
     const magneticElements = document.querySelectorAll('.magnetic');
     magneticElements.forEach(el => {
         el.addEventListener('mousemove', (e) => {
@@ -595,17 +608,17 @@ function initMagnetic() {
             const x = e.clientX - rect.left - rect.width / 2;
             const y = e.clientY - rect.top - rect.height / 2;
             el.style.transform = `translate(${x * 0.15}px, ${y * 0.15}px)`;
-        });
-        el.addEventListener('mouseleave', () => { 
-            el.style.transform = 'translate(0, 0)'; 
+        }, { passive: true });
+        el.addEventListener('mouseleave', () => {
+            el.style.transform = 'translate(0, 0)';
         });
     });
 }
 
 // === SPOTLIGHT EFFECT ===
-const spotlightCards = document.querySelectorAll('.spotlight-card');
-if (!isTouch) {
-    spotlightCards.forEach(card => {
+// === SPOTLIGHT EFFECT (desktop only) ===
+if (!('ontouchstart' in window) && navigator.maxTouchPoints === 0) {
+    document.querySelectorAll('.spotlight-card').forEach(card => {
         card.onmousemove = e => {
             const rect = card.getBoundingClientRect();
             card.style.setProperty('--mouse-x', `${e.clientX - rect.left}px`);
@@ -613,4 +626,6 @@ if (!isTouch) {
         };
     });
 }
+
+
 

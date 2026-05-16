@@ -2390,3 +2390,110 @@ footer {
   from { opacity: 0; transform: translateY(8px); }
   to   { opacity: 1; transform: translateY(0); }
 }
+
+/* ===================================================================
+   PERFORMANCE OPTIMIZATIONS
+   =================================================================== */
+
+/* ── GPU compositing hints for animated elements ── */
+nav,
+.mobile-nav,
+.nav-overlay {
+  will-change: transform;
+  transform: translateZ(0);
+}
+
+.cursor,
+.cursor-trail {
+  will-change: transform;
+}
+
+/* ── Layout containment to reduce browser work ── */
+.service-card,
+.port-card,
+.testimonial-card,
+.pricing-card,
+.building-card {
+  contain: layout style;
+}
+
+/* ── Image performance defaults ── */
+img {
+  content-visibility: auto;
+}
+
+/* Images that are above the fold should NOT be lazy — override in HTML */
+.brand-logo,
+nav img {
+  loading: eager; /* CSS can't set HTML attrs, but signals intent in DevTools */
+}
+
+/* ── Smooth scrolling only when not in reduced motion mode ── */
+@media (prefers-reduced-motion: no-preference) {
+  html { scroll-behavior: smooth; }
+}
+
+/* ── Disable all animations for reduced motion users ── */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  .reveal {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+
+  .sk-block {
+    animation: none !important;
+    background: var(--sk-base) !important;
+  }
+}
+
+/* ── Optimize animations on mobile ── */
+@media (max-width: 768px) {
+  /* Disable cursor trail entirely */
+  .cursor-trail { display: none !important; }
+
+  /* Simplify card hover transitions on touch */
+  .service-card,
+  .port-card,
+  .building-card,
+  .testimonial-card {
+    transition: transform 0.2s ease, box-shadow 0.2s ease !important;
+  }
+
+  /* Disable magnetic effect transforms on mobile */
+  .magnetic {
+    transform: none !important;
+  }
+
+  /* Faster reveal on mobile — don't make user wait */
+  .reveal {
+    transition: opacity 0.35s ease, transform 0.35s ease;
+  }
+
+  /* Reduce hero animation complexity */
+  .hero-badge-dot {
+    animation-duration: 2.5s;
+  }
+}
+
+/* ── Font display swap (for self-hosted fonts if ever added) ── */
+@font-face {
+  font-display: swap;
+}
+
+/* ── Scroll performance: composited layer on scroll containers ── */
+.services-grid,
+.portfolio-grid,
+.building-grid,
+.testimonials-grid {
+  -webkit-overflow-scrolling: touch;
+  transform: translateZ(0); /* own compositing layer */
+}
