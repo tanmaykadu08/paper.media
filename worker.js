@@ -168,6 +168,10 @@ export default {
       if (url.pathname.startsWith("/admin/")) {
         checkAdmin();
 
+        if (method === "GET" && url.pathname === "/admin/verify") {
+          return jsonResponse({ success: true, message: "Valid Secret Key" });
+        }
+
         if (method === "GET" && url.pathname === "/admin/inquiries") {
           const result = await turso("SELECT * FROM inquiries ORDER BY created_at DESC");
           return jsonResponse({ inquiries: result.rows });

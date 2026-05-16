@@ -6,7 +6,7 @@ workers_dev = true
 
 # ── Public vars (non-sensitive) ───────────────────────────────
 [vars]
-CLOUDINARY_CLOUD_NAME = "paper-media"
+CLOUDINARY_CLOUD_NAME = "dvkelv5xv"
 
 # ── Secrets — set with: wrangler secret put <NAME> ───────────
 # TURSO_DATABASE_URL
