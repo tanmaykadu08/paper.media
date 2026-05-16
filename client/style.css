@@ -1705,92 +1705,99 @@ footer {
   }
 }
 
-/* ===== RESPONSIVE ===== */
+/* ===================================================================
+   RESPONSIVE — Mobile-first polish
+   Targets: iPhone Safari, Android Chrome, Tablets
+   =================================================================== */
 
-/* --- Tablet (≤1024px) --- */
+/* ── Tablet (≤1024px) ── */
 @media (max-width: 1024px) {
   :root {
-    --nav-height: 70px;
-    --space-xl: 60px;
-    --space-xxl: 80px;
+    --nav-height: 68px;
+    --space-xl:   60px;
+    --space-xxl:  80px;
     --container-padding: 32px;
   }
 
-  nav {
-    padding: 0 32px;
-  }
-
-  .brand-logo { height: 46px; }
-
+  nav { padding: 0 32px; }
+  .brand-logo { height: 44px; }
   .section { padding: var(--space-xl) 0; }
-
-  .hero-title { font-size: clamp(36px, 5.5vw, 60px); }
+  .hero-title { font-size: clamp(36px, 5vw, 60px); }
 
   .services-grid,
   .portfolio-grid,
-  .building-grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
+  .building-grid { grid-template-columns: repeat(2, 1fr); }
+
+  .pricing-grid { grid-template-columns: repeat(2, 1fr); }
 
   .why-grid,
-  .about-grid {
-    grid-template-columns: 1fr;
-    gap: var(--space-lg);
-  }
+  .about-grid { grid-template-columns: 1fr; gap: var(--space-lg); }
+
+  .testimonials-grid { grid-template-columns: repeat(2, 1fr); }
 
   .cta-band { padding: var(--space-xl) 32px; }
-
   .spotlight-card::before { display: none; }
 }
 
-/* --- Mobile (≤768px) --- */
+/* ── Mobile (≤768px) ── */
 @media (max-width: 768px) {
 
-  /* Root token overrides — tighter mobile scale */
+  /* ── Base resets ── */
   :root {
-    --nav-height: 64px;
-    --space-xs:  6px;
-    --space-sm:  12px;
-    --space-md:  18px;
-    --space-lg:  28px;
-    --space-xl:  40px;
-    --space-xxl: 56px;
-    --container-padding: 20px;
+    --nav-height:          60px;
+    --space-xs:            5px;
+    --space-sm:            10px;
+    --space-md:            16px;
+    --space-lg:            24px;
+    --space-xl:            36px;
+    --space-xxl:           52px;
+    --container-padding:   20px;
   }
 
-  /* ── Hard overflow guard ── */
   html, body {
     overflow-x: hidden;
     max-width: 100vw;
+    -webkit-text-size-adjust: 100%;   /* Prevent iOS font inflation */
   }
 
-  * { max-width: 100%; box-sizing: border-box; }
+  *, *::before, *::after {
+    box-sizing: border-box;
+    max-width: 100%;
+  }
 
-  /* ── Cursor off on touch ── */
-  body { cursor: auto; }
+  body {
+    cursor: auto;
+    font-size: 15px;
+    line-height: 1.65;
+    -webkit-overflow-scrolling: touch;
+  }
+
   .cursor, .cursor-trail { display: none !important; }
 
   /* ── Navbar ── */
   nav {
     padding: 0 var(--container-padding) !important;
     height: var(--nav-height);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
   }
-  .nav-links, .nav-cta { display: none; }
-  .hamburger { display: flex; }
-  .brand-logo { height: 38px; }
+  .nav-links, .nav-cta { display: none !important; }
+  .hamburger { display: flex !important; }
+  .brand-logo { height: 36px; }
 
   /* ── Hero ── */
   #home {
-    min-height: auto;
-    padding: calc(var(--nav-height) + 36px) 0 40px;
+    min-height: unset;
+    height: auto;
+    padding: calc(var(--nav-height) + 32px) 0 44px;
     align-items: flex-start;
   }
 
   #home .container {
     flex-direction: column !important;
+    align-items: center !important;
     text-align: center;
-    gap: 28px !important;
-    align-items: center;
+    gap: 24px !important;
   }
 
   .hero-inner {
@@ -1799,22 +1806,24 @@ footer {
   }
 
   .hero-badge {
-    font-size: 11px;
-    padding: 6px 14px;
-    margin-bottom: 16px;
+    font-size: 10px;
+    padding: 5px 12px;
+    margin-bottom: 12px;
+    letter-spacing: 0.5px;
   }
 
   .hero-title {
-    font-size: clamp(28px, 7.5vw, 44px) !important;
-    letter-spacing: -1px;
-    line-height: 1.15;
-    margin-bottom: 16px;
+    font-size: clamp(26px, 7vw, 40px) !important;
+    letter-spacing: -0.8px;
+    line-height: 1.18;
+    margin-bottom: 14px;
   }
 
   .hero-sub {
-    font-size: 15px !important;
-    line-height: 1.65;
-    margin-bottom: 24px;
+    font-size: 14px !important;
+    line-height: 1.7;
+    margin-bottom: 22px;
+    opacity: 0.8;
     max-width: 100%;
   }
 
@@ -1828,41 +1837,46 @@ footer {
   .btn-dark, .btn-outline {
     width: 100%;
     text-align: center;
-    padding: 15px 20px;
+    padding: 14px 20px;
     font-size: 14px;
+    border-radius: 100px;
+    min-height: 48px;          /* Accessible tap target */
   }
 
-  /* Hide desktop stat cards, show mobile strip */
+  /* Show mobile stat strip, hide desktop grid */
   .hero-visual { display: none !important; }
 
   .hero-stats-strip {
-    display: grid;
+    display: grid !important;
     grid-template-columns: repeat(2, 1fr);
-    gap: 12px;
+    gap: 10px;
     width: 100%;
-    margin-top: 8px;
+    margin-top: 4px;
   }
 
   .hstat {
-    padding: 18px 12px;
-    border-radius: 14px;
+    padding: 16px 10px;
+    border-radius: 16px;
   }
 
-  .hstat-num { font-size: 22px; }
-  .hstat-label { font-size: 9px; }
+  .hstat-icon { font-size: 20px; margin-bottom: 6px; }
+  .hstat-num  { font-size: 20px; font-weight: 700; }
+  .hstat-label { font-size: 9px; letter-spacing: 0.5px; margin-top: 2px; }
 
-  /* ── Sections ── */
-  .section {
-    padding: var(--space-xl) 0;
+  /* ── Section defaults ── */
+  .section { padding: var(--space-xl) 0; }
+
+  .section-label {
+    font-size: 9px;
+    letter-spacing: 2px;
+    margin-bottom: 8px;
   }
-
-  .section-label { font-size: 10px; }
 
   .section-title {
-    font-size: clamp(22px, 6vw, 30px);
+    font-size: clamp(20px, 5.5vw, 28px);
     letter-spacing: -0.5px;
-    margin-bottom: 20px;
-    line-height: 1.2;
+    line-height: 1.22;
+    margin-bottom: 18px;
   }
 
   /* ── Horizontal swipe carousels ── */
@@ -1874,24 +1888,25 @@ footer {
     flex-wrap: nowrap !important;
     overflow-x: auto !important;
     overflow-y: visible !important;
+    -webkit-overflow-scrolling: touch;
     scroll-snap-type: x mandatory !important;
-    gap: 14px !important;
-    /* Bleed past container padding for full-width feel */
+    gap: 12px !important;
     margin-left:  calc(-1 * var(--container-padding)) !important;
     margin-right: calc(-1 * var(--container-padding)) !important;
     padding-left:  var(--container-padding) !important;
     padding-right: var(--container-padding) !important;
-    padding-bottom: 16px !important;
-    -webkit-overflow-scrolling: touch;
+    padding-bottom: 12px !important;
     scrollbar-width: none;
   }
 
+  /* Trailing spacer so last card doesn't snap against edge */
   .services-grid::after,
   .portfolio-grid::after,
   .building-grid::after,
   .testimonials-grid::after {
     content: '';
     flex: 0 0 var(--container-padding);
+    display: block;
   }
 
   .services-grid::-webkit-scrollbar,
@@ -1899,85 +1914,126 @@ footer {
   .building-grid::-webkit-scrollbar,
   .testimonials-grid::-webkit-scrollbar { display: none; }
 
-  /* Card sizes inside carousels */
+  /* ── Card sizes ── */
   .service-card,
   .port-card,
   .building-card,
   .testimonial-card {
-    flex: 0 0 80% !important;
-    min-width: 260px !important;
-    max-width: 340px !important;
+    flex: 0 0 78% !important;
+    min-width: 250px !important;
+    max-width: 320px !important;
     scroll-snap-align: start !important;
   }
 
   .service-card:active,
   .port-card:active,
   .building-card:active,
-  .testimonial-card:active {
-    transform: scale(0.98);
+  .testimonial-card:active { transform: scale(0.98); }
+
+  /* ── Service cards ── */
+  .service-card { padding: 18px; border-radius: 16px; }
+  .service-emoji { font-size: 32px; margin-bottom: 12px; }
+  .service-name { font-size: 18px; margin-bottom: 8px; }
+  .service-desc { font-size: 13px; line-height: 1.6; }
+  .service-pills { margin-top: 14px; gap: 6px; }
+  .pill { font-size: 10px; padding: 4px 10px; }
+
+  /* ── Portfolio cards ── */
+  .port-card { border-radius: 18px; }
+  .port-info { padding: 14px 16px; }
+  .port-name { font-size: 15px; margin-bottom: 4px; }
+  .port-tag  { font-size: 9px; padding: 4px 10px; margin-bottom: 8px; }
+
+  /* ── Building / process cards ── */
+  .building-card { padding: 18px; border-radius: 16px; }
+  .building-card-title { font-size: 15px; }
+  .building-card-sub   { font-size: 13px; }
+
+  /* ── Testimonial cards ── */
+  .testimonial-card { padding: 22px 20px; border-radius: 18px; }
+  .test-quote { font-size: 14px; line-height: 1.65; margin-bottom: 18px; }
+  .test-name  { font-size: 13px; }
+  .test-role  { font-size: 11px; }
+  .test-rating { font-size: 16px; margin-bottom: 12px; }
+
+  /* ── Pricing ── */
+  .pricing-grid {
+    display: grid !important;
+    grid-template-columns: 1fr !important;
+    gap: 14px;
   }
 
-  .service-card, .building-card { padding: 20px; }
-  .port-info { padding: 14px; }
-
-  /* Portfolio grid stacks on portfolio.html (no swipe needed) */
-  .portfolio-grid.full-grid {
-    flex-direction: column !important;
-    overflow-x: visible !important;
-    margin-left: 0 !important;
-    margin-right: 0 !important;
-    padding-left: 0 !important;
-    padding-right: 0 !important;
+  .pricing-card {
+    padding: 22px 18px;
+    border-radius: 18px;
   }
 
-  .portfolio-grid.full-grid .port-card {
-    flex: unset !important;
-    max-width: 100% !important;
-    min-width: unset !important;
-  }
+  /* ── About chips ── */
+  .about-visual { padding: var(--space-md); gap: 10px; border-radius: 18px; }
+  .about-chip   { padding: 14px 16px; border-radius: 12px; gap: 12px; }
+  .about-chip-icon { font-size: 20px; }
+  .about-chip-text { font-size: 13px; }
+  .about-chip-sub  { font-size: 11px; }
 
-  /* ── About / Contact grids ── */
+  /* ── About / Contact / Why grids ── */
   .why-grid, .about-grid, .contact-grid {
     grid-template-columns: 1fr;
     gap: 18px;
   }
 
-  .about-chip {
-    padding: 18px;
-  }
-
-  /* ── Forms ── */
-  .form-row {
-    grid-template-columns: 1fr;
+  /* ── About stats strip ── */
+  .about-stats {
+    grid-template-columns: repeat(3, 1fr) !important;
     gap: 12px;
+    padding: 24px 0;
+    margin-top: 24px;
   }
 
-  .form-btn {
-    width: 100%;
-    text-align: center;
-  }
-
-  /* ── Pricing grid ── */
-  .pricing-grid {
-    grid-template-columns: 1fr !important;
-    gap: 16px;
-  }
-
-  .pricing-card {
-    padding: 24px 20px;
-  }
+  .stat-count { font-size: clamp(24px, 6vw, 32px); }
+  .stat-label { font-size: 11px; }
 
   /* ── Creators (About page) ── */
   .creators-row {
-    flex-direction: column;
+    flex-direction: column !important;
     align-items: center;
+    gap: 10px;
   }
 
   .creator-box {
     width: 100%;
     min-width: unset;
-    padding: 20px;
+    padding: 18px 20px;
+    border-radius: 14px;
   }
+
+  .creator-name { font-size: 18px; }
+
+  /* ── Forms ── */
+  .form-row { grid-template-columns: 1fr; gap: 12px; }
+
+  .input, .textarea {
+    padding: 14px 16px;
+    font-size: 15px;
+    border-radius: 14px;
+  }
+
+  .textarea { height: 110px; }
+
+  .form-btn {
+    width: 100%;
+    text-align: center;
+    padding: 14px 20px;
+    font-size: 14px;
+    min-height: 48px;
+    border-radius: 100px;
+    align-self: stretch;
+  }
+
+  /* ── Contact link cards ── */
+  .contact-link-card { padding: 14px 16px; border-radius: 14px; }
+  .contact-link-icon { width: 42px; height: 42px; font-size: 18px; border-radius: 12px; }
+  .contact-link-title { font-size: 14px; }
+  .contact-link-sub   { font-size: 11px; }
 
   /* ── CTA Band ── */
   .cta-band {
@@ -1987,25 +2043,32 @@ footer {
 
   .cta-band .container {
     flex-direction: column !important;
-    gap: 20px !important;
+    gap: 18px !important;
     align-items: center;
   }
 
-  .cta-band h2 { font-size: 22px; }
-  .cta-band p  { font-size: 14px; }
+  .cta-band h2 {
+    font-size: clamp(20px, 5vw, 26px);
+    line-height: 1.3;
+  }
+
+  .cta-band p { font-size: 13px; margin-top: 6px; }
 
   .cta-band-btn {
     width: 100%;
     text-align: center;
-    padding: 15px 20px;
+    padding: 14px 20px;
+    min-height: 48px;
+    border-radius: 100px;
+    font-size: 14px;
   }
 
   /* ── Footer ── */
-  footer { padding: 36px 0; }
+  footer { padding: 32px 0; }
 
   footer .container {
     flex-direction: column !important;
-    gap: 24px !important;
+    gap: 20px !important;
     text-align: center;
     align-items: center;
   }
@@ -2014,40 +2077,67 @@ footer {
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
-    gap: 12px 20px;
+    gap: 10px 18px;
   }
 
-  .footer-copy { font-size: 12px; }
+  .footer-nav a { font-size: 13px; }
+  .footer-copy  { font-size: 11px; opacity: 0.6; }
+
+  /* ── Section reveal animation — faster on mobile ── */
+  .reveal {
+    transition: opacity 0.5s ease, transform 0.5s ease;
+  }
+
+  /* ── iPhone safe area inset ── */
+  body {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
 }
 
-/* --- Small phones (≤480px) --- */
+/* ── Small phones (≤480px) ── */
 @media (max-width: 480px) {
   :root {
-    --space-xl: 32px;
-    --space-xxl: 44px;
+    --space-xl:  28px;
+    --space-xxl: 40px;
     --container-padding: 16px;
   }
 
-  .hero-title { font-size: clamp(24px, 8vw, 36px) !important; }
-  .section-title { font-size: clamp(20px, 6vw, 26px); }
-
-  .hero-stats-strip {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 10px;
+  .hero-title {
+    font-size: clamp(22px, 7.5vw, 32px) !important;
+    letter-spacing: -0.5px;
   }
 
-  .hstat { padding: 14px 10px; }
-  .hstat-num { font-size: 20px; }
+  .section-title { font-size: clamp(18px, 6vw, 24px); }
+
+  .hero-stats-strip { gap: 8px; }
+  .hstat { padding: 12px 8px; border-radius: 12px; }
+  .hstat-num { font-size: 18px; }
+  .hstat-icon { font-size: 18px; }
 
   .service-card,
   .port-card,
   .building-card,
   .testimonial-card {
-    flex: 0 0 88% !important;
-    min-width: 240px !important;
+    flex: 0 0 86% !important;
+    min-width: 230px !important;
   }
 
-  .mobile-nav a { font-size: 24px; }
+  .mobile-nav a { font-size: 22px; padding: 8px 0; }
+  .mobile-nav { padding: 60px 28px; gap: 10px; }
 
-  .cta-band h2 { font-size: 20px; }
+  .hero-badge { font-size: 9px; padding: 5px 11px; }
+  .hero-sub { font-size: 13px !important; }
+  .section-label { font-size: 8.5px; }
 }
+
+/* ── Tablet landscape / iPad (769px – 1024px) ── */
+@media (min-width: 769px) and (max-width: 1024px) {
+  .hero-title { font-size: clamp(38px, 4.5vw, 54px); }
+
+  .testimonials-grid { grid-template-columns: repeat(2, 1fr); }
+
+  .pricing-grid { grid-template-columns: repeat(2, 1fr); }
+
+  .mobile-nav { width: 50%; }
+}
+
