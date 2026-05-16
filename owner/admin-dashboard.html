@@ -77,65 +77,31 @@
     <aside class="sidebar">
       <div class="admin-logo">Paper<span>.</span>Media <sub>CMS</sub></div>
       <nav class="nav-section" style="margin-top: 30px;">
-        <button class="nav-btn active" data-module="dashboard" onclick="renderModule('dashboard')">🏠 Dashboard</button>
-        <button class="nav-btn" data-module="homepage" onclick="renderModule('homepage')">📰 Homepage Hero</button>
-        <button class="nav-btn" data-module="portfolio" onclick="renderModule('portfolio')">📸 Featured Projects</button>
-        <button class="nav-btn" data-module="reviews" onclick="renderModule('reviews')">⭐ Client Reviews</button>
-        <button class="nav-btn" data-module="services" onclick="renderModule('services')">⚡ Services</button>
-        <button class="nav-btn" data-module="pricing" onclick="renderModule('pricing')">💰 Pricing Plans</button>
-        <button class="nav-btn" data-module="founders" onclick="renderModule('founders')">👥 Founders</button>
-        <button class="nav-btn" data-module="about" onclick="renderModule('about')">📖 About Text</button>
-        <button class="nav-btn" data-module="contact" onclick="renderModule('contact')">📞 Contact Info</button>
-        <button class="nav-btn" data-module="navigation" onclick="renderModule('navigation')">🔗 Navigation</button>
-        <button class="nav-btn" data-module="medialib" onclick="renderModule('medialib')">📁 Media Library</button>
-        <button class="nav-btn" data-module="appearance" onclick="renderModule('appearance')">🎨 Appearance</button>
+        <label>Main</label>
+        <button class="nav-btn active" data-page="dashboard" onclick="renderPage('dashboard')">🏠 Dashboard Overview</button>
+        <button class="nav-btn" data-page="portfolio" onclick="renderPage('portfolio')">📸 Portfolio Projects</button>
+        <button class="nav-btn" data-page="inquiries" onclick="renderPage('inquiries')">📩 Leads & Inquiries</button>
+        
+        <label style="margin-top:20px;">Content</label>
+        <button class="nav-btn" data-page="homepage" onclick="renderPage('homepage')">🏠 Homepage Hero</button>
+        <button class="nav-btn" data-page="services" onclick="renderPage('services')">⚡ Services</button>
+        <button class="nav-btn" data-page="pricing" onclick="renderPage('pricing')">💰 Pricing Plans</button>
+        <button class="nav-btn" data-page="founders" onclick="renderPage('founders')">👥 Founders</button>
+        <button class="nav-btn" data-page="appearance" onclick="renderPage('appearance')">🎨 Appearance</button>
+        <button class="nav-btn" data-page="settings" onclick="renderPage('settings')">⚙️ Site Settings</button>
+        
         <button class="nav-btn logout-btn" onclick="logoutAdmin()" style="margin-top: 20px;">🚪 Logout</button>
       </nav>
     </aside>
 
-    <main id="main-content">
-      <div class="dashboard-home">
-        <h1>Dashboard Overview</h1>
-        <div class="stats-grid">
-          <div class="card">Total Projects: 12</div>
-          <div class="card">Total Inquiries: 5</div>
-        </div>
+    <main class="main-wrapper">
+      <div id="main-content" class="content-body">
+        <!-- Content injected by admin.js -->
+        <div class="loading-view"><span>⌛</span> Loading Dashboard...</div>
       </div>
     </main>
   </div>
 
-  <script>
-    // Clean Logout Function
-    function logoutAdmin() {
-      localStorage.removeItem("papermedia_admin_auth");
-      window.location.href = "admin.html";
-    }
-
-    // AUTH CHECK AT THE VERY BOTTOM
-    const auth = localStorage.getItem("papermedia_admin_auth");
-    console.log("AUTH:", auth);
-
-    if (auth !== "true") {
-      window.location.href = "admin.html";
-    }
-
-    // DEBUG OVERLAY
-    document.body.innerHTML += `
-      <div style="
-        position:fixed;
-        top:20px;
-        right:20px;
-        background:black;
-        color:white;
-        padding:10px 16px;
-        border-radius:12px;
-        z-index:999999;
-        font-family:sans-serif;
-      ">
-        AUTH: ${localStorage.getItem("papermedia_admin_auth")}
-      </div>
-    `;
-  </script>
-  <script src="admin-cms.js"></script>
+  <script src="admin.js"></script>
 </body>
 </html>
