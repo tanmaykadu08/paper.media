@@ -61,11 +61,19 @@
     </button>
   </nav>
 
+  <!-- NAV OVERLAY -->
+  <div class="nav-overlay" id="navOverlay"></div>
+
   <!-- MOBILE NAV -->
   <div class="mobile-nav" id="mobileNav">
+    <div class="mobile-nav-header">
+      <div class="logo">
+        <img src="logo.png" alt="Logo" style="height: 30px;">
+      </div>
+    </div>
     <a href="index.html">Home</a>
-    <a href="services.html" class="active">Services</a>
     <a href="portfolio.html">Portfolio</a>
+    <a href="services.html" class="active">Services</a>
     <a href="pricing.html">Pricing</a>
     <a href="about.html">About</a>
     <a href="contact.html">Contact</a>
@@ -78,37 +86,8 @@
       <span class="section-label reveal">OUR EXPERTISE</span>
       <h1 class="section-title reveal">Services Built for Growth</h1>
       
-      <div class="services-grid">
-        <div class="service-card spotlight-card reveal">
-          <span class="service-emoji">🎬</span>
-          <div class="service-name">Reels Editing</div>
-          <p class="service-desc">Scroll-stopping reels designed to boost engagement and retention.</p>
-          <div class="service-pills">
-            <span class="pill">Short-form</span>
-            <span class="pill">Transitions</span>
-            <span class="pill">Colour Grade</span>
-          </div>
-        </div>
-        <div class="service-card spotlight-card reveal">
-          <span class="service-emoji">📱</span>
-          <div class="service-name">Social Media Management</div>
-          <p class="service-desc">We manage your content, posting, and growth so you focus on your business.</p>
-          <div class="service-pills">
-            <span class="pill">Instagram</span>
-            <span class="pill">Analytics</span>
-            <span class="pill">Growth</span>
-          </div>
-        </div>
-        <div class="service-card spotlight-card reveal">
-          <span class="service-emoji">✨</span>
-          <div class="service-name">Content Creation</div>
-          <p class="service-desc">From idea to execution — content that performs and converts.</p>
-          <div class="service-pills">
-            <span class="pill">Scripting</span>
-            <span class="pill">Thumbnails</span>
-            <span class="pill">Branding</span>
-          </div>
-        </div>
+      <div class="services-grid" id="servicesGrid">
+        <!-- Dynamically populated from cloud API -->
       </div>
     </div>
   </section>

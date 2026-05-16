@@ -6,20 +6,31 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Paper.Media – Content & Reels Creative Studio</title>
   <meta name="description" content="High-impact reels editing, social media management & content creation built to convert views into followers and followers into customers.">
-  <meta name="keywords" content="reels editing, short-form content, content agency, social media growth, video editing, creative studio">
-  <meta name="author" content="Paper.Media">
-  <meta name="robots" content="index, follow">
-
-  <!-- Favicon -->
   <link rel="icon" type="image/png" href="logo.png">
-
-  <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="preload" href="logo.png" as="image">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Sora:wght@600;700;800&display=swap" rel="stylesheet">
-
   <link rel="stylesheet" href="style.css">
+  <style>
+    /* Inline fixes for the new structure */
+    #home .container {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 60px;
+      flex-wrap: wrap;
+    }
+    @media (max-width: 1024px) {
+      #home .container {
+        justify-content: center;
+        text-align: center;
+        flex-direction: column;
+      }
+    }
+    .hero-visual {
+      flex-shrink: 0;
+    }
+  </style>
 </head>
 
 <body>
@@ -49,11 +60,19 @@
     </button>
   </nav>
 
+  <!-- NAV OVERLAY -->
+  <div class="nav-overlay" id="navOverlay"></div>
+
   <!-- MOBILE NAV -->
   <div class="mobile-nav" id="mobileNav">
+    <div class="mobile-nav-header">
+      <div class="logo">
+        <img src="logo.png" alt="Logo" style="height: 30px;">
+      </div>
+    </div>
     <a href="index.html" class="active">Home</a>
-    <a href="services.html">Services</a>
     <a href="portfolio.html">Portfolio</a>
+    <a href="services.html">Services</a>
     <a href="pricing.html">Pricing</a>
     <a href="about.html">About</a>
     <a href="contact.html">Contact</a>
@@ -61,30 +80,44 @@
   </div>
 
   <!-- HERO -->
-  <section class="hero" id="hero">
+  <section id="home">
     <div class="container">
-      <h1 id="client-hero_title" class="reveal">We Turn Content<br>Into Real Growth.</h1>
-      <p id="client-hero_sub" class="reveal" style="max-width: 600px; margin: 0 auto var(--space-lg); color: #666; font-size: 1.1rem;">
-        Short-form videos, reels, and edits that grab attention, build audience, and drive results.
-      </p>
-      <div class="reveal" style="display: flex; gap: 16px; justify-content: center;">
-        <a href="contact.html" id="client-hero_cta_primary" class="btn-dark magnetic">Start Your Project →</a>
-        <a href="portfolio.html" class="btn-outline magnetic">View Our Work</a>
+      <div class="hero-inner">
+        <div class="hero-badge reveal">
+          <div class="hero-badge-dot"></div>
+          Now accepting new brands
+        </div>
+        <h1 class="hero-title reveal" id="client-hero_title">We Turn Content<br>Into <em>Real Growth.</em></h1>
+        <p class="hero-sub reveal" id="client-hero_sub">
+          Short-form videos, reels, and edits that grab attention, build audience, and drive results.
+        </p>
+        <div class="hero-btns reveal">
+          <a href="contact.html" class="btn-dark magnetic">Start Your Project →</a>
+          <a href="portfolio.html" class="btn-outline magnetic">View Our Work</a>
+        </div>
       </div>
 
-      <!-- HERO STATS / CARDS -->
-      <div class="hero-stats reveal">
+      <!-- HERO VISUAL (STATS CARDS) -->
+      <div class="hero-visual reveal">
         <div class="hero-card spotlight-card">
+          <div class="hero-card-icon">🚀</div>
           <div class="hero-card-num">10M+</div>
           <div class="hero-card-label">Views Generated</div>
         </div>
         <div class="hero-card spotlight-card">
+          <div class="hero-card-icon">📈</div>
           <div class="hero-card-num">100+</div>
           <div class="hero-card-label">Brands Scaled</div>
         </div>
         <div class="hero-card spotlight-card">
+          <div class="hero-card-icon">⚡</div>
           <div class="hero-card-num">24h</div>
           <div class="hero-card-label">Response Time</div>
+        </div>
+        <div class="hero-card spotlight-card">
+          <div class="hero-card-icon">✨</div>
+          <div class="hero-card-num">98%</div>
+          <div class="hero-card-label">Client Retention</div>
         </div>
       </div>
     </div>
@@ -96,7 +129,7 @@
       <span class="section-label reveal">WHAT WE DO</span>
       <h2 class="section-title reveal">Services Built to Scale</h2>
       <div class="services-grid">
-        <!-- Dynamically populated -->
+        <!-- Dynamically populated from CMS -->
       </div>
       <div class="reveal" style="text-align: center; margin-top: var(--space-xl);">
         <a href="services.html" class="btn-outline magnetic">Explore All Services →</a>
@@ -104,13 +137,13 @@
     </div>
   </section>
 
-  <!-- PORTFOLIO SECTION (FEATURED) -->
+  <!-- PORTFOLIO SECTION -->
   <section class="section" style="background: var(--bg-soft);">
     <div class="container">
       <span class="section-label reveal">OUR RECENT WORK</span>
       <h2 class="section-title reveal">Featured Projects</h2>
       <div class="portfolio-grid" id="featuredPortfolio">
-        <!-- Dynamically populated -->
+        <!-- Dynamically populated from CMS -->
       </div>
       <div class="reveal" style="text-align: center; margin-top: var(--space-xl);">
         <a href="portfolio.html" class="btn-dark magnetic">View Full Portfolio →</a>
@@ -124,7 +157,7 @@
       <span class="section-label reveal">SUCCESS STORIES</span>
       <h2 class="section-title reveal">What Our Clients Say</h2>
       <div class="testimonials-grid" id="testimonialsGrid">
-        <!-- Dynamically populated -->
+        <!-- Dynamically populated from CMS -->
       </div>
     </div>
   </section>
@@ -159,71 +192,40 @@
 
   <script src="app.js"></script>
   <script>
-    // Load Featured Portfolio Items from CMS
     function loadFeatured(items = []) {
       const container = document.getElementById('featuredPortfolio');
-      const section = container.closest('section');
       if (!container) return;
-
-      try {
-        if (!items || items.length === 0) {
-          showEmptyState(container, section);
-          return;
-        }
-
-        container.innerHTML = '';
-        items.forEach(item => {
-          const card = document.createElement('div');
-          card.className = 'port-card spotlight-card reveal';
-          
-          const mediaHtml = item.video_url 
-            ? `<video src="${item.video_url}" muted loop playsinline class="port-video"></video>
-               <img src="${item.image_url}" alt="${item.title}" class="port-img" loading="lazy" decoding="async">`
-            : `<img src="${item.image_url}" alt="${item.title}" class="port-img" loading="lazy" decoding="async">`;
-
-          card.innerHTML = `
-            <a href="${item.link || 'portfolio.html'}" target="_blank" class="port-link">
-              <div class="port-thumb">
-                ${mediaHtml}
-                <div class="port-overlay">
-                  <span class="view-btn">View Reel →</span>
-                </div>
-              </div>
-              <div class="port-info">
-                <span class="port-tag">${item.tag || 'Project'}</span>
-                <div class="port-name">${item.title}</div>
-              </div>
-            </a>
-          `;
-          
-          if (item.video_url) {
-            const video = card.querySelector('video');
-            if (video) {
-                card.addEventListener('mouseenter', () => video.play().catch(e => {}));
-                card.addEventListener('mouseleave', () => {
-                  video.pause();
-                  video.currentTime = 0;
-                });
-            }
-          }
-          
-          container.appendChild(card);
-        });
-        
-        section.style.padding = "var(--space-xxl) 0";
-      } catch (e) {
-        showEmptyState(container, section);
+      container.innerHTML = '';
+      if (!items || items.length === 0) {
+        container.innerHTML = '<div class="portfolio-empty-state"><p>Projects coming soon.</p></div>';
+        return;
       }
-    }
-
-    function showEmptyState(container, section) {
-      container.innerHTML = `
-        <div class="portfolio-empty-state">
-          <p>Projects coming soon.</p>
-          <span>Currently building our first creative campaigns.</span>
-        </div>
-      `;
-      if (section) section.style.padding = "40px 0";
+      items.forEach(item => {
+        const card = document.createElement('div');
+        card.className = 'port-card spotlight-card reveal';
+        const mediaHtml = item.video_url 
+          ? `<video src="${item.video_url}" muted loop playsinline class="port-video"></video>
+             <img src="${item.image_url}" alt="${item.title}" class="port-img" loading="lazy" decoding="async">`
+          : `<img src="${item.image_url}" alt="${item.title}" class="port-img" loading="lazy" decoding="async">`;
+        card.innerHTML = `
+          <a href="${item.link || 'portfolio.html'}" target="_blank" class="port-link">
+            <div class="port-thumb">
+              ${mediaHtml}
+              <div class="port-overlay"><span class="view-btn">View Reel →</span></div>
+            </div>
+            <div class="port-info">
+              <span class="port-tag">${item.tag || 'Reel'}</span>
+              <div class="port-name">${item.title}</div>
+            </div>
+          </a>
+        `;
+        if (item.video_url) {
+          const v = card.querySelector('video');
+          card.addEventListener('mouseenter', () => v.play().catch(() => {}));
+          card.addEventListener('mouseleave', () => { v.pause(); v.currentTime = 0; });
+        }
+        container.appendChild(card);
+      });
     }
   </script>
 </body>

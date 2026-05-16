@@ -12,64 +12,90 @@ document.addEventListener('DOMContentLoaded', () => {
 const API_BASE = 'https://papermediaapi.paper-mediaa.workers.dev';
 
 async function loadSiteData() {
+    const path = window.location.pathname;
+    const isHome = path === '/' || path.endsWith('index.html');
+
+    // Show loading skeletons on dynamic grids
+    showLoadingState('.services-grid');
+    showLoadingState('.portfolio-grid', '#featuredPortfolio');
+    showLoadingState('.testimonials-grid', '#testimonialsGrid');
+    showLoadingState('.pricing-grid');
+    showLoadingState('.creators-grid');
+
     try {
-        // Fetch real-time data from Cloudflare Worker + Turso
-        const res = await fetch(`${API_BASE}/content?v=${Date.now()}`);
-        const data = await res.json();
-        const content = data.content || {};
+        // Fetch content + portfolio in parallel for speed
+        const [contentRes, portRes] = await Promise.all([
+            fetch(`${API_BASE}/content`, { cache: 'no-store' }),
+            (path.includes('portfolio.html') || isHome)
+                ? fetch(`${API_BASE}/portfolio?featured=${isHome ? '1' : '0'}`, { cache: 'no-store' })
+                : Promise.resolve(null)
+        ]);
 
-        // 1. Populate Announcement Banner
+        const { content = {} } = await contentRes.json();
+        const portData = portRes ? await portRes.json() : null;
+
+        // --- Global Updates ---
         updateBanner(content.homepage || {});
-
-        // 2. Populate Hero (if on home page)
         updateHero(content.homepage || {});
-
-        // 3. Populate Site Settings (Logo, Socials)
         updateSettings(content);
-        
-        // 3.5. Inject SEO, Schema, Canonical, and GA
         injectSEO(content);
-
-        // 4. Apply Appearance Settings
         applyAppearance(content.appearance || {}, content.mobile || {});
 
-        // 5. Page Specific Data
-        const path = window.location.pathname;
-        const isHome = path === '/' || path.endsWith('index.html');
-
-        if (path.includes('portfolio.html') || isHome) {
-            if (typeof loadFeatured === 'function') {
-                // Fetch portfolio from DB
-                const portRes = await fetch(`${API_BASE}/portfolio?featured=${isHome ? '1' : '0'}`);
-                const portData = await portRes.json();
-                loadFeatured(portData.items || []);
-            }
-        } 
-        
-        if (path.includes('services.html') || isHome) {
-            if (typeof updateServices === 'function') updateServices(content.services || []);
+        // --- Services (home + services.html) ---
+        if (isHome || path.includes('services.html')) {
+            const services = Array.isArray(content.services) ? content.services : [];
+            updateServices(services);
         }
-        
+
+        // --- Portfolio (home featured + full portfolio page) ---
+        if (portData && typeof loadFeatured === 'function') {
+            loadFeatured(portData.items || []);
+        }
+
+        // --- Testimonials (home only) ---
         if (isHome) {
-            const reviewsRaw = localStorage.getItem('papermedia_reviews');
-            const reviewsData = reviewsRaw ? JSON.parse(reviewsRaw) : [];
-            updateTestimonials(reviewsData);
+            const reviews = Array.isArray(content.reviews) ? content.reviews : [];
+            updateTestimonials(reviews);
         }
 
+        // --- Pricing ---
         if (path.includes('pricing.html')) {
-            if (typeof updatePricing === 'function') updatePricing(content.pricing || []);
-        } 
+            const pricing = Array.isArray(content.pricing) ? content.pricing : [];
+            updatePricing(pricing);
+        }
 
+        // --- Founders / About ---
         if (path.includes('about.html')) {
-            if (typeof updateFounders === 'function') updateFounders(content.founders || []);
-            const aboutTitle = document.querySelector('.cinematic-title');
-            if (aboutTitle && content.founders_intro) aboutTitle.innerHTML = content.founders_intro;
+            const founders = Array.isArray(content.founders) ? content.founders : [];
+            updateFounders(founders);
+            const aboutIntro = document.querySelector('.creators-intro');
+            if (aboutIntro && content.founders_intro) aboutIntro.innerHTML = content.founders_intro;
         }
 
     } catch (err) {
-        console.error('Error loading site data:', err);
+        console.error('CMS load error:', err);
+        // Clear loading states gracefully
+        clearLoadingStates();
     }
 }
+
+function showLoadingState(...selectors) {
+    selectors.forEach(sel => {
+        const el = document.querySelector(sel);
+        if (el && el.children.length === 0) {
+            el.innerHTML = `<div style="grid-column:1/-1; text-align:center; padding:40px; color:#aaa; font-size:14px;">Loading...</div>`;
+        }
+    });
+}
+
+function clearLoadingStates() {
+    ['.services-grid', '.portfolio-grid', '#featuredPortfolio', '.testimonials-grid', '#testimonialsGrid', '.pricing-grid', '.creators-grid']
+        .forEach(sel => {
+            const el = document.querySelector(sel);
+            if (el && el.querySelector('[style*="Loading"]')) el.innerHTML = '';
+        });
+}
+
 
 function updateBanner(content) {
     if (content.banner_active && content.banner_text) {
@@ -257,20 +283,35 @@ function updatePricing(pricing) {
 
 function updateFounders(founders) {
     const grid = document.querySelector('.creators-grid');
-    if (!grid || !founders || founders.length === 0) return;
-    
+    if (!grid) return;
+
+    // Default fallback team if API returns nothing
+    const defaultFounders = [
+        { name: 'Tanmay Kadu' },
+        { name: 'Kunal Patle' },
+        { name: 'Yashraj Ghuge' },
+        { name: 'Atharv Kamble' },
+        { name: 'Harsh Tiwari' }
+    ];
+    const team = founders && founders.length > 0 ? founders : defaultFounders;
+
+    // Split into rows of 3 and 2
     grid.innerHTML = '';
-    founders.forEach(f => {
-        grid.innerHTML += `
-            <div class="creator-card reveal visible">
-                <img src="${f.image || 'placeholder.jpg'}" alt="${f.name}" class="creator-img" loading="lazy" decoding="async">
-                <div class="creator-info">
+    const chunkSize = 3;
+    for (let i = 0; i < team.length; i += chunkSize) {
+        const row = document.createElement('div');
+        row.className = 'creators-row';
+        const chunk = team.slice(i, i + chunkSize);
+        chunk.forEach((f, j) => {
+            row.innerHTML += `
+                <div class="creator-box reveal visible" style="transition-delay: ${(i + j) * 0.1}s;">
                     <div class="creator-name">${f.name}</div>
-                    <div class="creator-role">${f.role}</div>
+                    ${f.role ? `<div style="font-size:13px; color:#888; margin-top:4px;">${f.role}</div>` : ''}
                 </div>
-            </div>
-        `;
-    });
+            `;
+        });
+        grid.appendChild(row);
+    }
 }
 
 function updateTestimonials(reviews) {
@@ -396,29 +437,46 @@ function initNavbar() {
     const navbar = document.getElementById('navbar');
     const hamburger = document.getElementById('hamburger');
     const mobileNav = document.getElementById('mobileNav');
+    const navOverlay = document.getElementById('navOverlay');
 
     if (hamburger && mobileNav) {
-        hamburger.addEventListener('click', () => {
-            hamburger.classList.toggle('open');
-            mobileNav.classList.toggle('open');
-            document.body.style.overflow = mobileNav.classList.contains('open') ? 'hidden' : 'auto';
-        });
+        const toggleMenu = () => {
+            const isOpen = mobileNav.classList.contains('open');
+            if (isOpen) {
+                closeMenu();
+            } else {
+                openMenu();
+            }
+        };
+
+        const openMenu = () => {
+            hamburger.classList.add('open');
+            mobileNav.classList.add('open');
+            if (navOverlay) navOverlay.classList.add('open');
+            document.body.style.overflow = 'hidden';
+        };
+
+        const closeMenu = () => {
+            hamburger.classList.remove('open');
+            mobileNav.classList.remove('open');
+            if (navOverlay) navOverlay.classList.remove('open');
+            document.body.style.overflow = 'auto';
+        };
+
+        hamburger.addEventListener('click', toggleMenu);
+
+        if (navOverlay) {
+            navOverlay.addEventListener('click', closeMenu);
+        }
 
         const mobileLinks = mobileNav.querySelectorAll('a');
         mobileLinks.forEach(link => {
-            link.addEventListener('click', () => {
-                hamburger.classList.remove('open');
-                mobileNav.classList.remove('open');
-                document.body.style.overflow = 'auto';
-            });
+            link.addEventListener('click', closeMenu);
         });
 
-        document.addEventListener('click', (e) => {
-            if (!hamburger.contains(e.target) && !mobileNav.contains(e.target)) {
-                hamburger.classList.remove('open');
-                mobileNav.classList.remove('open');
-                document.body.style.overflow = 'auto';
-            }
+        // Close on Esc key
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') closeMenu();
         });
     }
 

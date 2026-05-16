@@ -61,11 +61,19 @@
     </button>
   </nav>
 
+  <!-- NAV OVERLAY -->
+  <div class="nav-overlay" id="navOverlay"></div>
+
   <!-- MOBILE NAV -->
   <div class="mobile-nav" id="mobileNav">
+    <div class="mobile-nav-header">
+      <div class="logo">
+        <img src="logo.png" alt="Logo" style="height: 30px;">
+      </div>
+    </div>
     <a href="index.html">Home</a>
-    <a href="services.html">Services</a>
     <a href="portfolio.html">Portfolio</a>
+    <a href="services.html">Services</a>
     <a href="pricing.html">Pricing</a>
     <a href="about.html" class="active">About</a>
     <a href="contact.html">Contact</a>
@@ -153,26 +161,8 @@
         Paper.Media was started by a group of college students passionate about content, creativity, and building modern digital experiences through media and storytelling.
       </p>
       
-      <div class="creators-grid">
-        <div class="creators-row">
-          <div class="creator-box reveal" style="transition-delay: 0.1s;">
-            <div class="creator-name">Tanmay Kadu</div>
-          </div>
-          <div class="creator-box reveal" style="transition-delay: 0.2s;">
-            <div class="creator-name">Kunal Patle</div>
-          </div>
-          <div class="creator-box reveal" style="transition-delay: 0.3s;">
-            <div class="creator-name">Yashraj Ghuge</div>
-          </div>
-        </div>
-        <div class="creators-row">
-          <div class="creator-box reveal" style="transition-delay: 0.4s;">
-            <div class="creator-name">Atharv Kamble</div>
-          </div>
-          <div class="creator-box reveal" style="transition-delay: 0.5s;">
-            <div class="creator-name">Harsh Tiwari</div>
-          </div>
-        </div>
+      <div class="creators-grid" id="creatorsGrid">
+        <!-- Dynamically populated from cloud API -->
       </div>
     </div>
   </section>
