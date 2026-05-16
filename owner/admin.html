@@ -33,16 +33,42 @@
   </div>
 
   <script>
-    function loginAdmin() {
+    async function loginAdmin() {
         const secret = document.getElementById("adminSecret").value.trim();
+        const btn = document.querySelector(".btn-primary");
 
-        if (secret === "papermediaadmin2026") {
-            localStorage.setItem("papermedia_admin_auth", "true");
-            localStorage.setItem("paper_admin_key", secret); // Added for API sync
-            console.log("AUTH SAVED");
-            window.location.href = "admin-dashboard.html";
-        } else {
-            alert("Invalid Secret Key");
+        if (!secret) {
+            alert("Please enter a secret key.");
+            return;
+        }
+
+        btn.textContent = "Verifying...";
+        btn.disabled = true;
+
+        try {
+            // Verify with the live API
+            const response = await fetch("https://papermediaapi.paper-mediaa.workers.dev/admin/verify", {
+                method: "GET",
+                headers: {
+                    "X-Admin-Key": secret
+                }
+            });
+
+            if (response.ok) {
+                localStorage.setItem("papermedia_admin_auth", "true");
+                localStorage.setItem("paper_admin_key", secret);
+                console.log("AUTH SUCCESS");
+                window.location.href = "admin-dashboard.html";
+            } else {
+                alert("Invalid Secret Key");
+                btn.textContent = "Access Dashboard";
+                btn.disabled = false;
+            }
+        } catch (err) {
+            console.error(err);
+            alert("Connection error. Please check your internet.");
+            btn.textContent = "Access Dashboard";
+            btn.disabled = false;
         }
     }
   </script>
