@@ -150,6 +150,215 @@ button {
   /* Container */
   --container-max: 1200px;
   --container-padding: 24px;
+
+  /* Skeleton */
+  --sk-base:    #E8E3DA;
+  --sk-shine:   #F5F1EA;
+  --sk-radius:  10px;
+  --sk-speed:   1.6s;
+}
+
+/* ===== SKELETON LOADING ===== */
+
+@keyframes skeletonShimmer {
+  0%   { background-position: -600px 0; }
+  100% { background-position:  600px 0; }
+}
+
+.sk-block {
+  background: linear-gradient(
+    90deg,
+    var(--sk-base)   0px,
+    var(--sk-shine) 200px,
+    var(--sk-base) 400px
+  );
+  background-size: 600px 100%;
+  animation: skeletonShimmer var(--sk-speed) ease-in-out infinite;
+  border-radius: var(--sk-radius);
+}
+
+/* ── Service card skeleton ── */
+.sk-service {
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 4px 6px -1px rgba(0,0,0,0.04);
+}
+
+.sk-service .sk-emoji {
+  width: 44px; height: 44px;
+  border-radius: 10px;
+  margin-bottom: 20px;
+}
+
+.sk-service .sk-title {
+  height: 20px; width: 65%;
+  border-radius: 6px;
+  margin-bottom: 12px;
+}
+
+.sk-service .sk-line {
+  height: 13px; width: 100%;
+  border-radius: 5px;
+  margin-bottom: 8px;
+}
+
+.sk-service .sk-line.short { width: 75%; }
+
+/* ── Portfolio card skeleton ── */
+.sk-port {
+  border-radius: 24px;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  background: #fff;
+}
+
+.sk-port .sk-thumb {
+  aspect-ratio: 1 / 1;
+  border-radius: 0;
+  width: 100%;
+}
+
+.sk-port .sk-port-body {
+  padding: 20px 24px 24px;
+}
+
+.sk-port .sk-tag {
+  height: 20px; width: 30%;
+  border-radius: 100px;
+  margin-bottom: 14px;
+}
+
+.sk-port .sk-name {
+  height: 18px; width: 70%;
+  border-radius: 6px;
+}
+
+/* ── Testimonial card skeleton ── */
+.sk-test {
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 36px;
+  box-shadow: 0 4px 6px -1px rgba(0,0,0,0.04);
+}
+
+.sk-test .sk-stars {
+  height: 16px; width: 90px;
+  border-radius: 4px;
+  margin-bottom: 20px;
+}
+
+.sk-test .sk-text-line {
+  height: 13px; width: 100%;
+  border-radius: 5px;
+  margin-bottom: 8px;
+}
+
+.sk-test .sk-text-line.med { width: 85%; }
+.sk-test .sk-text-line.short { width: 60%; margin-bottom: 24px; }
+
+.sk-test .sk-author {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-top: 4px;
+}
+
+.sk-test .sk-avatar {
+  width: 48px; height: 48px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.sk-test .sk-author-info { flex: 1; }
+
+.sk-test .sk-author-name {
+  height: 14px; width: 55%;
+  border-radius: 5px;
+  margin-bottom: 8px;
+}
+
+.sk-test .sk-author-role {
+  height: 11px; width: 40%;
+  border-radius: 4px;
+}
+
+/* ── Pricing card skeleton ── */
+.sk-pricing {
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 36px 28px;
+  box-shadow: 0 4px 6px -1px rgba(0,0,0,0.04);
+}
+
+.sk-pricing .sk-tier {
+  height: 13px; width: 40%;
+  border-radius: 4px;
+  margin-bottom: 16px;
+}
+
+.sk-pricing .sk-price {
+  height: 48px; width: 55%;
+  border-radius: 8px;
+  margin-bottom: 12px;
+}
+
+.sk-pricing .sk-desc {
+  height: 13px; width: 80%;
+  border-radius: 5px;
+  margin-bottom: 28px;
+}
+
+.sk-pricing .sk-feat {
+  height: 13px; width: 100%;
+  border-radius: 5px;
+  margin-bottom: 10px;
+}
+
+.sk-pricing .sk-feat.med { width: 80%; }
+.sk-pricing .sk-feat.short { width: 65%; margin-bottom: 28px; }
+
+.sk-pricing .sk-btn {
+  height: 48px; width: 100%;
+  border-radius: 100px;
+}
+
+/* ── Hero skeleton (used when hero content is still loading) ── */
+.sk-hero-badge {
+  height: 28px; width: 180px;
+  border-radius: 100px;
+  margin-bottom: 20px;
+}
+
+.sk-hero-title {
+  height: 52px; width: 80%;
+  border-radius: 8px;
+  margin-bottom: 12px;
+}
+
+.sk-hero-title.second {
+  width: 60%;
+  margin-bottom: 20px;
+}
+
+.sk-hero-sub {
+  height: 16px; width: 90%;
+  border-radius: 5px;
+  margin-bottom: 10px;
+}
+
+.sk-hero-sub.short { width: 70%; margin-bottom: 32px; }
+
+.sk-hero-btns {
+  display: flex; gap: 14px; flex-wrap: wrap;
+}
+
+.sk-hero-btn {
+  height: 52px; width: 160px;
+  border-radius: 100px;
 }
 
 .container {
@@ -158,6 +367,7 @@ button {
   padding: 0 var(--container-padding);
   width: 100%;
 }
+
 
 /* ===== NAV ===== */
 nav {
@@ -2141,3 +2351,42 @@ footer {
   .mobile-nav { width: 50%; }
 }
 
+
+/* ── Skeleton: mobile carousel sizing ── */
+@media (max-width: 768px) {
+  .sk-service,
+  .sk-port,
+  .sk-test,
+  .sk-pricing {
+    flex: 0 0 78% !important;
+    min-width: 250px !important;
+    max-width: 320px !important;
+    scroll-snap-align: start !important;
+  }
+
+  .sk-test    { padding: 22px 18px; }
+  .sk-pricing { padding: 22px 18px; }
+}
+
+@media (max-width: 480px) {
+  .sk-service,
+  .sk-port,
+  .sk-test,
+  .sk-pricing {
+    flex: 0 0 86% !important;
+    min-width: 230px !important;
+  }
+}
+
+/* ── Content fade-in when skeletons are replaced ── */
+.services-grid > .service-card,
+.portfolio-grid > .port-card,
+.testimonials-grid > .testimonial-card,
+.pricing-grid > .pricing-card {
+  animation: contentFadeIn 0.4s ease both;
+}
+
+@keyframes contentFadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}

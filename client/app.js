@@ -15,12 +15,21 @@ async function loadSiteData() {
     const path = window.location.pathname;
     const isHome = path === '/' || path.endsWith('index.html');
 
-    // Show loading skeletons on dynamic grids
-    showLoadingState('.services-grid');
-    showLoadingState('.portfolio-grid', '#featuredPortfolio');
-    showLoadingState('.testimonials-grid', '#testimonialsGrid');
-    showLoadingState('.pricing-grid');
-    showLoadingState('.creators-grid');
+    // ── Inject skeletons immediately (before any fetch) ──────────────────
+    if (isHome || path.includes('services.html')) {
+        showSkeletons('.services-grid', 'service', 3);
+    }
+    if (isHome || path.includes('portfolio.html')) {
+        showSkeletons('#featuredPortfolio', 'portfolio', 3);
+        showSkeletons('.portfolio-grid:not(#featuredPortfolio)', 'portfolio', 6);
+    }
+    if (isHome) {
+        showSkeletons('.testimonials-grid', 'testimonial', 3);
+        showSkeletons('#testimonialsGrid', 'testimonial', 3);
+    }
+    if (path.includes('pricing.html')) {
+        showSkeletons('.pricing-grid', 'pricing', 3);
+    }
 
     try {
         // Fetch content + portfolio in parallel for speed
@@ -44,23 +53,29 @@ async function loadSiteData() {
         // --- Services (home + services.html) ---
         if (isHome || path.includes('services.html')) {
             const services = Array.isArray(content.services) ? content.services : [];
+            clearSkeletons('.services-grid');
             updateServices(services);
         }
 
-        // --- Portfolio (home featured + full portfolio page) ---
+        // --- Portfolio ---
         if (portData && typeof loadFeatured === 'function') {
+            clearSkeletons('#featuredPortfolio');
+            clearSkeletons('.portfolio-grid');
             loadFeatured(portData.items || []);
         }
 
         // --- Testimonials (home only) ---
         if (isHome) {
             const reviews = Array.isArray(content.reviews) ? content.reviews : [];
+            clearSkeletons('.testimonials-grid');
+            clearSkeletons('#testimonialsGrid');
             updateTestimonials(reviews);
         }
 
         // --- Pricing ---
         if (path.includes('pricing.html')) {
             const pricing = Array.isArray(content.pricing) ? content.pricing : [];
+            clearSkeletons('.pricing-grid');
             updatePricing(pricing);
         }
 
@@ -74,27 +89,79 @@ async function loadSiteData() {
 
     } catch (err) {
         console.error('CMS load error:', err);
-        // Clear loading states gracefully
-        clearLoadingStates();
+        // On error: clear all skeletons and show empty state
+        ['.services-grid', '#featuredPortfolio', '.portfolio-grid',
+         '.testimonials-grid', '#testimonialsGrid', '.pricing-grid'
+        ].forEach(sel => clearSkeletons(sel));
     }
 }
 
-function showLoadingState(...selectors) {
-    selectors.forEach(sel => {
-        const el = document.querySelector(sel);
-        if (el && el.children.length === 0) {
-            el.innerHTML = `<div style="grid-column:1/-1; text-align:center; padding:40px; color:#aaa; font-size:14px;">Loading...</div>`;
-        }
-    });
+
+// === SKELETON TEMPLATES ===
+
+const SKELETONS = {
+    service: () => `
+        <div class="sk-service">
+            <div class="sk-block sk-emoji"></div>
+            <div class="sk-block sk-title"></div>
+            <div class="sk-block sk-line"></div>
+            <div class="sk-block sk-line"></div>
+            <div class="sk-block sk-line short"></div>
+        </div>`,
+
+    portfolio: () => `
+        <div class="sk-port">
+            <div class="sk-block sk-thumb"></div>
+            <div class="sk-port-body">
+                <div class="sk-block sk-tag"></div>
+                <div class="sk-block sk-name"></div>
+            </div>
+        </div>`,
+
+    testimonial: () => `
+        <div class="sk-test">
+            <div class="sk-block sk-stars"></div>
+            <div class="sk-block sk-text-line"></div>
+            <div class="sk-block sk-text-line med"></div>
+            <div class="sk-block sk-text-line short"></div>
+            <div class="sk-author">
+                <div class="sk-block sk-avatar"></div>
+                <div class="sk-author-info">
+                    <div class="sk-block sk-author-name"></div>
+                    <div class="sk-block sk-author-role"></div>
+                </div>
+            </div>
+        </div>`,
+
+    pricing: () => `
+        <div class="sk-pricing">
+            <div class="sk-block sk-tier"></div>
+            <div class="sk-block sk-price"></div>
+            <div class="sk-block sk-desc"></div>
+            <div class="sk-block sk-feat"></div>
+            <div class="sk-block sk-feat med"></div>
+            <div class="sk-block sk-feat med"></div>
+            <div class="sk-block sk-feat short"></div>
+            <div class="sk-block sk-btn"></div>
+        </div>`,
+};
+
+function showSkeletons(selector, type, count = 3) {
+    const el = document.querySelector(selector);
+    if (!el) return;
+    // Only inject if container is empty or has placeholder comment
+    const alreadyHasContent = el.querySelector('.sk-service, .sk-port, .sk-test, .sk-pricing, .service-card, .port-card, .testimonial-card, .pricing-card');
+    if (alreadyHasContent) return;
+    const template = SKELETONS[type];
+    if (!template) return;
+    el.innerHTML = Array.from({ length: count }, template).join('');
 }
 
-function clearLoadingStates() {
-    ['.services-grid', '.portfolio-grid', '#featuredPortfolio', '.testimonials-grid', '#testimonialsGrid', '.pricing-grid', '.creators-grid']
-        .forEach(sel => {
-            const el = document.querySelector(sel);
-            if (el && el.querySelector('[style*="Loading"]')) el.innerHTML = '';
-        });
+function clearSkeletons(selector) {
+    const el = document.querySelector(selector);
+    if (el) el.innerHTML = '';
 }
+
 
 
 function updateBanner(content) {
@@ -115,27 +182,43 @@ function updateBanner(content) {
 
 function updateHero(content) {
     const title = document.getElementById('client-hero_title');
-    const sub = document.getElementById('client-hero_sub');
+    const sub   = document.getElementById('client-hero_sub');
     const ctaPrimary = document.getElementById('client-hero_cta_primary');
-    
-    if (title && content.hero_title) title.innerHTML = content.hero_title;
-    if (sub && content.hero_sub) sub.innerHTML = content.hero_sub;
-    if (ctaPrimary && content.hero_cta_text) ctaPrimary.innerText = content.hero_cta_text;
+
+    // Smooth content swap — fade out → update → fade in
+    const fadeSwap = (el, newHTML, isText = false) => {
+        if (!el || !newHTML) return;
+        el.style.transition = 'opacity 0.3s ease';
+        el.style.opacity = '0';
+        setTimeout(() => {
+            if (isText) el.innerText = newHTML;
+            else el.innerHTML = newHTML;
+            el.style.opacity = '1';
+        }, 300);
+    };
+
+    if (title && content.hero_title) fadeSwap(title, content.hero_title);
+    if (sub && content.hero_sub)     fadeSwap(sub, content.hero_sub);
+    if (ctaPrimary && content.hero_cta_text) fadeSwap(ctaPrimary, content.hero_cta_text, true);
     if (ctaPrimary && content.hero_cta_link) ctaPrimary.href = content.hero_cta_link;
 
-    // Stats
-    if (content.stats) {
+    // Stats — inject skeleton first, then replace with real data
+    const statsStrip = document.querySelector('.hero-stats-strip');
+    if (content.stats && statsStrip) {
         const statsContainers = document.querySelectorAll('.hstat, .hero-card');
         content.stats.slice(0, 4).forEach((stat, i) => {
-            if (statsContainers[i]) {
-                const numEl = statsContainers[i].querySelector('.hstat-num, .hero-card-num');
-                const labelEl = statsContainers[i].querySelector('.hstat-label, .hero-card-label');
-                if (numEl) numEl.innerText = stat.value;
-                if (labelEl) labelEl.innerText = stat.label;
-            }
+            const container = statsContainers[i];
+            if (!container) return;
+            // Remove shimmer if previously applied
+            container.classList.remove('sk-block');
+            const numEl   = container.querySelector('.hstat-num,   .hero-card-num');
+            const labelEl = container.querySelector('.hstat-label, .hero-card-label');
+            if (numEl)   { numEl.style.opacity   = '0'; setTimeout(() => { numEl.innerText   = stat.value; numEl.style.transition   = 'opacity 0.4s'; numEl.style.opacity   = '1'; }, 200 + i * 60); }
+            if (labelEl) { labelEl.style.opacity = '0'; setTimeout(() => { labelEl.innerText = stat.label; labelEl.style.transition = 'opacity 0.4s'; labelEl.style.opacity = '1'; }, 200 + i * 60); }
         });
     }
 }
+
 
 function updateSettings(content) {
     if (content.logo_url) {
