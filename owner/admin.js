@@ -491,14 +491,15 @@ function renderPortfolioGrid() {
                         ? `<div class="video-preview-wrap" style="width:100%; height:100%; display:flex; align-items:center; justify-content:center; background:#000;">
                              <span style="position:absolute; top:8px; right:8px; background:rgba(0,0,0,0.7); color:#fff; font-size:9px; padding:2px 6px; border-radius:4px; z-index:2; font-weight:700;">VIDEO</span>
                              <video 
-                                poster="${videoThumb}" 
-                                preload="none" 
-                                muted loop playsinline 
-                                style="width:100%; height:100%; object-fit:cover; opacity:0.8;" 
-                                onmouseenter="this.play()" 
-                                onmouseleave="this.pause(); this.currentTime=0;">
-                                <source src="${item.video_url}#t=0.1" type="video/mp4">
+            <div class="port-card-admin" style="background:var(--card); border:1px solid var(--border); border-radius:12px; overflow:hidden; transition:all 0.3s;">
+                <div style="height:200px; background:#f0f0f0; position:relative;">
+                    ${
+                        video 
+                        ? `<div style="width:100%; height:100%; position:relative;">
+                             <video muted playsinline style="width:100%; height:100%; object-fit:cover;">
+                                <source src="${video}#t=0.1" type="video/mp4">
                              </video>
+                             <div style="position:absolute; top:10px; right:10px; background:rgba(0,0,0,0.5); color:white; padding:4px 8px; border-radius:4px; font-size:10px;">REEL</div>
                            </div>` 
                         : `<img src="${thumbUrl || 'placeholder.png'}" style="width:100%; height:100%; object-fit:cover;" loading="lazy">`
                     }
@@ -506,8 +507,8 @@ function renderPortfolioGrid() {
                 <div style="padding:20px;">
                     <div style="display:flex; justify-content:space-between; align-items:start; margin-bottom:8px;">
                         <div>
-                            <h4 style="font-size:14px; font-weight:700; color:var(--text);">${item.title || 'Untitled'}</h4>
-                            <p style="font-size:11px; color:var(--muted);">${item.tag || 'No Category'}</p>
+                            <h4 style="font-size:14px; font-weight:700; color:var(--text);">${title}</h4>
+                            <p style="font-size:11px; color:var(--muted);">${tag}</p>
                         </div>
                     </div>
                     <div style="display:flex; gap:8px; margin-top:16px;">
