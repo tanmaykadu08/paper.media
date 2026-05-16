@@ -1706,93 +1706,91 @@ footer {
 }
 
 /* ===== RESPONSIVE ===== */
+
+/* --- Tablet (≤1024px) --- */
 @media (max-width: 1024px) {
   :root {
-    --nav-height: 80px;
+    --nav-height: 70px;
     --space-xl: 60px;
     --space-xxl: 80px;
-  }
-  
-  .brand-logo {
-    height: 50px;
+    --container-padding: 32px;
   }
 
   nav {
-    padding: 0 40px;
+    padding: 0 32px;
   }
 
-  .section {
-    padding: var(--space-xl) 0;
-  }
+  .brand-logo { height: 46px; }
 
-  .hero-title {
-    font-size: clamp(40px, 6vw, 60px);
-  }
+  .section { padding: var(--space-xl) 0; }
 
-  .services-grid, .portfolio-grid, .building-grid {
+  .hero-title { font-size: clamp(36px, 5.5vw, 60px); }
+
+  .services-grid,
+  .portfolio-grid,
+  .building-grid {
     grid-template-columns: repeat(2, 1fr);
   }
 
-  .why-grid, .about-grid {
+  .why-grid,
+  .about-grid {
     grid-template-columns: 1fr;
     gap: var(--space-lg);
   }
 
-  .cta-band {
-    padding: var(--space-xl) 40px;
-  }
+  .cta-band { padding: var(--space-xl) 32px; }
 
-  .spotlight-card::before {
-    display: none;
-  }
+  .spotlight-card::before { display: none; }
 }
 
+/* --- Mobile (≤768px) --- */
 @media (max-width: 768px) {
+
+  /* Root token overrides — tighter mobile scale */
   :root {
-    --nav-height: 70px;
-    --space-xl: var(--mobile-padding, 40px);
-    --space-xxl: var(--mobile-padding, 60px);
-    --h1-size: var(--mobile-h1, 2.5rem);
-    --p-size: var(--mobile-p, 1rem);
-    --hero-h: var(--mobile-hero-h, 80vh);
+    --nav-height: 64px;
+    --space-xs:  6px;
+    --space-sm:  12px;
+    --space-md:  18px;
+    --space-lg:  28px;
+    --space-xl:  40px;
+    --space-xxl: 56px;
+    --container-padding: 20px;
   }
 
-  .brand-logo {
-    height: 40px;
+  /* ── Hard overflow guard ── */
+  html, body {
+    overflow-x: hidden;
+    max-width: 100vw;
   }
 
-  body {
-    cursor: auto;
-  }
+  * { max-width: 100%; box-sizing: border-box; }
 
-  .cursor, .cursor-trail {
-    display: none !important;
-  }
+  /* ── Cursor off on touch ── */
+  body { cursor: auto; }
+  .cursor, .cursor-trail { display: none !important; }
 
+  /* ── Navbar ── */
   nav {
-    padding: 0 24px !important;
+    padding: 0 var(--container-padding) !important;
+    height: var(--nav-height);
   }
+  .nav-links, .nav-cta { display: none; }
+  .hamburger { display: flex; }
+  .brand-logo { height: 38px; }
 
-  .nav-links, .nav-cta {
-    display: none;
-  }
-
-  .hamburger {
-    display: flex;
-  }
-
+  /* ── Hero ── */
   #home {
-    padding: 100px 0 50px;
-    min-height: var(--hero-h, 80vh) !important;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
+    min-height: auto;
+    padding: calc(var(--nav-height) + 36px) 0 40px;
+    align-items: flex-start;
   }
 
   #home .container {
-    flex-direction: column;
+    flex-direction: column !important;
     text-align: center;
-    gap: 30px !important;
+    gap: 28px !important;
+    align-items: center;
   }
 
   .hero-inner {
@@ -1800,103 +1798,158 @@ footer {
     text-align: center;
   }
 
+  .hero-badge {
+    font-size: 11px;
+    padding: 6px 14px;
+    margin-bottom: 16px;
+  }
+
   .hero-title {
-    font-size: var(--h1-size, clamp(32px, 8vw, 48px)) !important;
-    margin-bottom: 20px;
+    font-size: clamp(28px, 7.5vw, 44px) !important;
+    letter-spacing: -1px;
+    line-height: 1.15;
+    margin-bottom: 16px;
   }
 
   .hero-sub {
-    font-size: var(--p-size, 16px) !important;
-    margin-bottom: 30px;
+    font-size: 15px !important;
+    line-height: 1.65;
+    margin-bottom: 24px;
+    max-width: 100%;
   }
 
   .hero-btns {
     flex-direction: column;
     width: 100%;
-    gap: 12px;
+    gap: 10px;
+    align-items: stretch;
   }
 
   .btn-dark, .btn-outline {
     width: 100%;
     text-align: center;
-    padding: 16px 24px;
+    padding: 15px 20px;
+    font-size: 14px;
   }
 
-  .hero-visual {
-    display: none;
-  }
+  /* Hide desktop stat cards, show mobile strip */
+  .hero-visual { display: none !important; }
 
   .hero-stats-strip {
     display: grid;
-    margin-top: 30px;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+    width: 100%;
+    margin-top: 8px;
   }
 
+  .hstat {
+    padding: 18px 12px;
+    border-radius: 14px;
+  }
+
+  .hstat-num { font-size: 22px; }
+  .hstat-label { font-size: 9px; }
+
+  /* ── Sections ── */
   .section {
     padding: var(--space-xl) 0;
   }
 
+  .section-label { font-size: 10px; }
+
   .section-title {
-    font-size: clamp(26px, 6vw, 32px);
-    margin-bottom: 30px;
+    font-size: clamp(22px, 6vw, 30px);
+    letter-spacing: -0.5px;
+    margin-bottom: 20px;
+    line-height: 1.2;
   }
 
-  /* Horizontal Swipe Layouts for Mobile */
-  .services-grid, 
-  .portfolio-grid, 
-  .building-grid, 
+  /* ── Horizontal swipe carousels ── */
+  .services-grid,
+  .portfolio-grid,
+  .building-grid,
   .testimonials-grid {
     display: flex !important;
     flex-wrap: nowrap !important;
     overflow-x: auto !important;
-    overflow-y: hidden !important;
+    overflow-y: visible !important;
     scroll-snap-type: x mandatory !important;
-    gap: 16px !important;
-    margin: 0 calc(-1 * var(--container-padding)) !important;
-    padding: 0 var(--container-padding) 30px !important;
-    -webkit-overflow-scrolling: touch !important;
-    scrollbar-width: none !important;
+    gap: 14px !important;
+    /* Bleed past container padding for full-width feel */
+    margin-left:  calc(-1 * var(--container-padding)) !important;
+    margin-right: calc(-1 * var(--container-padding)) !important;
+    padding-left:  var(--container-padding) !important;
+    padding-right: var(--container-padding) !important;
+    padding-bottom: 16px !important;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+
+  .services-grid::after,
+  .portfolio-grid::after,
+  .building-grid::after,
+  .testimonials-grid::after {
+    content: '';
+    flex: 0 0 var(--container-padding);
   }
 
   .services-grid::-webkit-scrollbar,
   .portfolio-grid::-webkit-scrollbar,
   .building-grid::-webkit-scrollbar,
-  .testimonials-grid::-webkit-scrollbar {
-    display: none !important;
-  }
+  .testimonials-grid::-webkit-scrollbar { display: none; }
 
-  .service-card, 
-  .port-card, 
-  .building-card, 
+  /* Card sizes inside carousels */
+  .service-card,
+  .port-card,
+  .building-card,
   .testimonial-card {
-    flex: 0 0 85% !important;
-    min-width: 280px !important;
-    scroll-snap-align: center !important;
-    transition: transform 0.3s ease !important;
+    flex: 0 0 80% !important;
+    min-width: 260px !important;
+    max-width: 340px !important;
+    scroll-snap-align: start !important;
   }
 
-  .service-card:active, 
-  .port-card:active, 
-  .building-card:active, 
+  .service-card:active,
+  .port-card:active,
+  .building-card:active,
   .testimonial-card:active {
-    transform: scale(0.98) !important;
+    transform: scale(0.98);
   }
 
-  .service-card, .building-card, .about-chip {
-    padding: 24px;
+  .service-card, .building-card { padding: 20px; }
+  .port-info { padding: 14px; }
+
+  /* Portfolio grid stacks on portfolio.html (no swipe needed) */
+  .portfolio-grid.full-grid {
+    flex-direction: column !important;
+    overflow-x: visible !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
   }
 
-  .port-info {
-    padding: 16px;
+  .portfolio-grid.full-grid .port-card {
+    flex: unset !important;
+    max-width: 100% !important;
+    min-width: unset !important;
   }
 
+  /* ── About / Contact grids ── */
   .why-grid, .about-grid, .contact-grid {
     grid-template-columns: 1fr;
-    gap: 20px;
+    gap: 18px;
   }
 
+  .about-chip {
+    padding: 18px;
+  }
+
+  /* ── Forms ── */
   .form-row {
     grid-template-columns: 1fr;
-    gap: 15px;
+    gap: 12px;
   }
 
   .form-btn {
@@ -1904,53 +1957,97 @@ footer {
     text-align: center;
   }
 
+  /* ── Pricing grid ── */
+  .pricing-grid {
+    grid-template-columns: 1fr !important;
+    gap: 16px;
+  }
+
+  .pricing-card {
+    padding: 24px 20px;
+  }
+
+  /* ── Creators (About page) ── */
+  .creators-row {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .creator-box {
+    width: 100%;
+    min-width: unset;
+    padding: 20px;
+  }
+
+  /* ── CTA Band ── */
   .cta-band {
     padding: var(--space-xl) 0;
     text-align: center;
   }
 
   .cta-band .container {
-    flex-direction: column;
-    gap: 24px !important;
+    flex-direction: column !important;
+    gap: 20px !important;
+    align-items: center;
   }
+
+  .cta-band h2 { font-size: 22px; }
+  .cta-band p  { font-size: 14px; }
 
   .cta-band-btn {
     width: 100%;
     text-align: center;
+    padding: 15px 20px;
   }
 
-  footer {
-    padding: 40px 0;
-  }
+  /* ── Footer ── */
+  footer { padding: 36px 0; }
 
   footer .container {
-    flex-direction: column;
-    gap: 30px !important;
+    flex-direction: column !important;
+    gap: 24px !important;
     text-align: center;
+    align-items: center;
   }
 
   .footer-nav {
-    flex-direction: column;
-    gap: 15px;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 12px 20px;
   }
+
+  .footer-copy { font-size: 12px; }
 }
 
+/* --- Small phones (≤480px) --- */
 @media (max-width: 480px) {
   :root {
-    --space-xl: 30px;
-    --space-xxl: 50px;
+    --space-xl: 32px;
+    --space-xxl: 44px;
+    --container-padding: 16px;
   }
 
-  .hero-title {
-    font-size: 30px;
+  .hero-title { font-size: clamp(24px, 8vw, 36px) !important; }
+  .section-title { font-size: clamp(20px, 6vw, 26px); }
+
+  .hero-stats-strip {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
   }
 
-  .section-title {
-    font-size: 24px;
+  .hstat { padding: 14px 10px; }
+  .hstat-num { font-size: 20px; }
+
+  .service-card,
+  .port-card,
+  .building-card,
+  .testimonial-card {
+    flex: 0 0 88% !important;
+    min-width: 240px !important;
   }
 
-  .hero-badge {
-    font-size: 10px;
-    padding: 6px 14px;
-  }
+  .mobile-nav a { font-size: 24px; }
+
+  .cta-band h2 { font-size: 20px; }
 }
