@@ -3,13 +3,40 @@
 
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="theme-color" content="#F5F1EA">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
   <title>Contact Us – Paper.Media</title>
   <meta name="description" content="Get in touch with Paper.Media. Start your journey towards high-impact content and social media growth today.">
+  <meta name="keywords" content="contact, contact Paper.Media, creative studio contact, social media management, content creation">
+  <meta name="author" content="Paper.Media">
+  <meta name="robots" content="index, follow">
+
+  <!-- Open Graph / Facebook -->
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://papermedia.co.in/contact.html">
+  <meta property="og:title" content="Contact Us – Paper.Media">
+  <meta property="og:description" content="Get in touch with Paper.Media. Start your journey towards high-impact content and social media growth today.">
+  <meta property="og:image" content="https://papermedia.co.in/preview.jpg">
+
+  <!-- Twitter -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:url" content="https://papermedia.co.in/contact.html">
+  <meta name="twitter:title" content="Contact Us – Paper.Media">
+  <meta name="twitter:description" content="Get in touch with Paper.Media. Start your journey towards high-impact content and social media growth today.">
+  <meta name="twitter:image" content="https://papermedia.co.in/preview.jpg">
+
+  <!-- Canonical -->
+  <link rel="canonical" href="https://papermedia.co.in/contact.html">
+
+  <link rel="icon" type="image/png" href="logo.png">
+  <link rel="icon" type="image/png" href="logo.png">
+  <link rel="dns-prefetch" href="https://papermediaapi.paper-mediaa.workers.dev">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="preload" href="logo.png" as="image">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Sora:wght@600;700;800&display=swap" rel="stylesheet">
+  <link rel="preload" href="logo.png" as="image" fetchpriority="high">
+  <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Sora:wght@700&display=swap">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Sora:wght@700&display=swap" media="print" onload="this.media='all'">
+  <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Sora:wght@700&display=swap"></noscript>
   <link rel="stylesheet" href="style.css">
 </head>
 
@@ -22,14 +49,15 @@
   </div>
 
   <!-- NAV -->
-  <nav id="navbar">
+  <nav id="navbar" class="main-nav">
     <div class="logo">
-      <a href="index.html"><img src="logo.png" alt="Paper.Media Logo" class="brand-logo"></a>
+      <a href="index.html"><img loading="lazy" decoding="async" src="logo.png" alt="Paper.Media Logo" class="brand-logo"></a>
     </div>
     <ul class="nav-links">
       <li><a href="index.html">Home</a></li>
       <li><a href="services.html">Services</a></li>
       <li><a href="portfolio.html">Portfolio</a></li>
+      <li><a href="pricing.html">Pricing</a></li>
       <li><a href="about.html">About</a></li>
       <li><a href="contact.html" class="active">Contact</a></li>
     </ul>
@@ -39,11 +67,20 @@
     </button>
   </nav>
 
+  <!-- NAV OVERLAY -->
+  <div class="nav-overlay" id="navOverlay"></div>
+
   <!-- MOBILE NAV -->
   <div class="mobile-nav" id="mobileNav">
+    <div class="mobile-nav-header">
+      <div class="logo">
+        <img loading="lazy" decoding="async" src="logo.png" alt="Logo" style="height: 30px;">
+      </div>
+    </div>
     <a href="index.html">Home</a>
-    <a href="services.html">Services</a>
     <a href="portfolio.html">Portfolio</a>
+    <a href="services.html">Services</a>
+    <a href="pricing.html">Pricing</a>
     <a href="about.html">About</a>
     <a href="contact.html" class="active">Contact</a>
     <a href="contact.html" class="mob-cta">Get Started →</a>
@@ -53,86 +90,30 @@
   <section class="section" style="padding-top: 150px;">
     <div class="container">
       <span class="section-label reveal">GET IN TOUCH</span>
-      <h2 class="section-title reveal">Let's Build Your Presence</h2>
+      <h1 class="section-title reveal">Let's Build Your Presence</h1>
       
       <div class="contact-grid">
         <div class="reveal">
           <p style="font-size: 16px; color: #666; line-height: 1.8; margin-bottom: var(--space-md);">Ready to take your content to the next level? Fill out the form or reach out via social media. We typically reply within 30 minutes.</p>
-          <div class="contact-links" id="dynamic-contact-links">
-            <!-- Populated by JS -->
+          
+          <div class="contact-links">
+            <a href="https://wa.me/919503691537" class="contact-link-card" target="_blank">
+              <div class="contact-link-icon">💬</div>
+              <div>
+                <div class="contact-link-title">WhatsApp Us</div>
+                <div class="contact-link-sub">Fastest response time</div>
+              </div>
+              <div class="contact-link-arrow">↗</div>
+            </a>
+            <a href="https://instagram.com/" class="contact-link-card" target="_blank">
+              <div class="contact-link-icon">📸</div>
+              <div>
+                <div class="contact-link-title">@paper.mediaa</div>
+                <div class="contact-link-sub">DM us on Instagram</div>
+              </div>
+              <div class="contact-link-arrow">↗</div>
+            </a>
           </div>
-
-          <script>
-            function loadContactInfo() {
-              const raw = localStorage.getItem('papermedia_cms_data');
-              let contact = { email: "", instagram: "", whatsapp: "" };
-              if (raw) {
-                try {
-                  const data = JSON.parse(raw);
-                  if (data.contact) contact = data.contact;
-                } catch(e) {}
-              }
-              
-              const container = document.getElementById('dynamic-contact-links');
-              if (!container) return;
-              
-              let html = '';
-
-              // 1. Instagram
-              if (contact.instagram && contact.instagram.trim() !== '') {
-                let igHandle = contact.instagram.split('instagram.com/')[1] || 'Instagram';
-                igHandle = igHandle.split('?')[0]; // Remove URL parameters like ?igsh=...
-                igHandle = igHandle.replace(/\//g, '');
-                if (!igHandle || igHandle === 'Instagram') igHandle = 'paper.mediaa';
-                
-                let igLink = contact.instagram.includes('http') ? contact.instagram : 'https://instagram.com/' + contact.instagram;
-                html += `
-                  <a href="${igLink}" class="contact-link-card" target="_blank">
-                    <div class="contact-link-icon">📸</div>
-                    <div>
-                      <div class="contact-link-title">@${igHandle}</div>
-                      <div class="contact-link-sub">DM us on Instagram</div>
-                    </div>
-                    <div class="contact-link-arrow">↗</div>
-                  </a>
-                `;
-              }
-              
-              // 2. WhatsApp
-              if (contact.whatsapp && contact.whatsapp.trim() !== '') {
-                let waClean = contact.whatsapp.replace(/[^0-9]/g, '');
-                let waLink = contact.whatsapp.includes('http') ? contact.whatsapp : 'https://wa.me/' + waClean;
-                html += `
-                  <a href="${waLink}" class="contact-link-card" target="_blank">
-                    <div class="contact-link-icon">💬</div>
-                    <div>
-                      <div class="contact-link-title">WhatsApp Us</div>
-                      <div class="contact-link-sub">Fastest response time</div>
-                    </div>
-                    <div class="contact-link-arrow">↗</div>
-                  </a>
-                `;
-              }
-              
-              // 3. Email
-              if (contact.email && contact.email.trim() !== '') {
-                html += `
-                  <a href="mailto:${contact.email}" class="contact-link-card" target="_blank">
-                    <div class="contact-link-icon">✉️</div>
-                    <div>
-                      <div class="contact-link-title">Email Us</div>
-                      <div class="contact-link-sub">${contact.email}</div>
-                    </div>
-                    <div class="contact-link-arrow">↗</div>
-                  </a>
-                `;
-              }
-              
-              container.innerHTML = html;
-            }
-            
-            document.addEventListener('DOMContentLoaded', loadContactInfo);
-          </script>
         </div>
 
         <form class="form reveal" id="contactForm" action="https://papermediaapi.paper-mediaa.workers.dev/contact" method="POST">
@@ -158,59 +139,118 @@
 
   <!-- FOOTER -->
   <footer>
-    <div class="container" style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: var(--space-md);">
-      <div class="footer-logo">
-        <img src="logo.png" alt="Paper.Media Logo" style="height: 40px; width: auto;" loading="lazy" decoding="async">
+    <div class="footer-inner container">
+
+      <!-- TOP: 4-column grid -->
+      <div class="footer-top">
+
+        <!-- Brand -->
+        <div class="footer-brand reveal">
+          <img src="logo.png" alt="Paper.Media" class="footer-logo-img" loading="eager" decoding="async">
+          <p class="footer-tagline">Building modern digital experiences through content, creativity, and storytelling.</p>
+          <div class="footer-socials">
+            <!-- Instagram -->
+            <a href="https://instagram.com/paper.mediaa" target="_blank" rel="noopener" class="footer-social-link" aria-label="Instagram" id="client-contact_ig">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="2" y="2" width="20" height="20" rx="5" ry="5"/>
+                <circle cx="12" cy="12" r="4"/>
+                <circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/>
+              </svg>
+            </a>
+            <!-- LinkedIn -->
+            <a href="https://linkedin.com/company/paper-media" target="_blank" rel="noopener" class="footer-social-link" aria-label="LinkedIn">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/>
+                <rect x="2" y="9" width="4" height="12"/>
+                <circle cx="4" cy="4" r="2"/>
+              </svg>
+            </a>
+            <!-- Email -->
+            <a href="mailto:paper.mediaa@gmail.com" class="footer-social-link" aria-label="Email">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+                <polyline points="22,6 12,13 2,6"/>
+              </svg>
+            </a>
+          </div>
+        </div>
+
+        <!-- Quick Links -->
+        <div class="footer-col reveal" style="transition-delay:0.1s;">
+          <div class="footer-col-title">Navigation</div>
+          <nav class="footer-links" aria-label="Footer navigation">
+            <a href="index.html">Home</a>
+            <a href="portfolio.html">Portfolio</a>
+            <a href="services.html">Services</a>
+            <a href="pricing.html">Pricing</a>
+            <a href="about.html">About</a>
+            <a href="contact.html">Contact</a>
+          </nav>
+        </div>
+
+        <!-- Services quick links -->
+        <div class="footer-col reveal" style="transition-delay:0.15s;">
+          <div class="footer-col-title">Services</div>
+          <nav class="footer-links" aria-label="Services navigation">
+            <a href="services.html">Reels Editing</a>
+            <a href="services.html">Social Media</a>
+            <a href="services.html">Brand Content</a>
+            <a href="services.html">Thumbnails</a>
+            <a href="services.html">Graphic Design</a>
+          </nav>
+        </div>
+
+        <!-- Contact -->
+        <div class="footer-col footer-col-contact reveal" style="transition-delay:0.2s;">
+          <div class="footer-col-title">Get in Touch</div>
+          <div class="footer-contact-item">
+            <span class="footer-contact-label">Email</span>
+            <a href="mailto:paper.mediaa@gmail.com" class="footer-contact-value">paper.mediaa@gmail.com</a>
+          </div>
+          <div class="footer-contact-item">
+            <span class="footer-contact-label">Business Inquiries</span>
+            <span class="footer-contact-value">Open to brands &amp; creators</span>
+          </div>
+          <a href="https://wa.me/919503691537" target="_blank" rel="noopener" class="footer-whatsapp-btn" id="client-contact_whatsapp">
+            <svg viewBox="0 0 24 24" fill="currentColor">
+              <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
+            </svg>
+            Chat on WhatsApp
+          </a>
+        </div>
+
+      </div><!-- /footer-top -->
+
+      <!-- BOTTOM BAR -->
+      <div class="footer-bottom">
+        <p class="footer-copy-text">© 2026 Paper.Media — All rights reserved.</p>
+        <div class="footer-legal">
+          <a href="privacy.html">Privacy Policy</a>
+          <span class="footer-legal-dot" aria-hidden="true"></span>
+          <a href="terms.html">Terms of Service</a>
+          <span class="footer-legal-dot" aria-hidden="true"></span>
+          <a href="sitemap.xml">Sitemap</a>
+        </div>
       </div>
-      <div class="footer-nav">
-        <a href="index.html">Home</a>
-        <a href="services.html">Services</a>
-        <a href="portfolio.html">Portfolio</a>
-        <a href="pricing.html">Pricing</a>
-        <a href="contact.html" class="active">Contact</a>
-      </div>
-      <div class="footer-copy">© 2025 Paper.Media. All rights reserved.</div>
-    </div>
+
+    </div><!-- /footer-inner -->
   </footer>
 
-  <script src="app.js"></script>
+  <script src="app.js" defer></script>
   <script>
     // Specific form submit logic for this page
     async function handleSubmit(event) {
       event.preventDefault();
       const form = document.getElementById("contactForm");
       const btn = form.querySelector('.form-btn');
-      const raw = localStorage.getItem('papermedia_cms_data');
-      let adminEmail = "";
-      if (raw) {
-        try {
-          const cmsData = JSON.parse(raw);
-          if (cmsData.contact && cmsData.contact.email) {
-            adminEmail = cmsData.contact.email;
-          }
-        } catch(e) {}
-      }
-
       const data = {
         name: form.elements.name.value,
         email: form.elements.email.value,
-        message: form.elements.message.value,
-        _replyto: form.elements.email.value // Helps FormSubmit set reply-to address
+        message: form.elements.message.value
       };
-      
       const originalText = btn.textContent;
       btn.textContent = 'Sending...'; btn.style.opacity = '0.7'; btn.disabled = true;
 
-      // 1. Send to FormSubmit for direct email (if configured)
-      if (adminEmail && adminEmail.includes('@')) {
-        fetch(`https://formsubmit.co/ajax/${adminEmail}`, {
-          method: form.method,
-          body: JSON.stringify(data),
-          headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' }
-        }).catch(() => {}); // Fire and forget
-      }
-
-      // 2. Save to Turso Database via Worker API
       fetch(event.target.action, {
         method: form.method,
         body: JSON.stringify(data),

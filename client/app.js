@@ -12,54 +12,157 @@ document.addEventListener('DOMContentLoaded', () => {
 const API_BASE = 'https://papermediaapi.paper-mediaa.workers.dev';
 
 async function loadSiteData() {
+    const path = window.location.pathname;
+    const isHome = path === '/' || path.endsWith('index.html');
+
+    // ── Inject skeletons immediately (before any fetch) ──────────────────
+    if (isHome || path.includes('services.html')) {
+        showSkeletons('.services-grid', 'service', 3);
+    }
+    if (isHome || path.includes('portfolio.html')) {
+        showSkeletons('#featuredPortfolio', 'portfolio', 3);
+        showSkeletons('.portfolio-grid:not(#featuredPortfolio)', 'portfolio', 6);
+    }
+    if (isHome) {
+        showSkeletons('.testimonials-grid', 'testimonial', 3);
+        showSkeletons('#testimonialsGrid', 'testimonial', 3);
+    }
+    if (path.includes('pricing.html')) {
+        showSkeletons('.pricing-grid', 'pricing', 3);
+    }
+
     try {
-        // Read directly from LocalStorage CMS
-        const raw = localStorage.getItem('papermedia_cms_data');
-        let content = {};
-        if (raw) {
-            content = JSON.parse(raw);
-        }
+        // Fetch content + portfolio in parallel for speed
+        const [contentRes, portRes] = await Promise.all([
+            fetch(`${API_BASE}/content`, { cache: 'no-store' }),
+            (path.includes('portfolio.html') || isHome)
+                ? fetch(`${API_BASE}/portfolio?featured=${isHome ? '1' : '0'}`, { cache: 'no-store' })
+                : Promise.resolve(null)
+        ]);
 
-        // 1. Populate Announcement Banner
+        const { content = {} } = await contentRes.json();
+        const portData = portRes ? await portRes.json() : null;
+
+        // --- Global Updates ---
         updateBanner(content.homepage || {});
-
-        // 2. Populate Hero (if on home page)
         updateHero(content.homepage || {});
-
-        // 3. Populate Site Settings (Logo, Socials)
         updateSettings(content);
-        
-        // 3.5. Inject SEO, Schema, Canonical, and GA
         injectSEO(content);
-
-        // 4. Apply Appearance Settings
         applyAppearance(content.appearance || {}, content.mobile || {});
 
-        // 5. Page Specific Data
-        if (window.location.pathname.includes('portfolio.html') || window.location.pathname === '/' || window.location.pathname.endsWith('index.html')) {
-            if (typeof loadFeatured === 'function') loadFeatured(content.projects || []);
-        } 
-        if (window.location.pathname.includes('services.html') || window.location.pathname === '/' || window.location.pathname.endsWith('index.html')) {
-            if (typeof updateServices === 'function') updateServices(content.services || []);
+        // --- Services (home + services.html) ---
+        if (isHome || path.includes('services.html')) {
+            const services = Array.isArray(content.services) ? content.services : [];
+            clearSkeletons('.services-grid');
+            updateServices(services);
         }
-        
-        // 6. Testimonials (Client Reviews)
-        if (window.location.pathname === '/' || window.location.pathname.endsWith('index.html')) {
-            const reviewsRaw = localStorage.getItem('papermedia_reviews');
-            const reviewsData = reviewsRaw ? JSON.parse(reviewsRaw) : [];
-            updateTestimonials(reviewsData);
+
+        // --- Portfolio ---
+        if (portData && typeof loadFeatured === 'function') {
+            clearSkeletons('#featuredPortfolio');
+            clearSkeletons('.portfolio-grid');
+            loadFeatured(portData.items || []);
         }
-        if (window.location.pathname.includes('pricing.html')) {
-            if (typeof updatePricing === 'function') updatePricing(content.pricing || []);
-        } 
-        if (window.location.pathname.includes('about.html')) {
-            if (typeof updateFounders === 'function') updateFounders(content.founders || []);
+
+        // --- Testimonials (home only) ---
+        if (isHome) {
+            const reviews = Array.isArray(content.reviews) ? content.reviews : [];
+            clearSkeletons('.testimonials-grid');
+            clearSkeletons('#testimonialsGrid');
+            updateTestimonials(reviews);
+        }
+
+        // --- Pricing ---
+        if (path.includes('pricing.html')) {
+            const pricing = Array.isArray(content.pricing) ? content.pricing : [];
+            clearSkeletons('.pricing-grid');
+            updatePricing(pricing);
+        }
+
+        // --- Founders / About ---
+        if (path.includes('about.html')) {
+            const founders = Array.isArray(content.founders) ? content.founders : [];
+            updateFounders(founders);
+            const aboutIntro = document.querySelector('.creators-intro');
+            if (aboutIntro && content.founders_intro) aboutIntro.innerHTML = content.founders_intro;
         }
 
     } catch (err) {
-        console.error('Error loading site data:', err);
+        console.error('CMS load error:', err);
+        // On error: clear all skeletons and show empty state
+        ['.services-grid', '#featuredPortfolio', '.portfolio-grid',
+         '.testimonials-grid', '#testimonialsGrid', '.pricing-grid'
+        ].forEach(sel => clearSkeletons(sel));
     }
 }
+
+
+// === SKELETON TEMPLATES ===
+
+const SKELETONS = {
+    service: () => `
+        <div class="sk-service">
+            <div class="sk-block sk-emoji"></div>
+            <div class="sk-block sk-title"></div>
+            <div class="sk-block sk-line"></div>
+            <div class="sk-block sk-line"></div>
+            <div class="sk-block sk-line short"></div>
+        </div>`,
+
+    portfolio: () => `
+        <div class="sk-port">
+            <div class="sk-block sk-thumb"></div>
+            <div class="sk-port-body">
+                <div class="sk-block sk-tag"></div>
+                <div class="sk-block sk-name"></div>
+            </div>
+        </div>`,
+
+    testimonial: () => `
+        <div class="sk-test">
+            <div class="sk-block sk-stars"></div>
+            <div class="sk-block sk-text-line"></div>
+            <div class="sk-block sk-text-line med"></div>
+            <div class="sk-block sk-text-line short"></div>
+            <div class="sk-author">
+                <div class="sk-block sk-avatar"></div>
+                <div class="sk-author-info">
+                    <div class="sk-block sk-author-name"></div>
+                    <div class="sk-block sk-author-role"></div>
+                </div>
+            </div>
+        </div>`,
+
+    pricing: () => `
+        <div class="sk-pricing">
+            <div class="sk-block sk-tier"></div>
+            <div class="sk-block sk-price"></div>
+            <div class="sk-block sk-desc"></div>
+            <div class="sk-block sk-feat"></div>
+            <div class="sk-block sk-feat med"></div>
+            <div class="sk-block sk-feat med"></div>
+            <div class="sk-block sk-feat short"></div>
+            <div class="sk-block sk-btn"></div>
+        </div>`,
+};
+
+function showSkeletons(selector, type, count = 3) {
+    const el = document.querySelector(selector);
+    if (!el) return;
+    // Only inject if container is empty or has placeholder comment
+    const alreadyHasContent = el.querySelector('.sk-service, .sk-port, .sk-test, .sk-pricing, .service-card, .port-card, .testimonial-card, .pricing-card');
+    if (alreadyHasContent) return;
+    const template = SKELETONS[type];
+    if (!template) return;
+    el.innerHTML = Array.from({ length: count }, template).join('');
+}
+
+function clearSkeletons(selector) {
+    const el = document.querySelector(selector);
+    if (el) el.innerHTML = '';
+}
+
+
 
 function updateBanner(content) {
     if (content.banner_active && content.banner_text) {
@@ -79,27 +182,43 @@ function updateBanner(content) {
 
 function updateHero(content) {
     const title = document.getElementById('client-hero_title');
-    const sub = document.getElementById('client-hero_sub');
+    const sub   = document.getElementById('client-hero_sub');
     const ctaPrimary = document.getElementById('client-hero_cta_primary');
-    
-    if (title && content.hero_title) title.innerHTML = content.hero_title;
-    if (sub && content.hero_sub) sub.innerHTML = content.hero_sub;
-    if (ctaPrimary && content.hero_cta_text) ctaPrimary.innerText = content.hero_cta_text;
+
+    // Smooth content swap — fade out → update → fade in
+    const fadeSwap = (el, newHTML, isText = false) => {
+        if (!el || !newHTML) return;
+        el.style.transition = 'opacity 0.3s ease';
+        el.style.opacity = '0';
+        setTimeout(() => {
+            if (isText) el.innerText = newHTML;
+            else el.innerHTML = newHTML;
+            el.style.opacity = '1';
+        }, 300);
+    };
+
+    if (title && content.hero_title) fadeSwap(title, content.hero_title);
+    if (sub && content.hero_sub)     fadeSwap(sub, content.hero_sub);
+    if (ctaPrimary && content.hero_cta_text) fadeSwap(ctaPrimary, content.hero_cta_text, true);
     if (ctaPrimary && content.hero_cta_link) ctaPrimary.href = content.hero_cta_link;
 
-    // Stats
-    if (content.stats) {
+    // Stats — inject skeleton first, then replace with real data
+    const statsStrip = document.querySelector('.hero-stats-strip');
+    if (content.stats && statsStrip) {
         const statsContainers = document.querySelectorAll('.hstat, .hero-card');
         content.stats.slice(0, 4).forEach((stat, i) => {
-            if (statsContainers[i]) {
-                const numEl = statsContainers[i].querySelector('.hstat-num, .hero-card-num');
-                const labelEl = statsContainers[i].querySelector('.hstat-label, .hero-card-label');
-                if (numEl) numEl.innerText = stat.value;
-                if (labelEl) labelEl.innerText = stat.label;
-            }
+            const container = statsContainers[i];
+            if (!container) return;
+            // Remove shimmer if previously applied
+            container.classList.remove('sk-block');
+            const numEl   = container.querySelector('.hstat-num,   .hero-card-num');
+            const labelEl = container.querySelector('.hstat-label, .hero-card-label');
+            if (numEl)   { numEl.style.opacity   = '0'; setTimeout(() => { numEl.innerText   = stat.value; numEl.style.transition   = 'opacity 0.4s'; numEl.style.opacity   = '1'; }, 200 + i * 60); }
+            if (labelEl) { labelEl.style.opacity = '0'; setTimeout(() => { labelEl.innerText = stat.label; labelEl.style.transition = 'opacity 0.4s'; labelEl.style.opacity = '1'; }, 200 + i * 60); }
         });
     }
 }
+
 
 function updateSettings(content) {
     if (content.logo_url) {
@@ -247,20 +366,35 @@ function updatePricing(pricing) {
 
 function updateFounders(founders) {
     const grid = document.querySelector('.creators-grid');
-    if (!grid || !founders || founders.length === 0) return;
-    
+    if (!grid) return;
+
+    // Default fallback team if API returns nothing
+    const defaultFounders = [
+        { name: 'Tanmay Kadu' },
+        { name: 'Kunal Patle' },
+        { name: 'Yashraj Ghuge' },
+        { name: 'Atharv Kamble' },
+        { name: 'Harsh Tiwari' }
+    ];
+    const team = founders && founders.length > 0 ? founders : defaultFounders;
+
+    // Split into rows of 3 and 2
     grid.innerHTML = '';
-    founders.forEach(f => {
-        grid.innerHTML += `
-            <div class="creator-card reveal visible">
-                <img src="${f.image || 'placeholder.jpg'}" alt="${f.name}" class="creator-img">
-                <div class="creator-info">
+    const chunkSize = 3;
+    for (let i = 0; i < team.length; i += chunkSize) {
+        const row = document.createElement('div');
+        row.className = 'creators-row';
+        const chunk = team.slice(i, i + chunkSize);
+        chunk.forEach((f, j) => {
+            row.innerHTML += `
+                <div class="creator-box reveal visible" style="transition-delay: ${(i + j) * 0.1}s;">
                     <div class="creator-name">${f.name}</div>
-                    <div class="creator-role">${f.role}</div>
+                    ${f.role ? `<div style="font-size:13px; color:#888; margin-top:4px;">${f.role}</div>` : ''}
                 </div>
-            </div>
-        `;
-    });
+            `;
+        });
+        grid.appendChild(row);
+    }
 }
 
 function updateTestimonials(reviews) {
@@ -386,49 +520,70 @@ function initNavbar() {
     const navbar = document.getElementById('navbar');
     const hamburger = document.getElementById('hamburger');
     const mobileNav = document.getElementById('mobileNav');
+    const navOverlay = document.getElementById('navOverlay');
 
     if (hamburger && mobileNav) {
-        hamburger.addEventListener('click', () => {
-            hamburger.classList.toggle('open');
-            mobileNav.classList.toggle('open');
-            document.body.style.overflow = mobileNav.classList.contains('open') ? 'hidden' : 'auto';
-        });
+        const toggleMenu = () => {
+            const isOpen = mobileNav.classList.contains('open');
+            if (isOpen) {
+                closeMenu();
+            } else {
+                openMenu();
+            }
+        };
+
+        const openMenu = () => {
+            hamburger.classList.add('open');
+            mobileNav.classList.add('open');
+            if (navOverlay) navOverlay.classList.add('open');
+            document.body.style.overflow = 'hidden';
+        };
+
+        const closeMenu = () => {
+            hamburger.classList.remove('open');
+            mobileNav.classList.remove('open');
+            if (navOverlay) navOverlay.classList.remove('open');
+            document.body.style.overflow = 'auto';
+        };
+
+        hamburger.addEventListener('click', toggleMenu);
+
+        if (navOverlay) {
+            navOverlay.addEventListener('click', closeMenu);
+        }
 
         const mobileLinks = mobileNav.querySelectorAll('a');
         mobileLinks.forEach(link => {
-            link.addEventListener('click', () => {
-                hamburger.classList.remove('open');
-                mobileNav.classList.remove('open');
-                document.body.style.overflow = 'auto';
-            });
+            link.addEventListener('click', closeMenu);
         });
 
-        document.addEventListener('click', (e) => {
-            if (!hamburger.contains(e.target) && !mobileNav.contains(e.target)) {
-                hamburger.classList.remove('open');
-                mobileNav.classList.remove('open');
-                document.body.style.overflow = 'auto';
-            }
+        // Close on Esc key
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') closeMenu();
         });
     }
 
+    // Throttled scroll listener using rAF — prevents layout thrashing
+    let ticking = false;
     window.addEventListener('scroll', () => {
-        let winScroll = window.scrollY;
-        if (winScroll > 50) {
-            navbar.style.boxShadow = "0 4px 20px rgba(0,0,0,0.05)";
-            navbar.style.padding = "0 50px";
-            navbar.style.background = "rgba(245, 241, 234, 0.95)";
-        } else {
-            navbar.style.boxShadow = "none";
-            navbar.style.padding = "0 60px";
-            navbar.style.background = "rgba(245, 241, 234, 0.85)";
+        if (!ticking) {
+            requestAnimationFrame(() => {
+                if (window.scrollY > 50) {
+                    navbar.classList.add('scrolled');
+                } else {
+                    navbar.classList.remove('scrolled');
+                }
+                ticking = false;
+            });
+            ticking = true;
         }
-    });
+    }, { passive: true });
 }
 
 // === SCROLL REVEAL ===
 function initScrollReveal() {
     const reveals = document.querySelectorAll('.reveal');
+    if (!reveals.length) return;
     const obs = new IntersectionObserver((entries) => {
         entries.forEach((entry) => {
             if (entry.isIntersecting) {
@@ -436,12 +591,16 @@ function initScrollReveal() {
                 obs.unobserve(entry.target);
             }
         });
-    }, { threshold: 0.1 });
+    }, { threshold: 0.08, rootMargin: '0px 0px -40px 0px' });
     reveals.forEach(r => obs.observe(r));
 }
 
 // === MAGNETIC ELEMENTS ===
 function initMagnetic() {
+    // Skip entirely on touch devices — no hover to respond to
+    const isTouch = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
+    if (isTouch) return;
+
     const magneticElements = document.querySelectorAll('.magnetic');
     magneticElements.forEach(el => {
         el.addEventListener('mousemove', (e) => {
@@ -449,17 +608,17 @@ function initMagnetic() {
             const x = e.clientX - rect.left - rect.width / 2;
             const y = e.clientY - rect.top - rect.height / 2;
             el.style.transform = `translate(${x * 0.15}px, ${y * 0.15}px)`;
-        });
-        el.addEventListener('mouseleave', () => { 
-            el.style.transform = 'translate(0, 0)'; 
+        }, { passive: true });
+        el.addEventListener('mouseleave', () => {
+            el.style.transform = 'translate(0, 0)';
         });
     });
 }
 
 // === SPOTLIGHT EFFECT ===
-const spotlightCards = document.querySelectorAll('.spotlight-card');
-if (!isTouch) {
-    spotlightCards.forEach(card => {
+// === SPOTLIGHT EFFECT (desktop only) ===
+if (!('ontouchstart' in window) && navigator.maxTouchPoints === 0) {
+    document.querySelectorAll('.spotlight-card').forEach(card => {
         card.onmousemove = e => {
             const rect = card.getBoundingClientRect();
             card.style.setProperty('--mouse-x', `${e.clientX - rect.left}px`);
@@ -467,4 +626,6 @@ if (!isTouch) {
         };
     });
 }
+
+
 

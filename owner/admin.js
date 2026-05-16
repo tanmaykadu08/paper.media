@@ -3,6 +3,17 @@
 const API_BASE = "https://papermediaapi.paper-mediaa.workers.dev";
 let adminKey = localStorage.getItem("paper_admin_key");
 
+// --- Auth Check ---
+if (localStorage.getItem("papermedia_admin_auth") !== "true") {
+    window.location.href = "admin.html";
+}
+
+function logoutAdmin() {
+    localStorage.removeItem("papermedia_admin_auth");
+    localStorage.removeItem("paper_admin_key");
+    window.location.href = "admin.html";
+}
+
 // --- Template Registry ---
 const PAGES = {
     dashboard: () => `
@@ -47,8 +58,9 @@ const PAGES = {
             <div class="card">
                 <h2>Quick Actions</h2>
                 <div style="display:flex; flex-direction:column; gap:12px; margin-top:12px;">
-                    <button class="btn-secondary" style="text-align:left;" onclick="renderPage('portfolio')">📁 Media Library</button>
+                    <button class="btn-secondary" style="text-align:left;" onclick="renderPage('portfolio')">📸 Add Portfolio Project</button>
                     <button class="btn-secondary" style="text-align:left;" onclick="renderPage('homepage')">🏠 Edit Homepage Hero</button>
+                    <button class="btn-secondary" style="text-align:left;" onclick="renderPage('medialib')">📁 Browse Media Assets</button>
                 </div>
             </div>
         </div>
@@ -112,8 +124,8 @@ const PAGES = {
     `,
     portfolio: () => `
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:40px;">
-            <h1>Media Library</h1>
-            <button class="btn-primary" onclick="openProjectModal()">Add Media</button>
+            <h1>Portfolio Manager</h1>
+            <button class="btn-primary" onclick="openProjectModal()">Add New Project</button>
         </div>
         <div id="portfolio-grid" class="grid-2">
             <!-- Dynamic projects -->
@@ -122,23 +134,45 @@ const PAGES = {
         <!-- Project Modal -->
         <div id="project-modal" class="modal hidden">
             <div class="modal-content">
-                <h2 id="modal-title">Add Media</h2>
+                <h2 id="modal-title">Add Project</h2>
                 <div class="form-group">
-                    <label>Description (Optional)</label>
-                    <textarea id="p-desc" style="height:80px;" placeholder="Brief details..."></textarea>
+                    <label>Project Title</label>
+                    <input type="text" id="p-title" placeholder="Brand Name / Project Title">
+                </div>
+                <div class="form-group">
+                    <label>Category / Tag</label>
+                    <input type="text" id="p-tag" placeholder="e.g. Fashion Film, Social Edit">
+                </div>
+                <div class="form-group">
+                    <label>Description</label>
+                    <textarea id="p-desc" style="height:80px;" placeholder="Brief project details..."></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Instagram / Reel Link</label>
+                    <input type="text" id="p-link" placeholder="https://instagram.com/reels/...">
                 </div>
                 <div class="grid-2">
                     <div class="form-group">
                         <label>Thumbnail Image</label>
-                        <input type="file" id="p-file-img" accept="image/*" onchange="uploadToCloudinary(this, 'image')">
+                        <div class="upload-container">
+                            <input type="file" id="p-file-img" accept="image/*" onchange="uploadToCloudinary(this, 'image')">
+                            <div class="progress-bar-wrap" id="p-img-progress-wrap" style="display:none; height:4px; background:#eee; border-radius:2px; margin-top:8px; overflow:hidden;">
+                                <div id="p-img-progress" style="width:0%; height:100%; background:var(--primary); transition:width 0.2s;"></div>
+                            </div>
+                        </div>
                         <input type="hidden" id="p-image">
-                        <div id="p-img-preview" style="margin-top:8px; font-size:12px; color:var(--muted);"></div>
+                        <div id="p-img-preview" style="margin-top:8px; display:flex; flex-wrap:wrap; gap:8px;"></div>
                     </div>
                     <div class="form-group">
                         <label>Reel / Video</label>
-                        <input type="file" id="p-file-vid" accept="video/*" onchange="uploadToCloudinary(this, 'video')">
+                        <div class="upload-container">
+                            <input type="file" id="p-file-vid" accept="video/*" onchange="uploadToCloudinary(this, 'video')">
+                            <div class="progress-bar-wrap" id="p-vid-progress-wrap" style="display:none; height:4px; background:#eee; border-radius:2px; margin-top:8px; overflow:hidden;">
+                                <div id="p-vid-progress" style="width:0%; height:100%; background:var(--primary); transition:width 0.2s;"></div>
+                            </div>
+                        </div>
                         <input type="hidden" id="p-video">
-                        <div id="p-vid-preview" style="margin-top:8px; font-size:12px; color:var(--muted);"></div>
+                        <div id="p-vid-preview" style="margin-top:8px; display:flex; flex-wrap:wrap; gap:8px;"></div>
                     </div>
                 </div>
                 <div class="form-group" style="display:flex; align-items:center; gap:12px; margin-top:12px;">
@@ -186,7 +220,11 @@ const PAGES = {
         </div>
         <div id="founders-container"></div>
     `,
-
+    medialib: () => `
+        <h1>Media Library</h1>
+        <p>Manage all assets used across the site.</p>
+        <div id="media-grid" class="grid-3" style="margin-top:32px;"></div>
+    `,
     appearance: () => `
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:40px;">
             <h1>Appearance</h1>
@@ -333,6 +371,7 @@ async function loadPageData(page) {
             case 'services': await initServices(); break;
             case 'pricing': await initPricing(); break;
             case 'founders': await initFounders(); break;
+            case 'medialib': await initMediaLib(); break;
             case 'appearance': await initAppearance(); break;
             case 'settings': await initSettings(); break;
         }
@@ -426,35 +465,68 @@ function renderPortfolioGrid() {
     const grid = document.getElementById('portfolio-grid');
     if (!grid) return;
 
-    grid.innerHTML = currentPortData.map((item, index) => `
-        <div class="card port-card-admin" style="padding:0; overflow:hidden;">
-            ${item.is_featured ? '<div class="featured-badge">Featured</div>' : ''}
-            <div class="reorder-controls">
-                <button class="reorder-btn" onclick="reorderProject(${item.id}, 'up')">▲</button>
-                <button class="reorder-btn" onclick="reorderProject(${item.id}, 'down')">▼</button>
-            </div>
-            <div style="height:150px; background:#f0f0f0;">
-                ${item.video_url ? `<video src="${item.video_url}" muted style="width:100%; height:100%; object-fit:cover;"></video>` : `<img src="${item.image_url}" style="width:100%; height:100%; object-fit:cover;">`}
-            </div>
-            <div style="padding:20px;">
-                <div style="display:flex; justify-content:space-between; align-items:start; margin-bottom:8px;">
-                    <div>
-                        <p style="font-size:12px; color:var(--muted);">${item.description || "No description"}</p>
+    grid.innerHTML = currentPortData.map((item, index) => {
+        // Use Cloudinary transformations for lightweight previews
+        let thumbUrl = item.image_url;
+        let videoThumb = "";
+
+        if (thumbUrl && thumbUrl.includes('cloudinary.com')) {
+            thumbUrl = thumbUrl.replace('/upload/', '/upload/c_fill,w_400,h_250,g_auto,q_auto,f_auto/');
+        }
+
+        if (item.video_url && item.video_url.includes('cloudinary.com')) {
+            // Generate a smart thumbnail from the first frame (0.1s) of the video
+            videoThumb = item.video_url.replace(/\.[^/.]+$/, ".jpg").replace('/upload/', '/upload/so_0.1,c_fill,w_400,h_250,g_auto,q_auto,f_auto/');
+        }
+
+        return `
+            <div class="card port-card-admin" style="padding:0; overflow:hidden;">
+                ${item.is_featured ? '<div class="featured-badge">Featured</div>' : ''}
+                <div class="reorder-controls">
+                    <button class="reorder-btn" title="Move Up" onclick="reorderProject(${item.id}, 'up')">▲</button>
+                    <button class="reorder-btn" title="Move Down" onclick="reorderProject(${item.id}, 'down')">▼</button>
+                </div>
+                <div style="height:150px; background:#f0f0f0; position:relative; overflow:hidden;">
+                    ${item.video_url 
+                        ? `<div class="video-preview-wrap" style="width:100%; height:100%; display:flex; align-items:center; justify-content:center; background:#000;">
+                             <span style="position:absolute; top:8px; right:8px; background:rgba(0,0,0,0.7); color:#fff; font-size:9px; padding:2px 6px; border-radius:4px; z-index:2; font-weight:700;">VIDEO</span>
+                             <video 
+                                poster="${videoThumb}" 
+                                preload="none" 
+                                muted loop playsinline 
+                                style="width:100%; height:100%; object-fit:cover; opacity:0.8;" 
+                                onmouseenter="this.play()" 
+                                onmouseleave="this.pause(); this.currentTime=0;">
+                                <source src="${item.video_url}#t=0.1" type="video/mp4">
+                             </video>
+                           </div>` 
+                        : `<img src="${thumbUrl || 'placeholder.png'}" style="width:100%; height:100%; object-fit:cover;" loading="lazy">`
+                    }
+                </div>
+                <div style="padding:20px;">
+                    <div style="display:flex; justify-content:space-between; align-items:start; margin-bottom:8px;">
+                        <div>
+                            <h4 style="font-size:14px; font-weight:700; color:var(--text);">${item.title || 'Untitled'}</h4>
+                            <p style="font-size:11px; color:var(--muted);">${item.tag || 'No Category'}</p>
+                        </div>
+                    </div>
+                    <div style="display:flex; gap:8px; margin-top:16px;">
+                        <button class="btn-secondary" style="font-size:12px; flex:1; padding:8px;" onclick="editProject(${item.id})">Edit</button>
+                        <button class="btn-secondary" style="font-size:12px; color:var(--danger); flex:1; padding:8px;" onclick="deletePort(${item.id})">Delete</button>
                     </div>
                 </div>
-                <div style="display:flex; gap:8px; margin-top:16px;">
-                    <button class="btn-secondary" style="font-size:12px; flex:1;" onclick="editProject(${item.id})">Edit</button>
-                    <button class="btn-secondary" style="font-size:12px; color:var(--danger);" onclick="deletePort(${item.id})">Delete</button>
-                </div>
             </div>
-        </div>
-    `).join('') || '<p style="grid-column:1/-1; text-align:center; padding:40px;">No projects found.</p>';
+        `;
+    }).join('') || '<p style="grid-column:1/-1; text-align:center; padding:80px; color:var(--muted);">No projects found in your portfolio.</p>';
 }
 
 function openProjectModal() {
     editingProjectId = null;
-    document.getElementById('modal-title').innerText = "Add Media";
+    document.getElementById('modal-title').innerText = "Add Project";
+    document.getElementById('p-title').value = "";
+    document.getElementById('p-tag').value = "";
     document.getElementById('p-desc').value = "";
+    document.getElementById('p-link').value = "";
     document.getElementById('p-image').value = "";
     document.getElementById('p-video').value = "";
     document.getElementById('p-featured').checked = false;
@@ -470,8 +542,11 @@ function editProject(id) {
     if (!item) return;
 
     editingProjectId = id;
-    document.getElementById('modal-title').innerText = "Edit Media";
+    document.getElementById('modal-title').innerText = "Edit Project";
+    document.getElementById('p-title').value = item.title || "";
+    document.getElementById('p-tag').value = item.tag || "";
     document.getElementById('p-desc').value = item.description || "";
+    document.getElementById('p-link').value = item.link || "";
     document.getElementById('p-image').value = item.image_url || "";
     document.getElementById('p-video').value = item.video_url || "";
     document.getElementById('p-featured').checked = item.is_featured === 1;
@@ -480,14 +555,16 @@ function editProject(id) {
 
 async function saveProject() {
     const payload = {
-        title: "Media",
-        tag: "",
+        title: document.getElementById('p-title').value,
+        tag: document.getElementById('p-tag').value,
         description: document.getElementById('p-desc').value,
-        link: "",
+        link: document.getElementById('p-link').value,
         image_url: document.getElementById('p-image').value,
         video_url: document.getElementById('p-video').value,
         is_featured: document.getElementById('p-featured').checked ? 1 : 0
     };
+
+    if (!payload.title) return showToast("Title is required", true);
 
     const btn = document.getElementById('btn-save-project');
     btn.disabled = true;
@@ -515,10 +592,44 @@ async function uploadToCloudinary(input, type) {
     const file = input.files[0];
     if (!file) return;
 
+    // --- 1. Validation ---
+    const MAX_IMG_SIZE = 10 * 1024 * 1024; // 10MB
+    const MAX_VID_SIZE = 100 * 1024 * 1024; // 100MB
+    const allowedImageTypes = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
+    const allowedVideoTypes = ['video/mp4', 'video/quicktime', 'video/webm'];
+
+    if (type === 'image') {
+        if (!allowedImageTypes.includes(file.type)) {
+            showToast("Unsupported image format", true);
+            input.value = ""; return;
+        }
+        if (file.size > MAX_IMG_SIZE) {
+            showToast("Image too large (Max 10MB)", true);
+            input.value = ""; return;
+        }
+    } else {
+        if (!allowedVideoTypes.includes(file.type)) {
+            showToast("Unsupported video format", true);
+            input.value = ""; return;
+        }
+        if (file.size > MAX_VID_SIZE) {
+            showToast("Video too large (Max 100MB)", true);
+            input.value = ""; return;
+        }
+    }
+
     const preview = document.getElementById(`p-${type === 'image' ? 'img' : 'vid'}-preview`);
     const hiddenInput = document.getElementById(`p-${type === 'image' ? 'image' : 'video'}`);
+    const progressWrap = document.getElementById(`p-${type === 'image' ? 'img' : 'vid'}-progress-wrap`);
+    const progressBar = document.getElementById(`p-${type === 'image' ? 'img' : 'vid'}-progress`);
 
-    preview.innerText = "Uploading...";
+    console.log(`[Upload] Starting ${type} upload:`, { name: file.name, size: (file.size/1024/1024).toFixed(2) + "MB" });
+
+    // Show loading state
+    preview.innerHTML = `<span style="font-size:11px; color:var(--primary);">Processing ${file.name}...</span>`;
+    progressWrap.style.display = "block";
+    progressBar.style.width = "0%";
+    input.disabled = true;
 
     try {
         const signRes = await api('/admin/media/sign');
@@ -530,19 +641,61 @@ async function uploadToCloudinary(input, type) {
 
         const cloudinaryUrl = `https://api.cloudinary.com/v1_1/${signRes.cloud_name}/${type}/upload`;
 
-        const uploadReq = await fetch(cloudinaryUrl, { method: "POST", body: formData });
-        const uploadRes = await uploadReq.json();
+        // Use XHR for progress tracking
+        const xhr = new XMLHttpRequest();
+        xhr.open("POST", cloudinaryUrl, true);
 
-        if (uploadRes.secure_url) {
-            hiddenInput.value = uploadRes.secure_url;
-            preview.innerText = "✅ Uploaded";
-            showToast(`${type.charAt(0).toUpperCase() + type.slice(1)} uploaded!`);
-        } else {
-            throw new Error("Upload failed");
-        }
+        xhr.upload.onprogress = (e) => {
+            if (e.lengthComputable) {
+                const percent = Math.round((e.loaded / e.total) * 100);
+                progressBar.style.width = percent + "%";
+                preview.innerHTML = `<span style="font-size:11px; color:#666;">Uploading: ${percent}%</span>`;
+            }
+        };
+
+        xhr.onload = function() {
+            input.disabled = false;
+            const uploadRes = JSON.parse(xhr.responseText);
+            console.log("[Upload] Cloudinary Response:", uploadRes);
+
+            if (xhr.status === 200 && uploadRes.secure_url) {
+                hiddenInput.value = uploadRes.secure_url;
+                progressWrap.style.display = "none";
+                
+                // Optimized preview rendering (Memory safe)
+                if (type === 'image') {
+                    preview.innerHTML = `
+                        <div style="position:relative;">
+                            <img src="${uploadRes.secure_url.replace('/upload/', '/upload/w_200,f_auto/')}" style="height:60px; border-radius:4px; border:1px solid #ddd;">
+                            <div style="position:absolute; top:-5px; right:-5px; background:green; color:white; border-radius:50%; width:16px; height:16px; display:flex; align-items:center; justify-content:center; font-size:10px;">✓</div>
+                        </div>
+                    `;
+                } else {
+                    preview.innerHTML = `
+                        <div style="font-size:11px; color:green; font-weight:600;">✅ Video Ready</div>
+                        <div style="font-size:10px; color:#888;">${uploadRes.secure_url.split('/').pop()}</div>
+                    `;
+                }
+                showToast(`${type.charAt(0).toUpperCase() + type.slice(1)} uploaded!`);
+            } else {
+                console.error("[Upload] Failed:", uploadRes.error ? uploadRes.error.message : "Unknown error");
+                throw new Error(uploadRes.error ? uploadRes.error.message : "Upload failed");
+            }
+        };
+
+        xhr.onerror = function() {
+            input.disabled = false;
+            throw new Error("Network error during upload");
+        };
+
+        xhr.send(formData);
+
     } catch (e) {
-        preview.innerText = "❌ Upload failed";
-        showToast("Cloudinary error", true);
+        console.error("[Upload] Error Exception:", e);
+        input.disabled = false;
+        progressWrap.style.display = "none";
+        preview.innerHTML = `<span style="font-size:11px; color:red;">❌ ${e.message || "Upload failed"}</span>`;
+        showToast(e.message || "Upload error", true);
     }
 }
 
@@ -635,7 +788,17 @@ function renderFounders() {
 }
 function addFounderRow() { foundersData.push({ name: '', role: '', image: '' }); renderFounders(); }
 
-
+async function initMediaLib() {
+    const data = await api('/portfolio');
+    document.getElementById('media-grid').innerHTML = data.items.map(item => `
+        <div class="card" style="padding:10px; text-align:center;">
+            <div style="height:80px; background:#f0f0f0; margin-bottom:10px;">
+                ${item.video_url ? '🎥 Video' : `<img src="${item.image_url}" style="width:100%; height:100%; object-fit:contain;">`}
+            </div>
+            <button class="btn-secondary" style="font-size:10px; width:100%;" onclick="navigator.clipboard.writeText('${item.image_url || item.video_url}'); showToast('URL Copied')">Copy URL</button>
+        </div>
+    `).join('') || '<p>No assets in library.</p>';
+}
 
 async function initAppearance() {
     const data = await api('/content');
@@ -724,4 +887,16 @@ async function exportLeads() {
         a.click();
         document.body.removeChild(a);
     } catch (e) { showToast("Export failed", true); }
+}
+// --- Initialization ---
+document.addEventListener('DOMContentLoaded', () => {
+    if (document.getElementById('main-content')) {
+        renderPage('dashboard');
+    }
+});
+
+// Helper for dynamic re-renders
+function refreshCurrentPage() {
+    const activeBtn = document.querySelector('.nav-btn.active');
+    if (activeBtn) renderPage(activeBtn.dataset.page);
 }
