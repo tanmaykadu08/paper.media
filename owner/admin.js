@@ -973,7 +973,7 @@ function replyToLead(id) {
     // Use businessEmail (from Site Settings) as the Gmail account to send from.
     // Gmail's authuser param selects the account: can be an email or 0/1/2 index.
     const authuser = businessEmail ? encodeURIComponent(businessEmail) : '0';
-    const gmailUrl = `https://mail.google.com/mail/u/${authuser}/?view=cm&fs=1&to=${encodeURIComponent(lead.email)}&su=${subject}&body=${body}`;
+    const gmailUrl = `https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(lead.email)}&su=${subject}&body=${body}&authuser=${authuser}`;
     window.open(gmailUrl, '_blank');
 
     // Mark as replied after 2 seconds
