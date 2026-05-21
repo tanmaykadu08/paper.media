@@ -857,7 +857,7 @@ function renderPricing() {
         </div>`;
     }).join('') || '<p>No pricing plans defined. Click "Add Plan" to get started.</p>';
 }
-function addPricingRow() { pricingData.push({ title: '', price: '', desc: '', features: [] }); renderPricing(); }
+function addPricingRow() { pricingData.push({ title: '', price: '₹', desc: '', features: [] }); renderPricing(); }
 
 async function initFounders() {
     const data = await api('/content');

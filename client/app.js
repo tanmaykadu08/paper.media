@@ -387,7 +387,7 @@ function updatePricing(pricing) {
     const grid = document.querySelector('.pricing-grid');
     if (!grid || !pricing || pricing.length === 0) return;
     grid.innerHTML = '';
-    pricing.forEach(p => {
+    pricing.forEach((p, i) => {
         // Support both field names (title = new standard, name = legacy)
         const title = p.title || p.name || 'Plan';
 
@@ -400,13 +400,30 @@ function updatePricing(pricing) {
         }
 
         const featuresHtml = feats.map(f => `<li><span class="check">✓</span> ${f}</li>`).join('');
+        
+        let priceHtml = p.price || '';
+        const priceMatch = priceHtml.match(/^([^\/]+)(\s*\/\s*.*)$/i);
+        if (priceMatch) {
+            priceHtml = `<span class="price-main">${priceMatch[1]}</span><span class="price-period">${priceMatch[2]}</span>`;
+        } else {
+            priceHtml = `<span class="price-main">${priceHtml}</span>`;
+        }
+
+        const isPopular = (pricing.length === 3 && i === 1) || (pricing.length === 2 && i === 1) || title.toLowerCase().includes('pro');
+        const popularBadge = isPopular ? `<div class="popular-badge">RECOMMENDED</div>` : '';
+        const popularClass = isPopular ? 'popular-plan' : '';
+        const btnClass = isPopular ? 'btn-primary' : 'btn-dark';
+
         grid.innerHTML += `
-            <div class="pricing-card spotlight-card reveal visible">
+            <div class="pricing-card spotlight-card reveal visible ${popularClass}">
+                ${popularBadge}
                 <div class="p-tier">${title}</div>
-                <div class="p-price">${p.price || ''}</div>
+                <div class="p-price">${priceHtml}</div>
                 <p class="p-desc">${p.desc || ''}</p>
-                <ul class="p-features">${featuresHtml}</ul>
-                <a href="contact.html" class="btn-dark magnetic" style="width:100%; display:block; text-align:center;">Get Started</a>
+                <div class="p-features-container">
+                    <ul class="p-features">${featuresHtml}</ul>
+                </div>
+                <a href="contact.html" class="${btnClass} magnetic" style="width:100%; display:block; text-align:center;">Get Started</a>
             </div>
         `;
     });
