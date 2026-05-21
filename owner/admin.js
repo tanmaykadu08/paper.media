@@ -958,22 +958,63 @@ function replyToLead(id) {
     if (!lead) { showToast("Lead not found", true); return; }
 
     const subject = encodeURIComponent('Reply from Paper.Media');
-    const body    = encodeURIComponent(`Hi ${lead.name || ''},\n\n`);
+    const body    = encodeURIComponent(`Hi ${lead.name || ''},\n\nThank you for reaching out to Paper.Media!\n\n`);
     const mailtoUrl = `mailto:${lead.email}?subject=${subject}&body=${body}`;
 
-    // Create a hidden <a> and click it — the only method that reliably opens
-    // the OS mail client from an HTTPS page across all browsers
-    const a = document.createElement('a');
-    a.href = mailtoUrl;
-    a.style.display = 'none';
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
+    // Remove any existing reply modal
+    const existing = document.getElementById('reply-modal-overlay');
+    if (existing) existing.remove();
 
-    showToast(`Opening email to ${lead.email}…`);
+    const overlay = document.createElement('div');
+    overlay.id = 'reply-modal-overlay';
+    overlay.style.cssText = `
+        position:fixed; inset:0; background:rgba(0,0,0,0.55); z-index:9999;
+        display:flex; align-items:center; justify-content:center; padding:20px;
+    `;
 
-    // Silently mark as replied after 2 seconds
-    setTimeout(() => updateLeadStatusSilent(id, 'replied'), 2000);
+    overlay.innerHTML = `
+        <div style="background:#fff; border-radius:16px; padding:32px; max-width:480px; width:100%;
+                    box-shadow:0 20px 60px rgba(0,0,0,0.3); font-family:inherit;">
+            <h2 style="margin:0 0 6px; font-size:20px; color:#1a1a1a;">Reply to Inquiry</h2>
+            <p style="margin:0 0 20px; font-size:13px; color:#888;">Tap the button below to open your mail app with a pre-filled message.</p>
+
+            <div style="background:#f5f1ea; border-radius:10px; padding:16px; margin-bottom:20px;">
+                <div style="font-size:12px; color:#888; margin-bottom:4px;">CLIENT</div>
+                <div style="font-weight:700; font-size:15px; color:#1a1a1a;">${lead.name || 'Unknown'}</div>
+                <div style="font-size:13px; color:#555; margin-top:2px;">${lead.email}</div>
+                ${lead.message ? `<div style="margin-top:12px; font-size:12px; color:#666; border-top:1px solid #e0dbd0; padding-top:10px; white-space:pre-wrap;">${lead.message}</div>` : ''}
+            </div>
+
+            <!-- Real <a> mailto link — most reliable on all browsers/devices -->
+            <a href="${mailtoUrl}"
+               style="display:block; width:100%; padding:14px; background:#1a1a1a; color:#fff;
+                      border-radius:10px; text-align:center; font-size:15px; font-weight:700;
+                      text-decoration:none; box-sizing:border-box; margin-bottom:10px;"
+               onclick="setTimeout(()=>updateLeadStatusSilent(${id},'replied'),2000)">
+                ✉️ Open Mail App
+            </a>
+
+            <button onclick="navigator.clipboard.writeText('${lead.email}').then(()=>showToast('Email copied!'))"
+                    style="display:block; width:100%; padding:12px; background:#f0ece4; color:#1a1a1a;
+                           border:none; border-radius:10px; font-size:14px; font-weight:600;
+                           cursor:pointer; box-sizing:border-box; margin-bottom:10px;">
+                📋 Copy Email Address
+            </button>
+
+            <button onclick="document.getElementById('reply-modal-overlay').remove()"
+                    style="display:block; width:100%; padding:10px; background:none; color:#999;
+                           border:none; font-size:13px; cursor:pointer;">
+                Cancel
+            </button>
+        </div>
+    `;
+
+    // Close on backdrop click
+    overlay.addEventListener('click', (e) => {
+        if (e.target === overlay) overlay.remove();
+    });
+
+    document.body.appendChild(overlay);
 }
 
 async function deleteLead(id) {

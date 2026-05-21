@@ -14,7 +14,3 @@ CLOUDINARY_CLOUD_NAME = "dvkelv5xv"
 # CLOUDINARY_API_KEY
 # CLOUDINARY_API_SECRET
 # ADMIN_SECRET_KEY
-# RESEND_API_KEY (optional, for sending emails via Resend)
-# SENDGRID_API_KEY (optional, for sending emails via SendGrid)
-# NOTIFICATION_EMAIL (optional, recipient for inquiry notifications)
-# EMAIL_FROM (optional, sender email address)

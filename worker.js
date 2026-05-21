@@ -1,84 +1,3 @@
-async function sendNotificationEmail({ name, email, message }, env) {
-  const toEmail = env.NOTIFICATION_EMAIL || "paper.mediaa@gmail.com";
-  const fromEmail = env.EMAIL_FROM || "Paper.Media Contact <onboarding@resend.dev>";
-  
-  if (env.RESEND_API_KEY) {
-    try {
-      const response = await fetch("https://api.resend.com/emails", {
-        method: "POST",
-        headers: {
-          "Authorization": `Bearer ${env.RESEND_API_KEY}`,
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-          from: fromEmail,
-          to: toEmail,
-          subject: `New Inquiry from ${name}`,
-          html: `
-            <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #eee; border-radius: 8px; background-color: #fcfcfc;">
-              <h2 style="color: #4f46e5; border-bottom: 1px solid #eee; padding-bottom: 10px;">New Website Inquiry</h2>
-              <p><strong>Name:</strong> ${name}</p>
-              <p><strong>Email:</strong> <a href="mailto:${email}">${email}</a></p>
-              <p><strong>Message:</strong></p>
-              <div style="white-space: pre-wrap; background-color: #f3f4f6; padding: 15px; border-radius: 6px; border-left: 4px solid #4f46e5; color: #1f2937;">${message}</div>
-              <hr style="border: 0; border-top: 1px solid #eee; margin: 20px 0;" />
-              <p style="font-size: 12px; color: #9ca3af;">This email was sent automatically from Paper.Media's contact form integration.</p>
-            </div>
-          `
-        })
-      });
-      if (!response.ok) {
-        const errText = await response.text();
-        console.error(`Failed to send email via Resend: ${response.status} ${errText}`);
-      } else {
-        console.log("Email sent successfully via Resend.");
-      }
-    } catch (e) {
-      console.error("Error sending email via Resend:", e);
-    }
-  } else if (env.SENDGRID_API_KEY) {
-    try {
-      const response = await fetch("https://api.sendgrid.com/v3/mail/send", {
-        method: "POST",
-        headers: {
-          "Authorization": `Bearer ${env.SENDGRID_API_KEY}`,
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-          personalizations: [{
-            to: [{ email: toEmail }]
-          }],
-          from: { email: fromEmail.includes("<") ? fromEmail.split("<")[1].replace(">", "").trim() : fromEmail, name: "Paper.Media Contact" },
-          subject: `New Inquiry from ${name}`,
-          content: [{
-            type: "text/html",
-            value: `
-              <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #eee; border-radius: 8px; background-color: #fcfcfc;">
-                <h2 style="color: #4f46e5; border-bottom: 1px solid #eee; padding-bottom: 10px;">New Website Inquiry</h2>
-                <p><strong>Name:</strong> ${name}</p>
-                <p><strong>Email:</strong> <a href="mailto:${email}">${email}</a></p>
-                <p><strong>Message:</strong></p>
-                <div style="white-space: pre-wrap; background-color: #f3f4f6; padding: 15px; border-radius: 6px; border-left: 4px solid #4f46e5; color: #1f2937;">${message}</div>
-                <hr style="border: 0; border-top: 1px solid #eee; margin: 20px 0;" />
-                <p style="font-size: 12px; color: #9ca3af;">This email was sent automatically from Paper.Media's contact form integration.</p>
-              </div>
-            `
-          }]
-        })
-      });
-      if (!response.ok) {
-        const errText = await response.text();
-        console.error(`Failed to send email via SendGrid: ${response.status} ${errText}`);
-      } else {
-        console.log("Email sent successfully via SendGrid.");
-      }
-    } catch (e) {
-      console.error("Error sending email via SendGrid:", e);
-    }
-  } else {
-    console.warn("No email API keys (RESEND_API_KEY or SENDGRID_API_KEY) found. Email not sent.");
-  }
-}
 
 export default {
   async fetch(request, env, ctx) {
@@ -209,15 +128,6 @@ export default {
       if (method === "POST" && url.pathname === "/contact") {
         const { name, email, message } = await request.json();
         await turso("INSERT INTO inquiries (name, email, message) VALUES (?, ?, ?)", [name, email, message]);
-        
-        // Asynchronously send notification email (does not block client response)
-        if (ctx && typeof ctx.waitUntil === "function") {
-          ctx.waitUntil(sendNotificationEmail({ name, email, message }, env));
-        } else {
-          // Fallback if ctx is not passed/available in local development testing
-          sendNotificationEmail({ name, email, message }, env);
-        }
-        
         return jsonResponse({ success: true, message: "Saved to DB" });
       }
 
