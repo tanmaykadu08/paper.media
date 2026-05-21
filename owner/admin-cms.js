@@ -425,7 +425,7 @@ function showMediaModal(idx = null) {
     if(idx !== null) {
         const p = getSiteData().projects[idx];
         existingDesc = p.desc || "";
-        existingUrl = p.thumbnail || "";
+        existingUrl = p.video || p.thumbnail || "";
     }
     
     let modal = document.getElementById('media-modal');
@@ -439,7 +439,7 @@ function showMediaModal(idx = null) {
                 <div class="form-group">
                     <label>Upload File (Image / Video)</label>
                     <input type="file" id="media-file-input" accept="image/*,video/*" style="margin-bottom:8px; padding: 12px; border: 2px dashed #ddd; width: 100%; border-radius: 8px; cursor: pointer;">
-                    <div style="font-size:11px; color:var(--muted); margin-bottom:16px;">Files are processed locally. For large files, use the URL field instead.</div>
+                    <div style="font-size:11px; color:var(--muted); margin-bottom:16px;">Files are uploaded to the cloud. Large videos are fully supported.</div>
                 </div>
                 <div style="text-align:center; font-size:12px; font-weight:bold; color:#aaa; margin-bottom:16px;">OR</div>
                 <div class="form-group">
@@ -458,15 +458,66 @@ function showMediaModal(idx = null) {
         `;
         document.body.appendChild(modal);
         
-        // Handle file selection and convert to data URL for local preview
-        document.getElementById('media-file-input').addEventListener('change', function(e) {
+        // Handle file selection and upload
+        document.getElementById('media-file-input').addEventListener('change', async function(e) {
             const file = e.target.files[0];
             if(!file) return;
-            const reader = new FileReader();
-            reader.onload = function(evt) {
-                document.getElementById('media-url-input').value = evt.target.result;
-            };
-            reader.readAsDataURL(file);
+            
+            const urlInput = document.getElementById('media-url-input');
+            const saveBtn = document.querySelector('#media-modal .btn-primary');
+            const originalBtnText = saveBtn.innerText;
+            
+            const type = file.type.startsWith('video/') ? 'video' : 'image';
+            
+            // Show uploading state
+            urlInput.value = "";
+            urlInput.placeholder = "Uploading to cloud...";
+            saveBtn.disabled = true;
+            saveBtn.innerText = "Uploading...";
+            
+            const secret = localStorage.getItem("papermedia_admin_secret");
+            
+            try {
+                // Try Cloudinary upload via worker signature
+                const signRes = await fetch("https://papermediaapi.paper-mediaa.workers.dev/admin/media/sign", {
+                    headers: { "X-Admin-Key": secret }
+                });
+                if (!signRes.ok) throw new Error("Unauthorized or signature request failed");
+                const signData = await signRes.json();
+                
+                const formData = new FormData();
+                formData.append("file", file);
+                formData.append("api_key", signData.api_key);
+                formData.append("timestamp", signData.timestamp);
+                formData.append("signature", signData.signature);
+                formData.append("resource_type", type);
+                
+                const cloudinaryUrl = `https://api.cloudinary.com/v1_1/${signData.cloud_name}/${type}/upload`;
+                const uploadReq = await fetch(cloudinaryUrl, { method: "POST", body: formData });
+                const uploadRes = await uploadReq.json();
+                
+                if (uploadRes.secure_url) {
+                    urlInput.value = uploadRes.secure_url;
+                    urlInput.placeholder = "https://...";
+                    showToast(`${type.charAt(0).toUpperCase() + type.slice(1)} uploaded to Cloudinary!`);
+                } else {
+                    throw new Error(uploadRes.error?.message || "Cloudinary upload failed");
+                }
+            } catch (err) {
+                console.error("Cloudinary upload failed, falling back to local processing:", err);
+                showToast("Cloud upload failed, using local file", true);
+                
+                // Fallback to FileReader
+                const reader = new FileReader();
+                reader.onload = function(evt) {
+                    urlInput.value = evt.target.result;
+                    urlInput.placeholder = "https://...";
+                };
+                reader.readAsDataURL(file);
+            } finally {
+                saveBtn.disabled = false;
+                saveBtn.innerText = originalBtnText;
+            }
         });
     }
     
@@ -501,12 +552,37 @@ window.saveMediaModal = function() {
         return;
     }
     
+    // Check if the URL is a video
+    const isVideo = url.includes('/video/upload/') || 
+                    url.startsWith('data:video/') || 
+                    /\.(mp4|mov|webm|avi|mkv|3gp|flv|wmv)($|\?)/i.test(url);
+    
+    let thumbnail = url;
+    let video = "";
+    
+    if (isVideo) {
+        video = url;
+        // Default video thumbnail placeholder
+        thumbnail = "https://images.unsplash.com/photo-1536440136628-849c177e76a1?w=300&auto=format&fit=crop";
+        if (url.includes('/video/upload/')) {
+            // Cloudinary automatic thumbnail for videos
+            thumbnail = url.replace(/\.[^/.]+$/, "") + ".jpg";
+        }
+    }
+    
     const data = getSiteData();
     if(editingIdx !== null) {
-        data.projects[editingIdx].thumbnail = url;
+        data.projects[editingIdx].thumbnail = thumbnail;
+        data.projects[editingIdx].video = video;
         data.projects[editingIdx].desc = desc;
     } else {
-        data.projects.push({ title: "Media", category: "", thumbnail: url, video: "", desc: desc || "" });
+        data.projects.push({ 
+            title: "Media", 
+            category: "", 
+            thumbnail: thumbnail, 
+            video: video, 
+            desc: desc || "" 
+        });
     }
     saveSiteData(data);
     document.getElementById('media-modal').classList.add('hidden');

@@ -1,7 +1,7 @@
 // === PAPER.MEDIA ADMIN ENGINE ===
 
 const API_BASE = "https://papermediaapi.paper-mediaa.workers.dev";
-let adminKey = localStorage.getItem("paper_admin_key");
+let adminKey = localStorage.getItem("papermedia_admin_secret") || localStorage.getItem("paper_admin_key");
 
 // --- Template Registry ---
 const PAGES = {
@@ -527,6 +527,7 @@ async function uploadToCloudinary(input, type) {
         formData.append("api_key", signRes.api_key);
         formData.append("timestamp", signRes.timestamp);
         formData.append("signature", signRes.signature);
+        formData.append("resource_type", type);
 
         const cloudinaryUrl = `https://api.cloudinary.com/v1_1/${signRes.cloud_name}/${type}/upload`;
 
@@ -538,11 +539,13 @@ async function uploadToCloudinary(input, type) {
             preview.innerText = "✅ Uploaded";
             showToast(`${type.charAt(0).toUpperCase() + type.slice(1)} uploaded!`);
         } else {
-            throw new Error("Upload failed");
+            console.error("Cloudinary upload failed:", uploadRes);
+            throw new Error(uploadRes.error?.message || "Upload failed");
         }
     } catch (e) {
+        console.error("uploadToCloudinary error:", e);
         preview.innerText = "❌ Upload failed";
-        showToast("Cloudinary error", true);
+        showToast("Cloudinary error: " + e.message, true);
     }
 }
 
