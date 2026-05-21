@@ -909,14 +909,22 @@ async function saveCMS(type) {
 
 function replyToLead(id) {
     const lead = currentInquiries.find(l => Number(l.id) === Number(id));
-    if (!lead) return;
+    if (!lead) { showToast("Lead not found", true); return; }
 
     const subject = encodeURIComponent('Reply from Paper.Media');
-    const body = encodeURIComponent(`Hi ${lead.name || ''},\n\n`);
+    const body    = encodeURIComponent(`Hi ${lead.name || ''},\n\n`);
     const mailtoUrl = `mailto:${lead.email}?subject=${subject}&body=${body}`;
 
-    // Open the OS mail client — most reliable method across all browsers/devices
-    window.location.href = mailtoUrl;
+    // Create a hidden <a> and click it — the only method that reliably opens
+    // the OS mail client from an HTTPS page across all browsers
+    const a = document.createElement('a');
+    a.href = mailtoUrl;
+    a.style.display = 'none';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+
+    showToast(`Opening email to ${lead.email}…`);
 
     // Silently mark as replied after 2 seconds
     setTimeout(() => updateLeadStatusSilent(id, 'replied'), 2000);
