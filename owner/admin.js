@@ -385,7 +385,14 @@ function toggleSidebar() {
 async function loadPageData(page) {
     try {
         switch (page) {
-            case 'dashboard': await initDashboard(); break;
+            case 'dashboard':
+                await initDashboard();
+                // Pre-load business email so Reply button works from any page
+                try {
+                    const sd = await api('/content');
+                    businessEmail = sd.content?.socials?.email || '';
+                } catch(e) {}
+                break;
             case 'inquiries': await initInquiries(); break;
             case 'homepage': await initHomepage(); break;
             case 'portfolio': await initPortfolio(); break;
@@ -768,6 +775,7 @@ async function reorderProject(id, direction) {
 let servicesData = [];
 let pricingData = [];
 let foundersData = [];
+let businessEmail = ''; // Business email used as Gmail authuser for Reply
 
 async function initServices() {
     const data = await api('/content');
@@ -901,6 +909,8 @@ async function initSettings() {
     document.getElementById('set-li').value = c.socials?.linkedin || '';
     document.getElementById('set-wa').value = c.socials?.whatsapp || '';
     document.getElementById('set-email').value = c.socials?.email || '';
+    // Store the business email globally so Reply button can use it
+    businessEmail = c.socials?.email || '';
 }
 
 function logoutAdmin() {
@@ -960,8 +970,10 @@ function replyToLead(id) {
     const subject = encodeURIComponent('Reply from Paper.Media');
     const body    = encodeURIComponent(`Hi ${lead.name || ''},\n\nThank you for reaching out to Paper.Media!\n\n`);
 
-    // Open Gmail compose in a new tab with client email pre-filled
-    const gmailUrl = `https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(lead.email)}&su=${subject}&body=${body}`;
+    // Use businessEmail (from Site Settings) as the Gmail account to send from.
+    // Gmail's authuser param selects the account: can be an email or 0/1/2 index.
+    const authuser = businessEmail ? encodeURIComponent(businessEmail) : '0';
+    const gmailUrl = `https://mail.google.com/mail/u/${authuser}/?view=cm&fs=1&to=${encodeURIComponent(lead.email)}&su=${subject}&body=${body}`;
     window.open(gmailUrl, '_blank');
 
     // Mark as replied after 2 seconds
