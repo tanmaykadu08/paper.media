@@ -2,6 +2,8 @@
 
 const API_BASE = "https://papermediaapi.paper-mediaa.workers.dev";
 let adminKey = localStorage.getItem("papermedia_admin_secret") || localStorage.getItem("paper_admin_key");
+let currentInquiries = [];
+
 
 // --- Auth Check ---
 if (localStorage.getItem("papermedia_admin_auth") !== "true") {
@@ -430,7 +432,8 @@ async function initDashboard() {
 
 async function initInquiries() {
     const data = await api('/admin/inquiries');
-    document.getElementById('leads-list').innerHTML = data.inquiries.map(l => `
+    currentInquiries = data.inquiries || [];
+    document.getElementById('leads-list').innerHTML = currentInquiries.map(l => `
         <tr>
             <td><strong>${l.name}</strong><br><small>${l.email}</small></td>
             <td><div style="font-size:12px; color:var(--muted); max-width:300px; white-space:pre-wrap;">${l.message}</div></td>
@@ -443,12 +446,11 @@ async function initInquiries() {
             </td>
             <td>
                 <div style="display:flex; gap:8px; align-items:center;">
-                    <a href="mailto:${l.email}?subject=Reply from Paper.Media&body=Hi ${encodeURIComponent(l.name)},%0D%0A%0D%0A" 
-                       onclick="updateLeadStatusSilent(${l.id}, 'replied')" 
-                       class="btn-primary" 
-                       style="font-size:12px; padding:8px 12px; text-decoration:none; display:inline-flex; align-items:center; font-weight:600; border-radius:8px; height:34px; line-height:1;">
+                    <button onclick="replyToLead(${l.id})" 
+                            class="btn-primary" 
+                            style="font-size:12px; padding:8px 12px; border:none; display:inline-flex; align-items:center; font-weight:600; border-radius:8px; height:34px; line-height:1; cursor:pointer;">
                        Reply
-                    </a>
+                    </button>
                     <button class="btn-secondary" style="font-size:12px; padding:8px 12px; border-radius:8px; color:var(--danger); height:34px; line-height:1;" onclick="deleteLead(${l.id})">Delete</button>
                 </div>
             </td>
@@ -913,6 +915,30 @@ async function updateLeadStatusSilent(id, newStatus) {
     } catch (e) {
         console.error("Silent status update failed:", e);
     }
+}
+
+function replyToLead(id) {
+    const lead = currentInquiries.find(l => Number(l.id) === Number(id));
+    if (!lead) return;
+
+    const email = lead.email;
+    const name = lead.name || "";
+
+    // Attempt to copy the email address to clipboard as a helpful fallback
+    try {
+        navigator.clipboard.writeText(email);
+        showToast("Opening mail client... (Email copied)");
+    } catch (e) {
+        showToast("Opening mail client...");
+    }
+
+    // Trigger the mail client directly in a new context to prevent browser interruption
+    window.open(`mailto:${email}?subject=Reply from Paper.Media&body=Hi ${encodeURIComponent(name)},%0D%0A%0D%0A`, '_blank');
+
+    // Wait for 1.5 seconds to ensure the mail client has launched before silently updating the database
+    setTimeout(() => {
+        updateLeadStatusSilent(id, 'replied');
+    }, 1500);
 }
 
 async function exportLeads() {
