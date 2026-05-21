@@ -221,20 +221,55 @@ function updateHero(content) {
 
 
 function updateSettings(content) {
+    // --- Logo ---
     if (content.logo_url) {
-        const logos = document.querySelectorAll('.brand-logo, .footer-logo img');
-        logos.forEach(img => img.src = content.logo_url);
+        document.querySelectorAll('.brand-logo, .footer-logo img, .footer-logo-img').forEach(img => img.src = content.logo_url);
     }
-    // Update Meta Title
+
+    // --- Meta Title ---
     if (content.meta_title) {
         document.title = content.meta_title;
     }
-    // Update socials
-    if (content.socials) {
-        const whatsapp = document.getElementById('client-contact_whatsapp');
-        const ig = document.getElementById('client-contact_ig');
-        if (whatsapp && content.socials.whatsapp) whatsapp.href = content.socials.whatsapp;
-        if (ig && content.socials.instagram) ig.href = content.socials.instagram;
+
+    // --- Socials: connect every link on the page to admin panel values ---
+    const s = content.socials || {};
+
+    // Helper: show/hide + update href for all matching elements
+    const syncLink = (selector, href) => {
+        document.querySelectorAll(selector).forEach(el => {
+            if (href) {
+                el.href = href;
+                el.style.display = '';   // make sure it's visible
+            } else {
+                el.style.display = 'none'; // hide if no value set in admin
+            }
+        });
+    };
+
+    // Instagram — stored as full URL in admin
+    syncLink('#client-contact_ig, [data-social="instagram"]', s.instagram || '');
+
+    // LinkedIn — stored as full URL in admin
+    syncLink('#client-contact_li, [data-social="linkedin"]', s.linkedin || '');
+
+    // WhatsApp — admin stores the raw number (e.g. 919503691537), convert to wa.me link
+    const waHref = s.whatsapp ? `https://wa.me/${s.whatsapp.replace(/\D/g, '')}` : '';
+    syncLink('#client-contact_whatsapp, [data-social="whatsapp"]', waHref);
+
+    // Email — admin stores plain email address, auto-prefix mailto:
+    const emailHref = s.email ? (s.email.startsWith('mailto:') ? s.email : `mailto:${s.email}`) : '';
+    syncLink('#client-contact_email, [data-social="email"]', emailHref);
+
+    // Also update the visible email text in the footer contact column
+    const emailTextEl = document.getElementById('client-contact_email_text');
+    if (emailTextEl) {
+        if (s.email) {
+            emailTextEl.textContent = s.email;
+            emailTextEl.href = `mailto:${s.email}`;
+            emailTextEl.style.display = '';
+        } else {
+            emailTextEl.style.display = 'none';
+        }
     }
 }
 
