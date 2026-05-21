@@ -465,12 +465,11 @@ async function initInquiries() {
             </td>
             <td>
                 <div style="display:flex; gap:8px; align-items:center;">
-                    <a href="mailto:${l.email}?subject=Reply from Paper.Media&body=Hi ${encodeURIComponent(l.name || '')},%0D%0A%0D%0A" 
-                       onclick="setTimeout(() => updateLeadStatusSilent(${l.id}, 'replied'), 2000)" 
-                       class="btn-primary" 
-                       style="font-size:12px; padding:8px 12px; text-decoration:none; display:inline-flex; align-items:center; font-weight:600; border-radius:8px; height:34px; line-height:1;">
-                       Reply
-                    </a>
+                    <button class="btn-primary" 
+                            onclick="replyToLead(${l.id})"
+                            style="font-size:12px; padding:8px 12px; border-radius:8px; height:34px; line-height:1; border:none; cursor:pointer;">
+                        Reply
+                    </button>
                     <button class="btn-secondary" style="font-size:12px; padding:8px 12px; border-radius:8px; color:var(--danger); height:34px; line-height:1;" onclick="deleteLead(${l.id})">Delete</button>
                 </div>
             </td>
@@ -906,6 +905,21 @@ async function saveCMS(type) {
     } catch (e) {
         showToast("Save failed", true);
     }
+}
+
+function replyToLead(id) {
+    const lead = currentInquiries.find(l => Number(l.id) === Number(id));
+    if (!lead) return;
+
+    const subject = encodeURIComponent('Reply from Paper.Media');
+    const body = encodeURIComponent(`Hi ${lead.name || ''},\n\n`);
+    const mailtoUrl = `mailto:${lead.email}?subject=${subject}&body=${body}`;
+
+    // Open the OS mail client — most reliable method across all browsers/devices
+    window.location.href = mailtoUrl;
+
+    // Silently mark as replied after 2 seconds
+    setTimeout(() => updateLeadStatusSilent(id, 'replied'), 2000);
 }
 
 async function deleteLead(id) {
