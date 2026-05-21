@@ -80,6 +80,26 @@ const PAGES = {
                 </tbody>
             </table>
         </div>
+
+        <!-- Reply Modal -->
+        <div id="reply-modal" class="modal hidden">
+            <div class="modal-content" style="max-width:500px;">
+                <h2 id="reply-modal-title">Reply to Inquiry</h2>
+                <div class="form-group" style="margin-top:20px;">
+                    <label>To:</label>
+                    <input type="text" id="reply-to" disabled style="background:#f3f4f6; color:#6b7280; cursor:not-allowed;">
+                </div>
+                <div class="form-group">
+                    <label>Message:</label>
+                    <textarea id="reply-msg" style="height:150px;" placeholder="Type your response..."></textarea>
+                </div>
+                <input type="hidden" id="reply-id">
+                <div style="display:flex; gap:12px; margin-top:32px;">
+                    <button class="btn-primary" id="btn-send-reply" onclick="sendReply()">Send Email</button>
+                    <button class="btn-secondary" onclick="closeReplyModal()">Cancel</button>
+                </div>
+            </div>
+        </div>
     `,
     homepage: () => `
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:40px;">
@@ -438,21 +458,19 @@ async function initInquiries() {
             <td><strong>${l.name}</strong><br><small>${l.email}</small></td>
             <td><div style="font-size:12px; color:var(--muted); max-width:300px; white-space:pre-wrap;">${l.message}</div></td>
             <td>
-                <div class="status-options">
-                    <button class="btn-status-opt ${l.status === 'new' ? 'active' : ''}" onclick="updateLeadStatus(${l.id}, 'new')">Unread</button>
-                    <button class="btn-status-opt ${l.status === 'read' ? 'active' : ''}" onclick="updateLeadStatus(${l.id}, 'read')">Read</button>
-                    <button class="btn-status-opt ${l.status === 'replied' ? 'active' : ''}" onclick="updateLeadStatus(${l.id}, 'replied')">Replied</button>
-                </div>
+                <select class="status-badge status-${l.status}" onchange="updateLeadStatus(${l.id}, this.value)">
+                    <option value="new" ${l.status === 'new' ? 'selected' : ''}>Unread</option>
+                    <option value="read" ${l.status === 'read' ? 'selected' : ''}>Read</option>
+                    <option value="replied" ${l.status === 'replied' ? 'selected' : ''}>Replied</option>
+                </select>
             </td>
             <td>
                 <div style="display:flex; gap:8px; align-items:center;">
-                    <a href="mailto:${l.email}?subject=Reply from Paper.Media&body=Hi ${encodeURIComponent(l.name || '')},%0D%0A%0D%0A" 
-                       target="_blank"
-                       onclick="setTimeout(() => updateLeadStatusSilent(${l.id}, 'replied'), 2000)" 
-                       class="btn-primary" 
-                       style="font-size:12px; padding:8px 12px; text-decoration:none; display:inline-flex; align-items:center; font-weight:600; border-radius:8px; height:34px; line-height:1;">
+                    <button class="btn-primary" 
+                            onclick="openReplyModal(${l.id})"
+                            style="font-size:12px; padding:8px 12px; border-radius:8px; height:34px; line-height:1;">
                        Reply
-                    </a>
+                    </button>
                     <button class="btn-secondary" style="font-size:12px; padding:8px 12px; border-radius:8px; color:var(--danger); height:34px; line-height:1;" onclick="deleteLead(${l.id})">Delete</button>
                 </div>
             </td>
@@ -904,18 +922,44 @@ async function updateLeadStatus(id, newStatus) {
     }
 }
 
-async function updateLeadStatusSilent(id, newStatus) {
+// --- Reply Modal Logic ---
+function openReplyModal(id) {
+    const lead = currentInquiries.find(l => Number(l.id) === Number(id));
+    if (!lead) return;
+    document.getElementById('reply-id').value = id;
+    document.getElementById('reply-to').value = `${lead.name} <${lead.email}>`;
+    document.getElementById('reply-modal-title').textContent = `Reply to ${lead.name}`;
+    document.getElementById('reply-msg').value = ``;
+    document.getElementById('reply-modal').classList.remove('hidden');
+}
+
+function closeReplyModal() {
+    document.getElementById('reply-modal').classList.add('hidden');
+}
+
+async function sendReply() {
+    const id = document.getElementById('reply-id').value;
+    const msg = document.getElementById('reply-msg').value.trim();
+    if (!msg) return showToast("Message cannot be empty", true);
+
+    const btn = document.getElementById('btn-send-reply');
+    btn.textContent = "Sending...";
+    btn.disabled = true;
+
     try {
-        await api(`/admin/inquiries/${id}`, {
-            method: 'PUT',
-            body: JSON.stringify({ status: newStatus })
+        await api(`/admin/inquiries/${id}/reply`, {
+            method: 'POST',
+            body: JSON.stringify({ message: msg })
         });
-        // Reload after a short delay so the visual update matches the layout reflow
-        setTimeout(() => {
-            initInquiries();
-        }, 800);
+        showToast("Email sent successfully!");
+        closeReplyModal();
+        initInquiries();
     } catch (e) {
-        console.error("Silent status update failed:", e);
+        showToast("Failed to send email. Check API keys.", true);
+        console.error(e);
+    } finally {
+        btn.textContent = "Send Email";
+        btn.disabled = false;
     }
 }
 

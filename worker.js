@@ -281,6 +281,49 @@ export default {
           return jsonResponse({ success: true });
         }
 
+        const replyMatch = url.pathname.match(/^\/admin\/inquiries\/(\d+)\/reply$/);
+        if (method === "POST" && replyMatch) {
+          const { message: replyMessage } = await request.json();
+          const inquiryId = Number(replyMatch[1]);
+          
+          const result = await turso("SELECT name, email FROM inquiries WHERE id = ?", [inquiryId]);
+          if (result.rows.length === 0) return jsonResponse({ error: "Inquiry not found" }, 404);
+          
+          const clientEmail = result.rows[0].email;
+          const clientName = result.rows[0].name;
+          const fromEmail = env.EMAIL_FROM || "Paper.Media <onboarding@resend.dev>";
+          
+          let emailSent = false;
+          if (env.RESEND_API_KEY) {
+             const res = await fetch("https://api.resend.com/emails", {
+                method: "POST",
+                headers: { "Authorization": `Bearer ${env.RESEND_API_KEY}`, "Content-Type": "application/json" },
+                body: JSON.stringify({
+                  from: fromEmail, to: clientEmail, subject: `Reply from Paper.Media`,
+                  html: `<div style="font-family:sans-serif; max-width:600px; margin:0 auto;"><p>Hi ${clientName},</p><div style="white-space:pre-wrap; color:#333;">${replyMessage}</div></div>`
+                })
+              });
+              if (res.ok) emailSent = true;
+          } else if (env.SENDGRID_API_KEY) {
+             const res = await fetch("https://api.sendgrid.com/v3/mail/send", {
+                method: "POST",
+                headers: { "Authorization": `Bearer ${env.SENDGRID_API_KEY}`, "Content-Type": "application/json" },
+                body: JSON.stringify({
+                  personalizations: [{ to: [{ email: clientEmail }] }],
+                  from: { email: fromEmail.includes("<") ? fromEmail.split("<")[1].replace(">", "").trim() : fromEmail, name: "Paper.Media" },
+                  subject: `Reply from Paper.Media`,
+                  content: [{ type: "text/html", value: `<div style="font-family:sans-serif; max-width:600px; margin:0 auto;"><p>Hi ${clientName},</p><div style="white-space:pre-wrap; color:#333;">${replyMessage}</div></div>` }]
+                })
+              });
+              if (res.ok) emailSent = true;
+          }
+
+          if (!emailSent) return jsonResponse({ error: "Failed to send email. Ensure API keys are set." }, 500);
+
+          await turso("UPDATE inquiries SET status = 'replied' WHERE id = ?", [inquiryId]);
+          return jsonResponse({ success: true });
+        }
+
         if (method === "POST" && url.pathname === "/admin/content") {
           const updates = await request.json(); 
           for (let [key, value] of Object.entries(updates)) {
