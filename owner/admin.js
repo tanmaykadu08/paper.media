@@ -433,11 +433,27 @@ async function initInquiries() {
     document.getElementById('leads-list').innerHTML = data.inquiries.map(l => `
         <tr>
             <td><strong>${l.name}</strong><br><small>${l.email}</small></td>
-            <td><div style="font-size:12px; color:var(--muted); max-width:300px;">${l.message}</div></td>
-            <td><span class="badge badge-${l.status}">${l.status}</span></td>
-            <td><button class="btn-secondary" onclick="deleteLead(${l.id})">Delete</button></td>
+            <td><div style="font-size:12px; color:var(--muted); max-width:300px; white-space:pre-wrap;">${l.message}</div></td>
+            <td>
+                <div class="status-options">
+                    <button class="btn-status-opt ${l.status === 'new' ? 'active' : ''}" onclick="updateLeadStatus(${l.id}, 'new')">Unread</button>
+                    <button class="btn-status-opt ${l.status === 'read' ? 'active' : ''}" onclick="updateLeadStatus(${l.id}, 'read')">Read</button>
+                    <button class="btn-status-opt ${l.status === 'replied' ? 'active' : ''}" onclick="updateLeadStatus(${l.id}, 'replied')">Replied</button>
+                </div>
+            </td>
+            <td>
+                <div style="display:flex; gap:8px; align-items:center;">
+                    <a href="mailto:${l.email}?subject=Reply from Paper.Media&body=Hi ${encodeURIComponent(l.name)},%0D%0A%0D%0A" 
+                       onclick="updateLeadStatusSilent(${l.id}, 'replied')" 
+                       class="btn-primary" 
+                       style="font-size:12px; padding:8px 12px; text-decoration:none; display:inline-flex; align-items:center; font-weight:600; border-radius:8px; height:34px; line-height:1;">
+                       Reply
+                    </a>
+                    <button class="btn-secondary" style="font-size:12px; padding:8px 12px; border-radius:8px; color:var(--danger); height:34px; line-height:1;" onclick="deleteLead(${l.id})">Delete</button>
+                </div>
+            </td>
         </tr>
-    `).join('') || '<tr><td colspan="4" style="text-align:center;">No inquiries found.</td></tr>';
+    `).join('') || '<tr><td colspan="4" style="text-align:center; padding:40px;">No inquiries found.</td></tr>';
 }
 
 async function initHomepage() {
@@ -869,6 +885,34 @@ async function deleteLead(id) {
         showToast("Lead deleted");
         initInquiries();
     } catch (e) { showToast("Delete failed", true); }
+}
+
+async function updateLeadStatus(id, newStatus) {
+    try {
+        await api(`/admin/inquiries/${id}`, {
+            method: 'PUT',
+            body: JSON.stringify({ status: newStatus })
+        });
+        showToast("Status updated");
+        initInquiries();
+    } catch (e) {
+        showToast("Failed to update status", true);
+    }
+}
+
+async function updateLeadStatusSilent(id, newStatus) {
+    try {
+        await api(`/admin/inquiries/${id}`, {
+            method: 'PUT',
+            body: JSON.stringify({ status: newStatus })
+        });
+        // Reload after a short delay so the visual update matches the layout reflow
+        setTimeout(() => {
+            initInquiries();
+        }, 800);
+    } catch (e) {
+        console.error("Silent status update failed:", e);
+    }
 }
 
 async function exportLeads() {
