@@ -778,15 +778,24 @@ function renderServices() {
     document.getElementById('services-container').innerHTML = servicesData.map((s, i) => `
         <div class="card">
             <div class="grid-2">
-                <input type="text" value="${s.name}" onchange="servicesData[${i}].name=this.value" placeholder="Service Name">
-                <input type="text" value="${s.icon}" onchange="servicesData[${i}].icon=this.value" placeholder="Icon/Emoji">
+                <div class="form-group">
+                    <label>Service Title</label>
+                    <input type="text" value="${s.title || s.name || ''}" oninput="servicesData[${i}].title=this.value" placeholder="e.g. Reels Editing">
+                </div>
+                <div class="form-group">
+                    <label>Icon / Emoji</label>
+                    <input type="text" value="${s.icon || ''}" oninput="servicesData[${i}].icon=this.value" placeholder="🎬">
+                </div>
             </div>
-            <textarea style="margin-top:12px;" onchange="servicesData[${i}].desc=this.value">${s.desc}</textarea>
-            <button onclick="servicesData.splice(${i},1); renderServices()" style="margin-top:12px; color:var(--danger); border:none; background:none; cursor:pointer;">Remove</button>
+            <div class="form-group" style="margin-top:12px;">
+                <label>Description</label>
+                <textarea oninput="servicesData[${i}].desc=this.value" placeholder="Short description of this service">${s.desc || ''}</textarea>
+            </div>
+            <button onclick="servicesData.splice(${i},1); renderServices()" style="margin-top:12px; color:var(--danger); border:none; background:none; cursor:pointer; font-size:13px;">🗑 Remove</button>
         </div>
-    `).join('') || '<p>No services defined.</p>';
+    `).join('') || '<p>No services defined. Click "Add Service" to get started.</p>';
 }
-function addServiceRow() { servicesData.push({ name: '', icon: '', desc: '' }); renderServices(); }
+function addServiceRow() { servicesData.push({ title: '', icon: '', desc: '' }); renderServices(); }
 
 async function initPricing() {
     const data = await api('/content');
@@ -794,16 +803,53 @@ async function initPricing() {
     renderPricing();
 }
 function renderPricing() {
-    document.getElementById('pricing-grid').innerHTML = pricingData.map((p, i) => `
+    document.getElementById('pricing-grid').innerHTML = pricingData.map((p, i) => {
+        // Normalise features — might be an array or a newline-separated string
+        const feats = Array.isArray(p.features)
+            ? p.features
+            : typeof p.features === 'string' && p.features.trim()
+                ? p.features.split('\n').map(f => f.trim()).filter(Boolean)
+                : [];
+
+        const featureInputs = feats.map((f, fi) => `
+            <div style="display:flex; gap:8px; align-items:center; margin-bottom:6px;">
+                <input type="text" value="${f.replace(/"/g, '&quot;')}"
+                       oninput="pricingData[${i}].features[${fi}]=this.value"
+                       placeholder="Feature"
+                       style="flex:1;">
+                <button onclick="pricingData[${i}].features.splice(${fi},1); renderPricing()"
+                        style="color:var(--danger); border:none; background:none; cursor:pointer; font-size:18px; line-height:1;"
+                        title="Remove feature">×</button>
+            </div>
+        `).join('');
+
+        return `
         <div class="card">
-            <input type="text" value="${p.name}" onchange="pricingData[${i}].name=this.value" placeholder="Plan Name">
-            <input type="text" value="${p.price}" onchange="pricingData[${i}].price=this.value" style="margin-top:8px;">
-            <textarea style="margin-top:8px;" onchange="pricingData[${i}].desc=this.value">${p.desc}</textarea>
-            <button onclick="pricingData.splice(${i},1); renderPricing()" style="margin-top:12px; color:var(--danger); border:none; background:none; cursor:pointer;">Remove</button>
-        </div>
-    `).join('') || '<p>No pricing plans defined.</p>';
+            <div class="grid-2">
+                <div class="form-group">
+                    <label>Plan Title</label>
+                    <input type="text" value="${p.title || p.name || ''}" oninput="pricingData[${i}].title=this.value" placeholder="e.g. Basic">
+                </div>
+                <div class="form-group">
+                    <label>Price</label>
+                    <input type="text" value="${p.price || ''}" oninput="pricingData[${i}].price=this.value" placeholder="e.g. ₹2999/mo">
+                </div>
+            </div>
+            <div class="form-group" style="margin-top:12px;">
+                <label>Description</label>
+                <input type="text" value="${(p.desc || '').replace(/"/g, '&quot;')}" oninput="pricingData[${i}].desc=this.value" placeholder="Short plan description">
+            </div>
+            <div class="form-group" style="margin-top:12px;">
+                <label>Features (one per line)</label>
+                <div id="feat-list-${i}">${featureInputs}</div>
+                <button onclick="(pricingData[${i}].features = pricingData[${i}].features || []).push(''); renderPricing()"
+                        style="margin-top:8px; font-size:12px; color:var(--primary); border:none; background:none; cursor:pointer; font-weight:600;">+ Add Feature</button>
+            </div>
+            <button onclick="pricingData.splice(${i},1); renderPricing()" style="margin-top:12px; color:var(--danger); border:none; background:none; cursor:pointer; font-size:13px;">🗑 Remove Plan</button>
+        </div>`;
+    }).join('') || '<p>No pricing plans defined. Click "Add Plan" to get started.</p>';
 }
-function addPricingRow() { pricingData.push({ name: '', price: '', desc: '', features: [] }); renderPricing(); }
+function addPricingRow() { pricingData.push({ title: '', price: '', desc: '', features: [] }); renderPricing(); }
 
 async function initFounders() {
     const data = await api('/content');

@@ -371,11 +371,13 @@ function updateServices(services) {
     if (!grid || !services || services.length === 0) return;
     grid.innerHTML = '';
     services.forEach(s => {
+        // Support both field names (title = new standard, name = legacy)
+        const title = s.title || s.name || '';
         grid.innerHTML += `
             <div class="service-card spotlight-card reveal visible">
-                <span class="service-emoji">${s.icon}</span>
-                <div class="service-name">${s.title}</div>
-                <p class="service-desc">${s.desc}</p>
+                <span class="service-emoji">${s.icon || ''}</span>
+                <div class="service-name">${title}</div>
+                <p class="service-desc">${s.desc || ''}</p>
             </div>
         `;
     });
@@ -386,12 +388,23 @@ function updatePricing(pricing) {
     if (!grid || !pricing || pricing.length === 0) return;
     grid.innerHTML = '';
     pricing.forEach(p => {
-        const featuresHtml = p.features.map(f => `<li><span class="check">✓</span> ${f}</li>`).join('');
+        // Support both field names (title = new standard, name = legacy)
+        const title = p.title || p.name || 'Plan';
+
+        // Normalise features — might be array, newline-string, or missing
+        let feats = [];
+        if (Array.isArray(p.features)) {
+            feats = p.features.filter(Boolean);
+        } else if (typeof p.features === 'string' && p.features.trim()) {
+            feats = p.features.split('\n').map(f => f.trim()).filter(Boolean);
+        }
+
+        const featuresHtml = feats.map(f => `<li><span class="check">✓</span> ${f}</li>`).join('');
         grid.innerHTML += `
             <div class="pricing-card spotlight-card reveal visible">
-                <div class="p-tier">${p.title}</div>
-                <div class="p-price">${p.price}</div>
-                <p class="p-desc">${p.desc}</p>
+                <div class="p-tier">${title}</div>
+                <div class="p-price">${p.price || ''}</div>
+                <p class="p-desc">${p.desc || ''}</p>
                 <ul class="p-features">${featuresHtml}</ul>
                 <a href="contact.html" class="btn-dark magnetic" style="width:100%; display:block; text-align:center;">Get Started</a>
             </div>
