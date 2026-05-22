@@ -324,6 +324,12 @@
       return url;
     }
 
+    function isVideoContent(url) {
+      if (!url) return false;
+      const lower = url.toLowerCase();
+      return lower.includes('.mp4') || lower.includes('.webm') || lower.includes('.mov') || lower.includes('.ogg') || lower.includes('/video/upload/');
+    }
+
     function loadFeatured(items = []) {
       const container = document.getElementById('featuredPortfolio');
       if (!container) return;
@@ -340,23 +346,32 @@
         // Safe field mapping to handle various API response formats
         const rawVideo = item.video_url || item.video || item.reel_url;
         const rawImage = item.image_url || item.image || item.thumbnail || item.url;
-        const video = optimizeMedia(rawVideo);
-        const image = optimizeMedia(rawImage);
+        
+        let videoUrl = null;
+        let imageUrl = null;
+
+        if (rawVideo) {
+          videoUrl = optimizeMedia(rawVideo);
+          imageUrl = rawImage ? optimizeMedia(rawImage) : null;
+        } else if (rawImage && (isVideoContent(rawImage) || item.media_type === 'video')) {
+          videoUrl = optimizeMedia(rawImage);
+        } else {
+          imageUrl = optimizeMedia(rawImage);
+        }
         
         const title = item.title || item.name || "Untitled Project";
         const tag = item.tag || item.category || "Featured";
         const link = item.link || 'portfolio.html';
 
         // Check if there is valid media to prevent empty broken cards
-        if (!video && !image) return;
+        if (!videoUrl && !imageUrl) return;
 
         const card = document.createElement('div');
         card.className = 'port-card spotlight-card reveal';
         
-        const mediaHtml = video 
-          ? `<video src="${video}" autoplay muted loop playsinline preload="metadata" class="port-video"></video>
-             ${image ? `<img src="${image}" alt="${title}" class="port-img" loading="lazy">` : ''}`
-          : `<img src="${image || 'preview.jpg'}" alt="${title}" class="port-img" loading="lazy">`;
+        const mediaHtml = videoUrl 
+          ? `<video src="${videoUrl}" ${imageUrl ? `poster="${imageUrl}"` : ''} autoplay muted loop playsinline preload="metadata" class="port-video"></video>`
+          : `<img src="${imageUrl || 'preview.jpg'}" alt="${title}" class="port-img" loading="lazy">`;
 
         // The cinematic layout
         card.innerHTML = `
@@ -375,7 +390,7 @@
         `;
         
         // Ensure autoplay works on dynamic elements
-        if (video) {
+        if (videoUrl) {
           const v = card.querySelector('video');
           v.play().catch(() => {});
         }

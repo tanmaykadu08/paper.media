@@ -185,6 +185,12 @@
       return url;
     }
 
+    function isVideoContent(url) {
+      if (!url) return false;
+      const lower = url.toLowerCase();
+      return lower.includes('.mp4') || lower.includes('.webm') || lower.includes('.mov') || lower.includes('.ogg') || lower.includes('/video/upload/');
+    }
+
     // Specific portfolio loading for this page
     async function loadFeatured(items = []) {
       const container = document.getElementById('portfolioContainer');
@@ -204,31 +210,41 @@
           // Robust field mapping
           const rawVideo = item.video_url || item.video || item.reel_url;
           const rawImage = item.image_url || item.image || item.thumbnail || item.url;
-          const video = optimizeMedia(rawVideo);
-          const image = optimizeMedia(rawImage);
+          
+          let videoUrl = null;
+          let imageUrl = null;
+
+          if (rawVideo) {
+            videoUrl = optimizeMedia(rawVideo);
+            imageUrl = rawImage ? optimizeMedia(rawImage) : null;
+          } else if (rawImage && (isVideoContent(rawImage) || item.media_type === 'video')) {
+            videoUrl = optimizeMedia(rawImage);
+          } else {
+            imageUrl = optimizeMedia(rawImage);
+          }
           
           const title = item.title || item.name || "Portfolio Item";
           const tag = item.tag || item.category || "Portfolio";
           const link = item.link || '#';
 
           // Check if there is valid media to prevent empty broken cards
-          if (!video && !image && !item.emoji) return;
+          if (!videoUrl && !imageUrl && !item.emoji) return;
 
           const card = document.createElement('div');
           card.className = 'port-card spotlight-card reveal';
 
           let mediaContent = '';
-          if (video) {
-            mediaContent = `<video src="${video}" autoplay muted loop playsinline preload="metadata" class="port-video"></video>`;
-          } else if (image) {
-            mediaContent = `<img src="${image}" alt="${title}" class="port-img" loading="lazy">`;
+          if (videoUrl) {
+            mediaContent = `<video src="${videoUrl}" ${imageUrl ? `poster="${imageUrl}"` : ''} autoplay muted loop playsinline preload="metadata" class="port-video"></video>`;
+          } else if (imageUrl) {
+            mediaContent = `<img src="${imageUrl}" alt="${title}" class="port-img" loading="lazy">`;
           }
 
           // The cinematic layout
           card.innerHTML = `
             <div class="port-thumb" style="background:${item.bg_color || '#222'};">
               ${mediaContent}
-              ${(!video && !image) ? `<div style="display:flex;align-items:center;justify-content:center;height:100%;font-size:48px;">${item.emoji || '📸'}</div>` : ''}
+              ${(!videoUrl && !imageUrl) ? `<div style="display:flex;align-items:center;justify-content:center;height:100%;font-size:48px;">${item.emoji || '📸'}</div>` : ''}
               <div class="port-overlay">
                 <div class="play-icon">
                   <svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
@@ -241,7 +257,7 @@
             </div>
           `;
           
-          if (video) {
+          if (videoUrl) {
             const v = card.querySelector('video');
             v.play().catch(() => {});
           }
@@ -249,9 +265,9 @@
           // Add interactive video experience
           card.addEventListener('click', (e) => {
             e.preventDefault();
-            if (video) {
+            if (videoUrl) {
               if (typeof window.openLightbox === 'function') {
-                window.openLightbox(video);
+                window.openLightbox(videoUrl);
               }
             } else if (link && link !== '#') {
               window.open(link, '_blank');
