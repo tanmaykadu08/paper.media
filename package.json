@@ -1,0 +1,13 @@
+{
+  "name": "papermedia-backend",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev":    "wrangler dev",
+    "deploy": "wrangler deploy",
+    "sitemap": "node generate-sitemap.js"
+  },
+  "devDependencies": {
+    "wrangler": "^3.65.0"
+  }
+}

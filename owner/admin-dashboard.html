@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Paper.Media Admin</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Sora:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="admin.css">
+  <style>
+    /* Ensure no global hiding logic is affecting the dashboard */
+    body { background: #f5f1ea; margin: 0; overflow-x: hidden; }
+    
+    /* Clean Admin Layout */
+    .admin-layout {
+      display: flex;
+      height: 100vh;
+      width: 100vw;
+    }
+    
+    .sidebar {
+      width: 260px;
+      background: #ffffff;
+      border-right: 1px solid var(--border);
+      padding: 32px 16px;
+      flex-shrink: 0;
+      overflow-y: auto;
+    }
+    
+    #main-content {
+      flex: 1;
+      padding: 40px;
+      overflow-y: auto;
+    }
+    
+    .dashboard-home h1 {
+      margin-bottom: 24px;
+    }
+    
+    .stats-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+    }
+    
+    .card {
+      background: #ffffff;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 32px;
+      font-size: 18px;
+      font-weight: 600;
+    }
+    
+    /* Responsive Adjustments */
+    @media (max-width: 768px) {
+      .admin-layout {
+        flex-direction: column;
+      }
+      .sidebar {
+        width: 100%;
+        height: auto;
+        border-right: none;
+        border-bottom: 1px solid var(--border);
+      }
+      #main-content {
+        padding: 20px;
+      }
+      .stats-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="admin-layout">
+    <aside class="sidebar">
+      <div class="admin-logo">Paper<span>.</span>Media <sub>CMS</sub></div>
+      <nav class="nav-section" style="margin-top: 30px;">
+        <label>Main</label>
+        <button class="nav-btn active" data-page="dashboard" onclick="renderPage('dashboard')">🏠 Dashboard Overview</button>
+        <button class="nav-btn" data-page="portfolio" onclick="renderPage('portfolio')">📸 Portfolio Projects</button>
+        <button class="nav-btn" data-page="inquiries" onclick="renderPage('inquiries')">📩 Leads & Inquiries</button>
+        
+        <label style="margin-top:20px;">Content</label>
+        <button class="nav-btn" data-page="homepage" onclick="renderPage('homepage')">🏠 Homepage Hero</button>
+        <button class="nav-btn" data-page="services" onclick="renderPage('services')">⚡ Services</button>
+        <button class="nav-btn" data-page="pricing" onclick="renderPage('pricing')">💰 Pricing Plans</button>
+        <button class="nav-btn" data-page="founders" onclick="renderPage('founders')">👥 Founders</button>
+        <button class="nav-btn" data-page="appearance" onclick="renderPage('appearance')">🎨 Appearance</button>
+        <button class="nav-btn" data-page="settings" onclick="renderPage('settings')">⚙️ Site Settings</button>
+        
+        <button class="nav-btn logout-btn" onclick="logoutAdmin()" style="margin-top: 20px;">🚪 Logout</button>
+      </nav>
+    </aside>
+
+    <main class="main-wrapper">
+      <div id="main-content" class="content-body">
+        <!-- Content injected by admin.js -->
+        <div class="loading-view"><span>⌛</span> Loading Dashboard...</div>
+      </div>
+    </main>
+  </div>
+
+  <script src="admin.js"></script>
+</body>
+</html>
