@@ -28,7 +28,7 @@ async function loadSiteData() {
         showSkeletons('#testimonialsGrid', 'testimonial', 3);
     }
     if (path.includes('pricing.html')) {
-        showSkeletons('.pricing-grid', 'pricing', 3);
+        showSkeletons('.pricing-grid', 'pricing', 4);
     }
 
     try {
@@ -50,18 +50,39 @@ async function loadSiteData() {
         injectSEO(content);
         applyAppearance(content.appearance || {}, content.mobile || {});
 
+        const allContentItems = [
+            ...(Array.isArray(content.services) ? content.services : []),
+            ...(portData && Array.isArray(portData.items) ? portData.items : [])
+        ];
+
         // --- Services (home + services.html) ---
         if (isHome || path.includes('services.html')) {
-            const services = Array.isArray(content.services) ? content.services : [];
+            // Ensure Services section only renders items with type/category = "service"
+            const services = allContentItems.filter(item => 
+                item.type === 'service' || 
+                item.category === 'service' ||
+                (!item.type && !item.category && !item.video_url && !item.image_url) // safe fallback for legacy services
+            );
             clearSkeletons('.services-grid');
             updateServices(services);
         }
 
         // --- Portfolio ---
-        if (portData && typeof loadFeatured === 'function') {
+        if (typeof loadFeatured === 'function') {
+            // Featured Projects section only renders items with: featured_project, reel, portfolio_item
+            const validTypes = ['featured_project', 'reel', 'portfolio_item'];
+            const portfolioItems = allContentItems.filter(item => 
+                validTypes.includes(item.type) || 
+                validTypes.includes(item.category) ||
+                validTypes.includes(item.tag) ||
+                item.featured_project === true || 
+                item.reel === true || 
+                item.portfolio_item === true
+            );
+            
             clearSkeletons('#featuredPortfolio');
             clearSkeletons('.portfolio-grid');
-            loadFeatured(portData.items || []);
+            loadFeatured(portfolioItems);
         }
 
         // --- Testimonials (home only) ---
@@ -691,6 +712,46 @@ if (!('ontouchstart' in window) && navigator.maxTouchPoints === 0) {
         };
     });
 }
+// === LIGHTBOX VIDEO PLAYER ===
+window.openLightbox = function(videoSrc) {
+    let modal = document.getElementById('videoLightbox');
+    if (!modal) {
+        modal = document.createElement('div');
+        modal.className = 'lightbox-modal';
+        modal.id = 'videoLightbox';
+        modal.innerHTML = `
+            <div class="lightbox-content">
+                <div class="lightbox-close" id="lightboxClose">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                </div>
+                <video id="lightboxVideo" class="lightbox-video" controls playsinline></video>
+            </div>
+        `;
+        document.body.appendChild(modal);
+        
+        modal.querySelector('#lightboxClose').addEventListener('click', closeLightbox);
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) closeLightbox();
+        });
+    }
+    
+    const vid = modal.querySelector('#lightboxVideo');
+    vid.src = videoSrc;
+    modal.classList.add('active');
+    vid.play().catch(() => {});
+};
 
-
-
+window.closeLightbox = function() {
+    const modal = document.getElementById('videoLightbox');
+    if (modal) {
+        modal.classList.remove('active');
+        const vid = modal.querySelector('#lightboxVideo');
+        if (vid) {
+            vid.pause();
+            vid.src = '';
+        }
+    }
+};

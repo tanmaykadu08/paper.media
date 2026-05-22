@@ -178,6 +178,13 @@
 
   <script src="app.js" defer></script>
   <script>
+    function optimizeMedia(url) {
+      if (url && url.includes('res.cloudinary.com') && !url.includes('q_auto')) {
+        return url.replace('/upload/', '/upload/f_auto,q_auto/');
+      }
+      return url;
+    }
+
     // Specific portfolio loading for this page
     async function loadFeatured(items = []) {
       const container = document.getElementById('portfolioContainer');
@@ -195,34 +202,62 @@
         container.innerHTML = '';
         items.forEach(item => {
           // Robust field mapping
-          const video = item.video_url || item.video || item.reel_url;
-          const image = item.image_url || item.image || item.thumbnail || item.url;
+          const rawVideo = item.video_url || item.video || item.reel_url;
+          const rawImage = item.image_url || item.image || item.thumbnail || item.url;
+          const video = optimizeMedia(rawVideo);
+          const image = optimizeMedia(rawImage);
+          
           const title = item.title || item.name || "Portfolio Item";
           const tag = item.tag || item.category || "Portfolio";
           const link = item.link || '#';
+
+          // Check if there is valid media to prevent empty broken cards
+          if (!video && !image && !item.emoji) return;
 
           const card = document.createElement('div');
           card.className = 'port-card spotlight-card reveal';
 
           let mediaContent = '';
           if (video) {
-            mediaContent = `<video src="${video}" autoplay muted loop playsinline style="width:100%; height:100%; object-fit:cover; position:absolute; top:0; left:0; border-radius:inherit;"></video>`;
+            mediaContent = `<video src="${video}" autoplay muted loop playsinline preload="metadata" class="port-video"></video>`;
           } else if (image) {
-            mediaContent = `<img src="${image}" alt="${title}" style="width:100%; height:100%; object-fit:cover; position:absolute; top:0; left:0; border-radius:inherit;" loading="lazy">`;
+            mediaContent = `<img src="${image}" alt="${title}" class="port-img" loading="lazy">`;
           }
 
+          // The cinematic layout
           card.innerHTML = `
-          <a href="${link}" target="_blank" style="text-decoration:none; color:inherit;">
-            <div class="port-thumb" style="background:${item.bg_color || '#f5e6e8'}; position:relative; overflow:hidden;">
+            <div class="port-thumb" style="background:${item.bg_color || '#222'};">
               ${mediaContent}
               ${(!video && !image) ? `<div style="display:flex;align-items:center;justify-content:center;height:100%;font-size:48px;">${item.emoji || '📸'}</div>` : ''}
+              <div class="port-overlay">
+                <div class="play-icon">
+                  <svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+                </div>
+              </div>
             </div>
             <div class="port-info">
               <span class="port-tag">${tag}</span>
               <div class="port-name">${title}</div>
             </div>
-          </a>
-        `;
+          `;
+          
+          if (video) {
+            const v = card.querySelector('video');
+            v.play().catch(() => {});
+          }
+
+          // Add interactive video experience
+          card.addEventListener('click', (e) => {
+            e.preventDefault();
+            if (video) {
+              if (typeof window.openLightbox === 'function') {
+                window.openLightbox(video);
+              }
+            } else if (link && link !== '#') {
+              window.open(link, '_blank');
+            }
+          });
+
           container.appendChild(card);
         });
         
