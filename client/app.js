@@ -100,8 +100,8 @@ async function loadSiteData() {
             updatePricing(pricing);
         }
 
-        // --- Founders / About ---
-        if (path.includes('about.html')) {
+        // --- Founders / About (Moved to Home) ---
+        if (isHome) {
             const founders = Array.isArray(content.founders) ? content.founders : [];
             updateFounders(founders);
             const aboutIntro = document.querySelector('.creators-intro');
@@ -243,9 +243,9 @@ function updateHero(content) {
 
 function updateSettings(content) {
     // --- Logo ---
-    if (content.logo_url) {
-        document.querySelectorAll('.brand-logo, .footer-logo img, .footer-logo-img').forEach(img => img.src = content.logo_url);
-    }
+    // if (content.logo_url) {
+    //     document.querySelectorAll('.brand-logo, .footer-logo img, .footer-logo-img').forEach(img => img.src = content.logo_url);
+    // }
 
     // --- Meta Title ---
     if (content.meta_title) {
@@ -338,7 +338,7 @@ function injectSEO(content) {
             "@type": "Organization",
             "name": "Paper.Media",
             "url": "https://papermedia.co.in/",
-            "logo": content.logo_url || "https://papermedia.co.in/logo.png"
+            "logo": content.logo_url || "https://papermedia.co.in/paper-media-logo.jpg"
         };
         schemaScript.textContent = JSON.stringify(schemaData);
     }
