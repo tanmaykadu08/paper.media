@@ -21,9 +21,19 @@ body {
   font-family: 'Inter', sans-serif;
   overflow-x: hidden;
   -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
   line-height: 1.6;
   cursor: none;
   position: relative;
+}
+
+body.internal-page {
+  padding-top: var(--nav-height);
+}
+
+::selection {
+  background: var(--primary);
+  color: #fff;
 }
 
 
@@ -546,19 +556,23 @@ nav.main-nav.scrolled {
   flex: 1;
   overflow-y: auto;
   overflow-x: hidden;
-  padding: 0 24px;
+  padding: 24px;
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  /* Allow scroll instead of sticking to center and getting cut off */
+  justify-content: flex-start;
 }
 
+.mobile-nav-section,
 .mobile-nav-links {
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 32px;
   width: 100%;
+  margin: auto 0;
 }
 
+.mobile-nav-section a.main-link,
 .mobile-nav-links a.main-link {
   font-size: clamp(24px, 8vw, 32px);
   font-family: 'Sora', sans-serif;
@@ -566,9 +580,11 @@ nav.main-nav.scrolled {
   color: #000;
   text-decoration: none;
   transition: color 0.3s ease;
-  line-height: 1.2;
+  line-height: 1.4;
 }
 
+.mobile-nav-section a.main-link:hover, 
+.mobile-nav-section a.main-link.active,
 .mobile-nav-links a.main-link:hover, 
 .mobile-nav-links a.main-link.active {
   color: var(--primary);
@@ -2108,44 +2124,75 @@ a.footer-contact-value:hover {
 
 @media (max-width: 768px) {
   .footer-top {
-    grid-template-columns: 1fr 1fr !important;
-    gap: 40px 24px !important;
-    padding: 44px 0 36px;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    text-align: center !important;
+    gap: 28px !important;
+    padding: 32px 0 24px !important;
   }
   
   .footer-col {
-    grid-column: span 1;
-    text-align: left;
-  }
-  
-  .footer-brand {
-    grid-column: 1 / -1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    gap: 12px;
   }
 
-  .footer-tagline { max-width: 100%; }
+  .footer-brand {
+    align-items: center;
+    margin-bottom: 8px;
+  }
+
+  .footer-logo-img { margin: 0 auto 12px; }
+  .footer-tagline { max-width: 100%; text-align: center; }
+  
+  .footer-socials { 
+    justify-content: center; 
+    margin-top: 8px; 
+  }
+
+  .footer-links { 
+    align-items: center; 
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 16px;
+  }
+  
+  .footer-col-title {
+    margin-bottom: 4px;
+  }
+
+  .footer-col-contact {
+    gap: 8px;
+  }
+
+  .footer-contact-item { 
+    align-items: center; 
+    margin-bottom: 8px;
+  }
+
+  .footer-whatsapp-btn { margin: 8px auto 0; }
 
   .footer-bottom {
     flex-direction: column;
-    align-items: flex-start;
+    align-items: center;
     gap: 12px;
-    padding: 18px 0;
-  }
-}
-
-@media (max-width: 480px) {
-  .footer-top {
-    grid-template-columns: 1fr !important;
-    gap: 32px !important;
+    padding: 16px 0;
+    text-align: center;
   }
   
-  .footer-col {
-    grid-column: 1 / -1;
+  .footer-legal { 
+    justify-content: center; 
+    flex-wrap: wrap; 
+    gap: 8px 12px; 
   }
-
-  .footer-brand { grid-column: auto; }
-  .footer-col-contact { flex-direction: column; gap: 16px; }
-
-  .footer-legal { flex-wrap: wrap; gap: 4px 8px; }
+  
   .footer-legal-dot { display: none; }
 }
 
@@ -2520,7 +2567,7 @@ a.footer-contact-value:hover {
   }
 
   nav { padding: 0 32px; }
-  .brand-logo { height: 45px; }
+  .brand-logo { height: 50px; }
   .section { padding: var(--space-xl) 0; }
   .hero-title { font-size: clamp(36px, 5vw, 60px); }
 
@@ -2587,7 +2634,7 @@ a.footer-contact-value:hover {
   }
   .nav-links, .nav-cta { display: none !important; }
   .hamburger { display: flex !important; }
-  .brand-logo { height: 45px; }
+  .brand-logo { height: 50px; }
 
   /* ── Hero ── */
   #home {
