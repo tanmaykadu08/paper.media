@@ -226,7 +226,7 @@
 
           let mediaContent = '';
           if (videoUrl) {
-            mediaContent = `<video src="${videoUrl}" ${imageUrl ? `poster="${imageUrl}"` : ''} autoplay muted loop playsinline preload="metadata" class="port-video"></video>`;
+            mediaContent = `<video src="${videoUrl}" ${imageUrl ? `poster="${imageUrl}"` : ''} autoplay muted loop playsinline controls preload="metadata" class="port-video" style="border-radius: 16px;"></video>`;
           } else if (imageUrl) {
             mediaContent = `<img src="${imageUrl}" alt="${title}" class="port-img" loading="lazy">`;
           }

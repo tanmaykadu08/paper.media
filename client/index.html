@@ -440,7 +440,7 @@
         card.className = 'port-card spotlight-card reveal';
         
         const mediaHtml = videoUrl 
-          ? `<video src="${videoUrl}" ${imageUrl ? `poster="${imageUrl}"` : \'\'} autoplay muted loop playsinline controls preload="metadata" class="port-video" style="border-radius: 16px;"></video>`
+          ? `<video src="${videoUrl}" ${imageUrl ? `poster="${imageUrl}"` : ''} autoplay muted loop playsinline controls preload="metadata" class="port-video" style="border-radius: 16px;"></video>`
           : `<img src="${imageUrl || 'preview.jpg'}" alt="${title}" class="port-img" loading="lazy">`;
 
         // The cinematic layout
