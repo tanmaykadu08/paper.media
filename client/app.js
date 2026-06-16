@@ -1,8 +1,7 @@
 // === GLOBAL APP LOGIC ===
 
 document.addEventListener('DOMContentLoaded', () => {
-    initCursor();
-    initNavbar();
+        initNavbar();
     initScrollReveal();
     initMagnetic();
     loadSiteData(); // Load CMS content
@@ -526,80 +525,6 @@ function updateTestimonials(reviews) {
 // ... existing helper functions (initCursor, initNavbar, etc.) remains same ...
 
 // === CUSTOM CURSOR ===
-function initCursor() {
-    const cursor = document.getElementById('cursor');
-    if (!cursor) return;
-    
-    const isTouch = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
-    if (isTouch) {
-        cursor.style.display = 'none';
-        return;
-    }
-
-    let mouseX = window.innerWidth / 2;
-    let mouseY = window.innerHeight / 2;
-    let cursorX = mouseX;
-    let cursorY = mouseY;
-
-    document.addEventListener('mousemove', (e) => {
-        mouseX = e.clientX;
-        mouseY = e.clientY;
-    });
-
-    const trailCount = 8;
-    const trails = [];
-    for (let i = 0; i < trailCount; i++) {
-        const dot = document.createElement('div');
-        dot.className = 'cursor-trail';
-        document.body.appendChild(dot);
-        trails.push({ x: mouseX, y: mouseY, el: dot });
-    }
-
-    let rotation = 0;
-
-    function renderCursor() {
-        const dx = mouseX - cursorX;
-        const dy = mouseY - cursorY;
-        cursorX += dx * 0.35;
-        cursorY += dy * 0.35;
-
-        if (Math.abs(dx) > 1 || Math.abs(dy) > 1) {
-            const targetRotation = Math.atan2(dy, dx) * 180 / Math.PI + 45;
-            let dRotation = targetRotation - rotation;
-            if (dRotation > 180) dRotation -= 360;
-            if (dRotation < -180) dRotation += 360;
-            rotation += dRotation * 0.15;
-        }
-
-        cursor.style.transform = `translate3d(${cursorX}px, ${cursorY}px, 0) translate(-50%, -50%) rotate(${rotation}deg)`;
-
-        trails[0].x = cursorX;
-        trails[0].y = cursorY;
-        for (let i = 1; i < trailCount; i++) {
-            trails[i].x += (trails[i - 1].x - trails[i].x) * 0.4;
-            trails[i].y += (trails[i - 1].y - trails[i].y) * 0.4;
-        }
-        trails.forEach((trail, i) => {
-            trail.el.style.transform = `translate3d(${trail.x}px, ${trail.y}px, 0) translate(-50%, -50%)`;
-            trail.el.style.opacity = 1 - (i / trailCount);
-            trail.el.style.transform += ` scale(${1 - (i / trailCount) * 0.5})`;
-        });
-
-        requestAnimationFrame(renderCursor);
-    }
-    requestAnimationFrame(renderCursor);
-
-    document.addEventListener('mouseover', (e) => {
-        if (e.target.closest('a, button, .magnetic, .port-card, .service-card, .building-card, .testimonial-card')) {
-            cursor.classList.add('hovered');
-        }
-    });
-    document.addEventListener('mouseout', (e) => {
-        if (e.target.closest('a, button, .magnetic, .port-card, .service-card, .building-card, .testimonial-card')) {
-            cursor.classList.remove('hovered');
-        }
-    });
-}
 
 // === NAVBAR & MOBILE MENU ===
 function initNavbar() {
@@ -633,6 +558,10 @@ function initNavbar() {
         };
 
         hamburger.addEventListener('click', toggleMenu);
+
+        // Wire up the in-drawer close button if present
+        const closeBtn = document.getElementById('mobileNavClose');
+        if (closeBtn) closeBtn.addEventListener('click', closeMenu);
 
         if (navOverlay) {
             navOverlay.addEventListener('click', closeMenu);
