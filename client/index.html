@@ -169,7 +169,6 @@
       <div class="reveal" style="text-align: center; margin-top: var(--space-xl);">
         <a href="services.html" class="btn-outline magnetic">Explore All Services →</a>
       </div>
-      <div class="portfolio-grid" id="featuredPortfolio"></div>
     </div>
   </section>
 
@@ -434,19 +433,23 @@
         const link = item.link || 'portfolio.html';
 
         // Check if there is valid media to prevent empty broken cards
-        if (!videoUrl && !imageUrl) return;
+        if (!videoUrl && !imageUrl && !item.emoji) return;
 
         const card = document.createElement('div');
         card.className = 'port-card spotlight-card reveal';
-        
-        const mediaHtml = videoUrl 
-          ? `<video src="${videoUrl}" ${imageUrl ? `poster="${imageUrl}"` : ''} autoplay muted loop playsinline controls preload="metadata" class="port-video" style="border-radius: 16px;"></video>`
-          : `<img src="${imageUrl || 'preview.jpg'}" alt="${title}" class="port-img" loading="lazy">`;
+
+        let mediaContent = '';
+        if (videoUrl) {
+          mediaContent = `<video src="${videoUrl}" ${imageUrl ? `poster="${imageUrl}"` : ''} autoplay muted loop playsinline controls preload="metadata" class="port-video" style="border-radius: 16px;"></video>`;
+        } else if (imageUrl) {
+          mediaContent = `<img src="${imageUrl}" alt="${title}" class="port-img" loading="lazy">`;
+        }
 
         // The cinematic layout
         card.innerHTML = `
-          <div class="port-thumb">
-            ${mediaHtml}
+          <div class="port-thumb" style="background:${item.bg_color || '#222'};">
+            ${mediaContent}
+            ${(!videoUrl && !imageUrl) ? `<div style="display:flex;align-items:center;justify-content:center;height:100%;font-size:48px;">${item.emoji || '📸'}</div>` : ''}
             <div class="port-overlay">
               <div class="play-icon">
                 <svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>

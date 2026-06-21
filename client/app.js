@@ -49,39 +49,20 @@ async function loadSiteData() {
         injectSEO(content);
         applyAppearance(content.appearance || {}, content.mobile || {});
 
-        const allContentItems = [
-            ...(Array.isArray(content.services) ? content.services : []),
-            ...(portData && Array.isArray(portData.items) ? portData.items : [])
-        ];
+        const servicesData = Array.isArray(content.services) ? content.services : [];
+        const portfolioData = portData && Array.isArray(portData.items) ? portData.items : [];
 
         // --- Services (home + services.html) ---
         if (isHome || path.includes('services.html')) {
-            // Ensure Services section only renders items with type/category = "service"
-            const services = allContentItems.filter(item => 
-                item.type === 'service' || 
-                item.category === 'service' ||
-                (!item.type && !item.category && !item.video_url && !item.image_url) // safe fallback for legacy services
-            );
             clearSkeletons('.services-grid');
-            updateServices(services);
+            updateServices(servicesData);
         }
 
         // --- Portfolio ---
         if (typeof loadFeatured === 'function') {
-            // Featured Projects section only renders items with: featured_project, reel, portfolio_item
-            const validTypes = ['featured_project', 'reel', 'portfolio_item'];
-            const portfolioItems = allContentItems.filter(item => 
-                validTypes.includes(item.type) || 
-                validTypes.includes(item.category) ||
-                validTypes.includes(item.tag) ||
-                item.featured_project === true || 
-                item.reel === true || 
-                item.portfolio_item === true
-            );
-            
             clearSkeletons('#featuredPortfolio');
             clearSkeletons('.portfolio-grid');
-            loadFeatured(portfolioItems);
+            loadFeatured(portfolioData);
         }
 
         // --- Testimonials (home only) ---
@@ -106,6 +87,12 @@ async function loadSiteData() {
             const aboutIntro = document.querySelector('.creators-intro');
             if (aboutIntro && content.founders_intro) aboutIntro.innerHTML = content.founders_intro;
         }
+
+        // Re-initialize animations for newly added elements
+        setTimeout(() => {
+            initScrollReveal();
+            if (typeof initMagnetic === 'function') initMagnetic();
+        }, 100);
 
     } catch (err) {
         console.error('CMS load error:', err);
@@ -597,7 +584,7 @@ function initNavbar() {
 
 // === SCROLL REVEAL ===
 function initScrollReveal() {
-    const reveals = document.querySelectorAll('.reveal');
+    const reveals = document.querySelectorAll('.reveal:not(.visible)');
     if (!reveals.length) return;
     const obs = new IntersectionObserver((entries) => {
         entries.forEach((entry) => {
