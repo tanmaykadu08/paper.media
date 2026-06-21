@@ -225,8 +225,26 @@ const PAGES = {
     `,
     medialib: () => `
         <h1>Media Library</h1>
-        <p>Manage all assets used across the site.</p>
-        <div id="media-grid" class="grid-3" style="margin-top:32px;"></div>
+        <p>Manage all assets used across the site or browse your Cloudinary folders.</p>
+        
+        <div style="display:flex; gap:12px; margin-top:20px; margin-bottom:20px;">
+            <button class="btn-primary" id="tab-added-media" onclick="switchMediaTab('added')">Added Media</button>
+            <button class="btn-secondary" id="tab-cloud-folders" onclick="switchMediaTab('folders')">Cloudinary Folders</button>
+        </div>
+
+        <div id="view-added-media">
+            <div id="media-grid" class="grid-3" style="margin-top:20px;"></div>
+        </div>
+
+        <div id="view-cloud-folders" style="display:none;">
+            <div style="display:flex; gap:12px; margin-bottom:20px;">
+                <select id="cloudinary-folder-select" class="form-group" style="flex:1; max-width:300px; margin:0;" onchange="loadCloudinaryFolder(this.value)">
+                    <option value="">Select Folder...</option>
+                </select>
+                <button class="btn-secondary" onclick="loadCloudinaryFolders(true)">↻ Refresh Folders</button>
+            </div>
+            <div id="cloud-media-grid" class="grid-3"></div>
+        </div>
     `,
     appearance: () => `
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:40px;">
@@ -880,15 +898,108 @@ function renderFounders() {
 function addFounderRow() { foundersData.push({ name: '', role: '', image: '' }); renderFounders(); }
 
 async function initMediaLib() {
+    switchMediaTab('added');
+}
+
+function switchMediaTab(tab) {
+    if (tab === 'added') {
+        document.getElementById('tab-added-media').className = 'btn-primary';
+        document.getElementById('tab-cloud-folders').className = 'btn-secondary';
+        document.getElementById('view-added-media').style.display = 'block';
+        document.getElementById('view-cloud-folders').style.display = 'none';
+        loadAddedMedia();
+    } else {
+        document.getElementById('tab-added-media').className = 'btn-secondary';
+        document.getElementById('tab-cloud-folders').className = 'btn-primary';
+        document.getElementById('view-added-media').style.display = 'none';
+        document.getElementById('view-cloud-folders').style.display = 'block';
+        loadCloudinaryFolders();
+    }
+}
+
+async function loadAddedMedia() {
     const data = await api('/portfolio');
     document.getElementById('media-grid').innerHTML = data.items.map(item => `
         <div class="card" style="padding:10px; text-align:center;">
-            <div style="height:80px; background:#f0f0f0; margin-bottom:10px;">
-                ${item.video_url ? '🎥 Video' : `<img src="${item.image_url}" style="width:100%; height:100%; object-fit:contain;">`}
+            <div style="height:120px; background:#f0f0f0; margin-bottom:10px; border-radius:8px; overflow:hidden;">
+                ${item.video_url 
+                    ? '<div style="display:flex;align-items:center;justify-content:center;height:100%;font-size:24px;background:#000;color:#fff;">🎥</div>' 
+                    : `<img src="${item.image_url}" style="width:100%; height:100%; object-fit:cover;">`
+                }
             </div>
-            <button class="btn-secondary" style="font-size:10px; width:100%;" onclick="navigator.clipboard.writeText('${item.image_url || item.video_url}'); showToast('URL Copied')">Copy URL</button>
+            <p style="font-size:11px; margin-bottom:8px; color:var(--muted); text-overflow:ellipsis; overflow:hidden; white-space:nowrap;">${item.title || 'Untitled'}</p>
+            <button class="btn-secondary" style="font-size:10px; width:100%; padding:6px;" onclick="navigator.clipboard.writeText('${item.image_url || item.video_url}'); showToast('URL Copied')">Copy URL</button>
         </div>
     `).join('') || '<p>No assets in library.</p>';
+}
+
+async function loadCloudinaryFolders(force = false) {
+    const sel = document.getElementById('cloudinary-folder-select');
+    if (!force && sel.options.length > 1) return; // already loaded
+    try {
+        sel.innerHTML = '<option value="">Loading folders...</option>';
+        const res = await api('/admin/media/folders');
+        if (res && res.folders) {
+            sel.innerHTML = '<option value="">Select Folder...</option>' + res.folders.map(f => `<option value="${f.path}">${f.name}</option>`).join('');
+        } else {
+            sel.innerHTML = '<option value="">Failed to load</option>';
+        }
+    } catch(e) {
+        sel.innerHTML = '<option value="">Error loading</option>';
+    }
+}
+
+async function loadCloudinaryFolder(folderName) {
+    if (!folderName) {
+        document.getElementById('cloud-media-grid').innerHTML = '';
+        return;
+    }
+    const grid = document.getElementById('cloud-media-grid');
+    grid.innerHTML = '<p>Loading folder contents...</p>';
+    try {
+        const res = await api('/admin/media/search', { method: 'POST', body: JSON.stringify({ folder: folderName }) });
+        if (res && res.resources) {
+            grid.innerHTML = res.resources.map(item => `
+                <div class="card" style="padding:10px; text-align:center;">
+                    <div style="height:120px; background:#f0f0f0; margin-bottom:10px; border-radius:8px; overflow:hidden; position:relative;">
+                        ${item.resource_type === 'video'
+                            ? `<video src="${item.secure_url}" style="width:100%; height:100%; object-fit:cover;" muted loop onmouseenter="this.play()" onmouseleave="this.pause()"></video><span style="position:absolute;top:4px;right:4px;background:rgba(0,0,0,0.7);color:#fff;font-size:9px;padding:2px 4px;border-radius:4px;">VIDEO</span>`
+                            : `<img src="${item.secure_url.replace('/upload/', '/upload/w_300,c_fill,g_auto,q_auto,f_auto/')}" style="width:100%; height:100%; object-fit:cover;">`
+                        }
+                    </div>
+                    <div style="display:flex; gap:6px;">
+                        <button class="btn-primary" style="font-size:10px; flex:1; padding:6px;" onclick="addMediaToPortfolio('${item.secure_url}', '${item.resource_type}')">Add to Website</button>
+                        <button class="btn-secondary" style="font-size:10px; flex:1; padding:6px;" onclick="navigator.clipboard.writeText('${item.secure_url}'); showToast('URL Copied')">Copy URL</button>
+                    </div>
+                </div>
+            `).join('') || '<p>No media found in this folder.</p>';
+        }
+    } catch (e) {
+        grid.innerHTML = '<p style="color:var(--danger)">Error fetching folder contents.</p>';
+    }
+}
+
+function addMediaToPortfolio(url, type) {
+    // Navigate to Portfolio tab
+    renderPage('portfolio');
+    
+    // Wait for render
+    setTimeout(() => {
+        openProjectModal();
+        if (type === 'video') {
+            document.getElementById('p-video').value = url;
+            document.getElementById('p-vid-preview').innerHTML = `<div style="font-size:11px; color:green; font-weight:600;">✅ Video Ready</div>`;
+        } else {
+            document.getElementById('p-image').value = url;
+            document.getElementById('p-img-preview').innerHTML = `
+                <div style="position:relative;">
+                    <img src="${url.replace('/upload/', '/upload/w_200,f_auto/')}" style="height:60px; border-radius:4px; border:1px solid #ddd;">
+                    <div style="position:absolute; top:-5px; right:-5px; background:green; color:white; border-radius:50%; width:16px; height:16px; display:flex; align-items:center; justify-content:center; font-size:10px;">✓</div>
+                </div>
+            `;
+        }
+        showToast("Media linked! Add details and Save.");
+    }, 100);
 }
 
 async function initAppearance() {

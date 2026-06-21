@@ -214,6 +214,37 @@ export default {
           });
         }
 
+        if (method === "GET" && url.pathname === "/admin/media/folders") {
+          const cloudName = env.CLOUDINARY_CLOUD_NAME;
+          const auth = btoa(`${env.CLOUDINARY_API_KEY}:${env.CLOUDINARY_API_SECRET}`);
+          const res = await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/folders`, {
+            headers: { 'Authorization': `Basic ${auth}` }
+          });
+          const data = await res.json();
+          return jsonResponse(data);
+        }
+
+        if (method === "POST" && url.pathname === "/admin/media/search") {
+          const { folder } = await request.json();
+          const cloudName = env.CLOUDINARY_CLOUD_NAME;
+          const auth = btoa(`${env.CLOUDINARY_API_KEY}:${env.CLOUDINARY_API_SECRET}`);
+          
+          const res = await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/resources/search`, {
+            method: 'POST',
+            headers: {
+              'Authorization': `Basic ${auth}`,
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+              expression: `folder="${folder}"`,
+              max_results: 500,
+              sort_by: [{ created_at: "desc" }]
+            })
+          });
+          const data = await res.json();
+          return jsonResponse(data);
+        }
+
         if (method === "POST" && url.pathname === "/admin/portfolio") {
             const { title, tag, emoji, bg_color, image_url, video_url, description, link, is_featured, sort_order } = await request.json();
             await turso(
